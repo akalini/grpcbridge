@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.google.protobuf'
+    apply plugin: 'idea'
+
+    repositories {
+        jcenter()
+    }
+
+    ext {
+        ver = [
+                protobuf: '3.0.0',
+                grpc: '0.15.0'
+        ]
+    }
+
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.21'
+
+        compile group: 'com.google.protobuf', name: 'protobuf-java', version: ver.protobuf
+        compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: ver.protobuf
+        compile group: 'io.grpc', name: 'grpc-protobuf', version: ver.grpc
+
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.assertj:assertj-core-java8:1.0.0m1'
+    }
+
+    protobuf {
+        protoc {
+            artifact = 'com.google.protobuf:protoc:' + ver.protobuf
+        }
+
+        plugins {
+            grpc {
+                artifact = 'io.grpc:protoc-gen-grpc-java:' + ver.grpc
+            }
+        }
+
+        generateProtoTasks {
+            all()*.plugins {
+                grpc {}
+            }
+        }
+    }
+
+    idea {
+        module {
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/grpc");
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/java");
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/grpc");
+        }
+    }
+}
