@@ -1,0 +1,134 @@
+syntax = "proto3";
+package grpcbridge.test.proto;
+
+import "google/api/annotations.proto";
+
+enum Enum { INVALID = 0; VALID = 1; }
+
+message Nested {
+  string nestedField = 1;
+}
+
+message GetRequest {
+  string stringField = 1;
+  int32 intField = 2;
+  int64 longField = 3;
+  float floatField = 4;
+  double doubleField = 5;
+  bool boolField = 6;
+  bytes bytesField = 7;
+  Enum enumField = 8;
+  Nested nested = 9;
+}
+
+message GetResponse {
+  string stringField = 1;
+  int32 intField = 2;
+  int64 longField = 3;
+  float floatField = 4;
+  double doubleField = 5;
+  bool boolField = 6;
+  bytes bytesField = 7;
+  Enum enumField = 8;
+  Nested nested = 9;
+}
+
+message PostRequest {
+  string stringField = 1;
+  int32 intField = 2;
+}
+
+message PostResponse {
+  string stringField = 1;
+  int32 intField = 2;
+}
+
+message PutRequest {
+  string stringField = 1;
+}
+
+message PutResponse {
+  string stringField = 1;
+}
+
+message DeleteRequest {
+  string stringField = 1;
+}
+
+message DeleteResponse {
+  string stringField = 1;
+}
+
+message PatchRequest {
+  string stringField = 1;
+}
+
+message PatchResponse {
+  string stringField = 1;
+}
+
+
+service TestService {
+  rpc Get (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get/{stringField}"
+    };
+  }
+
+  rpc GetMultipleParams (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-multi/{stringField}/{intField}/{longField}/{floatField}/{doubleField}/{boolField}/{bytesField}/{enumField}"
+    };
+  }
+
+  rpc GetNestedParams (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-nested/{nested.nestedField}"
+    };
+  }
+
+  rpc GetUnknownPath (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-unknown-path/{unknown.name}"
+    };
+  }
+
+  rpc GetUnknownParam (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-unknown-param/{nested.unknown}"
+    };
+  }
+
+  rpc Post (PostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+        post: "/post/{stringField}"
+        body: "*"
+    };
+  }
+
+  rpc PostCustomBody (PostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+        post: "/post_custom/{stringField}"
+        body: "{intField}"
+    };
+  }
+
+  rpc Put (PutRequest) returns (PutResponse) {
+    option (google.api.http) = {
+        put: "/put/{stringField}"
+        body: "*"
+    };
+  }
+
+  rpc Delete (DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+        delete: "/delete/{stringField}"
+    };
+  }
+
+  rpc Patch (PatchRequest) returns (PatchResponse) {
+    option (google.api.http) = {
+        patch: "/patch/{stringField}"
+    };
+  }
+}
