@@ -1,3 +1,23 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+    id 'maven'
+    id 'maven-publish'
+}
+
+group = 'grpcbridge'
+version = '1.0.0'
+
+publishing {
+    publications {
+        lib(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId 'lib'
+            version version
+        }
+    }
+}
+
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
     compile group: 'io.grpc', name: 'grpc-netty', version: ver.grpc
@@ -6,3 +26,26 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'ch.qos.logback:logback-classic:1.1.7'
 }
+
+bintray {
+    user = 'akalini'
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['lib']
+
+    pkg {
+        repo = 'maven'
+        name = 'grpcbridge'
+        userOrg = 'akalini'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/akalini/grpcbridge'
+
+        version {
+            name = '1.0.0'
+            desc = 'Expose your gRPC based API as a set of HTTP RESTful endpoints. HTTP framework agnostic.'
+            released  = new Date()
+        }
+    }
+}
+
+
+

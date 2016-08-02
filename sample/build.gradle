@@ -11,4 +11,3 @@ dependencies {
 
     compile "com.sparkjava:spark-core:2.5"
 }
-
