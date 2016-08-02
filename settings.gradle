@@ -1,3 +1,4 @@
 include 'lib'
+include 'sample'
 
 rootProject.name = 'grpc-bridge'
