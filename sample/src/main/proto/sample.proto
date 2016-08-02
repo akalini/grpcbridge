@@ -1,0 +1,66 @@
+syntax = "proto3";
+package grpcbridge.sample.proto;
+
+import "google/api/annotations.proto";
+
+enum Enum { INVALID = 0; VALID = 1; }
+
+message Nested {
+  string nestedField = 1;
+}
+
+message PostRequest {
+  string stringField = 1;
+  int32 intField = 2;
+  double doubleField = 3;
+  bool boolField = 4;
+  Enum enumField = 5;
+  Nested nested= 6;
+}
+
+message PostResponse {
+  string stringField = 1;
+  int32 intField = 2;
+  double doubleField = 3;
+  bool boolField = 4;
+  Enum enumField = 5;
+  Nested nested = 6;
+}
+
+message GetRequest {
+  string stringField = 1;
+  int32 intField = 2;
+  double doubleField = 3;
+  bool boolField = 4;
+  Enum enumField = 5;
+  Nested nested = 6;
+}
+
+message GetResponse {
+  string stringField = 1;
+  int32 intField = 2;
+  double doubleField = 3;
+  bool boolField = 4;
+  Enum enumField = 5;
+  Nested nested = 6;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Sample Service.
+//
+
+service SampleService {
+  rpc Post (PostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+        post: "/post/{stringField}"
+        body: "*"
+    };
+  }
+
+  rpc Get (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get/{stringField}"
+    };
+  }
+}
