@@ -5,14 +5,14 @@ plugins {
 }
 
 group = 'grpcbridge'
-version = '1.0.0'
+version = '1.0.1'
 
 publishing {
     publications {
         lib(MavenPublication) {
             from components.java
             groupId group
-            artifactId 'lib'
+            artifactId 'grpcbridge'
             version version
         }
     }
@@ -46,6 +46,3 @@ bintray {
         }
     }
 }
-
-
-
