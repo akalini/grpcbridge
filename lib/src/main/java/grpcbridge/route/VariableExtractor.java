@@ -33,7 +33,8 @@ final class VariableExtractor {
             vars.add(varName);
             matcher.appendReplacement(pathPatternBuilder, VAR_SEGMENT);
         }
-        this.pattern = Pattern.compile(pathPatternBuilder.toString());
+        String pathPattern = pathPatternBuilder.toString();
+        this.pattern = Pattern.compile(pathPattern.isEmpty() ? pattern : pathPattern);
     }
 
     /**
