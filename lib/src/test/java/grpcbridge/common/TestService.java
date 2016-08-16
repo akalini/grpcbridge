@@ -1,7 +1,6 @@
 package grpcbridge.common;
 
 import com.google.protobuf.TextFormat;
-import grpcbridge.test.proto.Test;
 import grpcbridge.test.proto.Test.*;
 import grpcbridge.test.proto.TestServiceGrpc;
 import io.grpc.stub.StreamObserver;
@@ -29,6 +28,11 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 .setNested(request.getNested())
                 .build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getStatic(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+        get(request, responseObserver);
     }
 
     @Override

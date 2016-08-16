@@ -57,6 +57,11 @@ public final class Route {
         }
     }
 
+    @Override
+    public String toString() {
+        return descriptor.getFullName();
+    }
+
     private Message newRpcRequest() {
         return impl
                 .getMethodDescriptor()
