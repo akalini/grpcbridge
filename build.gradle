@@ -19,8 +19,8 @@ allprojects {
 
     ext {
         ver = [
-                protobuf: '3.0.0',
-                grpc: '0.15.0'
+            protobuf: '3.0.0',
+            grpc: '0.15.0'
         ]
     }
 

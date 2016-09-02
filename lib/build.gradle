@@ -5,7 +5,8 @@ plugins {
 }
 
 group = 'grpcbridge'
-version = '1.0.2'
+archivesBaseName = 'grpcbridge'
+version = '1.0.4'
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
@@ -41,13 +42,13 @@ bintray {
 
     pkg {
         repo = 'maven'
-        name = 'grpcbridge'
+        name = project.group
         userOrg = 'akalini'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/akalini/grpcbridge'
 
         version {
-            name = '1.0.0'
+            name = project.version
             desc = 'Expose your gRPC based API as a set of HTTP RESTful endpoints. HTTP framework agnostic.'
             released  = new Date()
         }
