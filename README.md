@@ -8,15 +8,15 @@ Maven:
 ```xml
 <dependency>
   <groupId>grpcbridge</groupId>
-  <artifactId>lib</artifactId>
-  <version>1.0.0</version>
+  <artifactId>grpcbridge</artifactId>
+  <version>1.0.3</version>
   <type>pom</type>
 </dependency>
 ```
 
 Gradle:
 ```groovy
-compile 'grpcbridge:lib:1.0.0'
+compile 'grpcbridge:grpcbridge:1.0.3'
 ```
 
 The library requires Java 8.
