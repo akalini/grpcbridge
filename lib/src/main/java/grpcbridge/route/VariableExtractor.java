@@ -28,13 +28,17 @@ final class VariableExtractor {
 
         StringBuffer pathPatternBuilder = new StringBuffer();
         Matcher matcher = VAR_PATTERN.matcher(pattern);
+        int lastMatched = 0;
+
         while (matcher.find()) {
             String varName = matcher.group().substring(1, matcher.group().length() - 1);
             vars.add(varName);
             matcher.appendReplacement(pathPatternBuilder, VAR_SEGMENT);
+            lastMatched = matcher.end();
         }
-        String pathPattern = pathPatternBuilder.toString();
-        this.pattern = Pattern.compile(pathPattern.isEmpty() ? pattern : pathPattern);
+
+        pathPatternBuilder.append(pattern.substring(lastMatched));
+        this.pattern = Pattern.compile(pathPatternBuilder.toString());
     }
 
     /**

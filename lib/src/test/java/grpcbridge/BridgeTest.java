@@ -41,6 +41,22 @@ public class BridgeTest {
     }
 
     @Test
+    public void get_withSuffix() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello/suffix")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .build()));
+    }
+
+    @Test
     public void get_static() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-static")
