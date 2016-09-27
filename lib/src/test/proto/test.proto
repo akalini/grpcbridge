@@ -75,6 +75,12 @@ service TestService {
     };
   }
 
+  rpc GetWithSuffix (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get/{stringField}/suffix"
+    };
+  }
+
   rpc GetStatic (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-static"
