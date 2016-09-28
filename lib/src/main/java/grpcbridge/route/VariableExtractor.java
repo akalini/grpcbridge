@@ -26,6 +26,8 @@ final class VariableExtractor {
     public VariableExtractor(String pattern) {
         this.vars = new ArrayList<>();
 
+        pattern = pattern.replace("?", "\\?");
+
         StringBuffer pathPatternBuilder = new StringBuffer();
         Matcher matcher = VAR_PATTERN.matcher(pattern);
         int lastMatched = 0;
