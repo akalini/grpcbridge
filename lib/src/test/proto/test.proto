@@ -75,6 +75,12 @@ service TestService {
     };
   }
 
+  rpc GetWithParams (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get?string_field={stringField}&int_field={intField}"
+    };
+  }
+
   rpc GetWithSuffix (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get/{stringField}/suffix"

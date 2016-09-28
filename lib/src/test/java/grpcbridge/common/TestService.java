@@ -36,6 +36,11 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
+    public void getWithParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+        get(request, responseObserver);
+    }
+
+    @Override
     public void getStatic(GetRequest request, StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }

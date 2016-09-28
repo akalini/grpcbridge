@@ -41,6 +41,23 @@ public class BridgeTest {
     }
 
     @Test
+    public void get_withParams() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string_field=hello&int_field=987")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .setIntField(987)
+                .build()));
+    }
+
+    @Test
     public void get_withSuffix() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello/suffix")
