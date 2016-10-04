@@ -126,7 +126,7 @@ service TestService {
 
   rpc PostCustomBody (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post_custom/{stringField}"
+        post: "/post-custom/{stringField}"
         body: "{intField}"
     };
   }

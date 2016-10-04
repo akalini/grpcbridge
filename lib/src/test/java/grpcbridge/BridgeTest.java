@@ -58,6 +58,86 @@ public class BridgeTest {
     }
 
     @Test
+    public void get_withParams_reordered() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?int_field=987&string_field=hello")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .setIntField(987)
+                .build()));
+    }
+
+    @Test
+    public void get_withParams_camelCase() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?stringField=hello&intField=987")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .setIntField(987)
+                .build()));
+    }
+
+    @Test
+    public void get_withParams_trainCase() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string-field=hello&int-field=987")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .setIntField(987)
+                .build()));
+    }
+
+    @Test
+    public void get_withParams_partial() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string_field=hello")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .build()));
+    }
+
+    @Test
+    public void get_withParams_noParams() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest));
+    }
+
+    @Test
     public void get_withSuffix() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello/suffix")
@@ -167,7 +247,7 @@ public class BridgeTest {
 
     @Test
     public void post_customBody() {
-        HttpRequest request = HttpRequest.builder(HttpMethod.POST, "/post_custom/hello")
+        HttpRequest request = HttpRequest.builder(HttpMethod.POST, "/post-custom/hello")
                 .body(Integer.toString(999))
                 .build();
 
