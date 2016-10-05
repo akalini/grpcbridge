@@ -34,7 +34,7 @@ public final class Route {
 
     /**
      * Matches HTTP request against the gRPC method definition. If the route
-     * matches returns an {@link RpcCall} instance that can be used to invoke
+     * containsAll returns an {@link RpcCall} instance that can be used to invoke
      * the corresponding gRPC method.
      *
      * @param httpRequest HTTP request

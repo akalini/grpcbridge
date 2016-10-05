@@ -2,10 +2,8 @@ package grpcbridge.route;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Extracts variables from the path and body definitions as described by
@@ -19,7 +17,7 @@ final class VariableExtractor {
 
     private final Pattern pattern;
     private final List<String> pathVars;
-    private final Map<String, String> queryVars;
+    private final UrlQueryParams queryVars;
 
     /**
      * Creates new var extractor.
@@ -32,7 +30,7 @@ final class VariableExtractor {
         this.pathVars = new ArrayList<>();
 
         StringBuffer pathPatternBuilder = new StringBuffer();
-        Matcher matcher = VAR_PATTERN.matcher(pathAndQuery.getPath());
+        Matcher matcher = VAR_PATTERN.matcher(pathAndQuery.path());
         int lastMatched = 0;
 
         while (matcher.find()) {
@@ -42,26 +40,25 @@ final class VariableExtractor {
             lastMatched = matcher.end();
         }
 
-        pathPatternBuilder.append(pathAndQuery.getPath().substring(lastMatched));
+        pathPatternBuilder.append(pathAndQuery.path().substring(lastMatched));
         this.pattern = Pattern.compile(pathPatternBuilder.toString());
-        this.queryVars = pathAndQuery.getQueryParams();
+        this.queryVars = new UrlQueryParams(pathAndQuery.query());
     }
 
     /**
-     * Checks if the input matches the variable extractor pattern.
+     * Checks if the input containsAll the variable extractor pattern.
      *
      * @param input input to parse
-     * @return true if the variable extractor matches the input
+     * @return true if the variable extractor containsAll the input
      */
     public boolean matches(String input) {
         UrlPathAndQuery pathAndQuery = UrlPathAndQuery.parse(input);
 
-        if (!pattern.matcher(pathAndQuery.getPath()).matches()) {
+        if (!pattern.matcher(pathAndQuery.path()).matches()) {
             return false;
         }
 
-        if (!pathAndQuery.getQueryParams().isEmpty()
-                && !queryVars.keySet().containsAll(pathAndQuery.getQueryParams().keySet())) {
+        if (!queryVars.containsAll(pathAndQuery.query().keySet())) {
             return false;
         }
 
@@ -79,17 +76,14 @@ final class VariableExtractor {
 
         List<Variable> result = new ArrayList<>();
 
-        Matcher pathMatcher = pattern.matcher(pathAndQuery.getPath());
+        Matcher pathMatcher = pattern.matcher(pathAndQuery.path());
         if (pathMatcher.matches()) {
             for (int i = 0; i < pathVars.size(); i++) {
                 result.add(new Variable(pathVars.get(i), pathMatcher.group(1 + i)));
             }
         }
 
-        result.addAll(pathAndQuery.getQueryParams().entrySet()
-                .stream()
-                .map(e -> new Variable(e.getKey(), e.getValue()))
-                .collect(Collectors.toList()));
+        result.addAll(queryVars.extractVars(pathAndQuery.query()));
 
         return result;
     }

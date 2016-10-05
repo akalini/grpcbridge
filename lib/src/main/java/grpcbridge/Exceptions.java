@@ -27,7 +27,7 @@ public final class Exceptions {
     }
 
     /**
-     * Thrown if no route matches the supplied HTTP request.
+     * Thrown if no route containsAll the supplied HTTP request.
      */
     public final static class RouteNotFoundException extends BridgeException {
         public RouteNotFoundException(String message) {
