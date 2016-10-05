@@ -4,12 +4,16 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.String.format;
 
 /**
  * Describes a variable that can be specified in {@link com.google.api.HttpRule}
  * path or body patterns in the {path.to.protobuf.field} form.
+ *
+ * The variable name and path is converted to snake case since that's the protobuf
+ * convention.
  */
 public final class Variable {
     private final String name;
@@ -74,5 +78,20 @@ public final class Variable {
 
     @Override public String toString() {
         return format("%s = %s", name, value);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Variable)) {
+            return false;
+        }
+
+        Variable other = (Variable) obj;
+        return name.equals(other.name) && Objects.equals(value, other.value);
     }
 }

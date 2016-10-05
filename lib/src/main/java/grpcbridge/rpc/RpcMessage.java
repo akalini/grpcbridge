@@ -52,7 +52,7 @@ public class RpcMessage {
         for (String segment : var.getFieldPath()) {
             Descriptors.FieldDescriptor field = current.getDescriptorForType().findFieldByName(segment);
             if (field == null) {
-                throw new ConfigurationException("Invalid variable path: " + var);
+                throw new ConfigurationException("Invalid variable path: " + var + ", looking for: " + segment);
             }
             current = current.getFieldBuilder(field);
         }

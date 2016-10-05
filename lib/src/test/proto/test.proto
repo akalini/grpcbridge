@@ -6,84 +6,84 @@ import "google/api/annotations.proto";
 enum Enum { INVALID = 0; VALID = 1; }
 
 message Nested {
-  string nestedField = 1;
+  string nested_field = 1;
 }
 
 message GetRequest {
-  string stringField = 1;
-  int32 intField = 2;
-  int64 longField = 3;
-  float floatField = 4;
-  double doubleField = 5;
-  bool boolField = 6;
-  bytes bytesField = 7;
-  Enum enumField = 8;
+  string string_field = 1;
+  int32 int_field = 2;
+  int64 long_field = 3;
+  float float_field = 4;
+  double double_field = 5;
+  bool bool_field = 6;
+  bytes bytes_field = 7;
+  Enum enum_field = 8;
   Nested nested = 9;
 }
 
 message GetResponse {
-  string stringField = 1;
-  int32 intField = 2;
-  int64 longField = 3;
-  float floatField = 4;
-  double doubleField = 5;
-  bool boolField = 6;
-  bytes bytesField = 7;
-  Enum enumField = 8;
+  string string_field = 1;
+  int32 int_field = 2;
+  int64 long_field = 3;
+  float float_field = 4;
+  double double_field = 5;
+  bool bool_field = 6;
+  bytes bytes_field = 7;
+  Enum enum_field = 8;
   Nested nested = 9;
 }
 
 message PostRequest {
-  string stringField = 1;
-  int32 intField = 2;
+  string string_field = 1;
+  int32 int_field = 2;
 }
 
 message PostResponse {
-  string stringField = 1;
-  int32 intField = 2;
+  string string_field = 1;
+  int32 int_field = 2;
 }
 
 message PutRequest {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 message PutResponse {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 message DeleteRequest {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 message DeleteResponse {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 message PatchRequest {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 message PatchResponse {
-  string stringField = 1;
+  string string_field = 1;
 }
 
 
 service TestService {
   rpc Get (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get/{stringField}"
+        get: "/get/{string_field}"
     };
   }
 
   rpc GetWithParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get?string_field={stringField}&int_field={intField}"
+        get: "/get?string_field={string_field}&int_field={int_field}"
     };
   }
 
   rpc GetWithSuffix (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get/{stringField}/suffix"
+        get: "/get/{string_field}/suffix"
     };
   }
 
@@ -95,13 +95,13 @@ service TestService {
 
   rpc GetMultipleParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-multi/{stringField}/{intField}/{longField}/{floatField}/{doubleField}/{boolField}/{bytesField}/{enumField}"
+        get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}"
     };
   }
 
   rpc GetNestedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-nested/{nested.nestedField}"
+        get: "/get-nested/{nested.nested_field}"
     };
   }
 
@@ -119,34 +119,34 @@ service TestService {
 
   rpc Post (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post/{stringField}"
+        post: "/post/{string_field}"
         body: "*"
     };
   }
 
   rpc PostCustomBody (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post-custom/{stringField}"
-        body: "{intField}"
+        post: "/post-custom/{string_field}"
+        body: "{int_field}"
     };
   }
 
   rpc Put (PutRequest) returns (PutResponse) {
     option (google.api.http) = {
-        put: "/put/{stringField}"
+        put: "/put/{string_field}"
         body: "*"
     };
   }
 
   rpc Delete (DeleteRequest) returns (DeleteResponse) {
     option (google.api.http) = {
-        delete: "/delete/{stringField}"
+        delete: "/delete/{string_field}"
     };
   }
 
   rpc Patch (PatchRequest) returns (PatchResponse) {
     option (google.api.http) = {
-        patch: "/patch/{stringField}"
+        patch: "/patch/{string_field}"
     };
   }
 }

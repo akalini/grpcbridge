@@ -1,7 +1,5 @@
 package grpcbridge.route;
 
-import com.google.common.base.CaseFormat;
-
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,30 +38,18 @@ final class UrlPathAndQuery {
         }
     }
 
-    public String getPath() {
+    public String path() {
         return path;
     }
 
-    public Map<String, String> getQueryParams() {
+    public Map<String, String> query() {
         return query;
     }
 
     private static Map.Entry<String, String> toMapEntry(String value) {
         String[] keyAndValue = value.split("=");
         return keyAndValue.length == 1
-                ? new SimpleImmutableEntry<>(toCamelCase(keyAndValue[0]), "")
-                : new SimpleImmutableEntry<>(toCamelCase(keyAndValue[0]), keyAndValue[1]);
-    }
-
-    private static String toCamelCase(String value) {
-        if (value.contains("_")) {
-            return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, value);
-        }
-
-        if (value.contains("-")) {
-            return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, value);
-        }
-
-        return value;
+                ? new SimpleImmutableEntry<>(keyAndValue[0], "")
+                : new SimpleImmutableEntry<>(keyAndValue[0], keyAndValue[1]);
     }
 }
