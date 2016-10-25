@@ -3,7 +3,8 @@ package grpcbridge.rpc;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.Message;
-import io.grpc.*;
+import io.grpc.ServerCall;
+import io.grpc.ServerMethodDefinition;
 
 /**
  * Abstracts away a gRPC method invocation. The invocation holds a pointer to
@@ -11,15 +12,17 @@ import io.grpc.*;
  * invocation.
  */
 public final class RpcCall {
-    private final ServerCallHandler<Message, Message> handler;
+    private final ServerMethodDefinition<Message, Message> method;
     private RpcMessage request;
 
     /**
-     * @param handler gRPC method handler, maps to the actual implementation
+     * @param method gRPC method descriptor
      * @param request gRPC request
      */
-    public RpcCall(ServerCallHandler<Message, Message> handler, RpcMessage request) {
-        this.handler = handler;
+    public RpcCall(
+            ServerMethodDefinition<Message, Message> method,
+            RpcMessage request) {
+        this.method = method;
         this.request = request;
     }
 
@@ -30,7 +33,9 @@ public final class RpcCall {
      */
     public ListenableFuture<RpcMessage> execute() {
         SettableFuture<RpcMessage> result = SettableFuture.create();
-        ServerCall.Listener<Message> listener = handler.startCall(new AsyncCall(result), request.getMetadata());
+        ServerCall.Listener<Message> listener = method
+                .getServerCallHandler()
+                .startCall(new AsyncCall(method.getMethodDescriptor(), result), request.getMetadata());
 
         listener.onMessage(request.getBody());
         listener.onHalfClose();

@@ -51,7 +51,7 @@ public final class Route {
             BodyParser bodyParser = new BodyParser(httpRule, newRpcRequest());
             RpcMessage rpcRequest = bodyParser.extract(httpRequest);
             pathMatcher.parse(httpRequest).forEach(rpcRequest::setVar);
-            return Optional.of(new RpcCall(impl.getServerCallHandler(), rpcRequest));
+            return Optional.of(new RpcCall(impl, rpcRequest));
         } else {
             return Optional.empty();
         }

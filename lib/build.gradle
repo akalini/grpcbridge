@@ -6,7 +6,7 @@ plugins {
 
 group = 'grpcbridge'
 archivesBaseName = 'grpcbridge'
-version = '1.0.8'
+version = '1.0.9-SNAPSHOT'
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
