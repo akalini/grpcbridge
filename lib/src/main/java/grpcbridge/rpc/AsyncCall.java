@@ -9,10 +9,12 @@ import io.grpc.*;
  * {@link SettableFuture} that is much easier to work with.
  */
 final class AsyncCall extends ServerCall<Message, Message> {
+    private final MethodDescriptor<Message, Message> method;
+    private final SettableFuture<RpcMessage> delegate;
     private Metadata headers;
-    private SettableFuture<RpcMessage> delegate;
 
-    public AsyncCall(SettableFuture<RpcMessage> delegate) {
+    public AsyncCall(MethodDescriptor<Message, Message> method, SettableFuture<RpcMessage> delegate) {
+        this.method = method;
         this.delegate = delegate;
     }
 
@@ -44,6 +46,6 @@ final class AsyncCall extends ServerCall<Message, Message> {
 
     @Override
     public MethodDescriptor<Message, Message> getMethodDescriptor() {
-        return null;
+        return method;
     }
 }
