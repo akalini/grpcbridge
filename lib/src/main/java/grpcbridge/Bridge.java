@@ -92,7 +92,11 @@ public final class Bridge {
         try {
             return getUninterruptibly(handleAsync(httpRequest));
         } catch (ExecutionException e) {
-            throw new Exceptions.BridgeException("Unhandled error", e);
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            } else {
+                throw new Exceptions.BridgeException("Unhandled error", e);
+            }
         }
     }
 
