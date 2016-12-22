@@ -1,9 +1,19 @@
 package grpcbridge.common;
 
 import com.google.protobuf.TextFormat;
-import grpcbridge.test.proto.Test.*;
+import grpcbridge.test.proto.Test.DeleteRequest;
+import grpcbridge.test.proto.Test.DeleteResponse;
+import grpcbridge.test.proto.Test.GetRequest;
+import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.PatchRequest;
+import grpcbridge.test.proto.Test.PatchResponse;
+import grpcbridge.test.proto.Test.PostRequest;
+import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PutRequest;
+import grpcbridge.test.proto.Test.PutResponse;
 import grpcbridge.test.proto.TestServiceGrpc;
 import io.grpc.stub.StreamObserver;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +36,7 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 .setEnumField(request.getEnumField())
                 .setBytesField(request.getBytesField())
                 .setNested(request.getNested())
+                .addAllRepeatedField(request.getRepeatedFieldList())
                 .build());
         responseObserver.onCompleted();
     }
@@ -52,6 +63,11 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
 
     @Override
     public void getNestedParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+        get(request, responseObserver);
+    }
+
+    @Override
+    public void getRepeatedParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 

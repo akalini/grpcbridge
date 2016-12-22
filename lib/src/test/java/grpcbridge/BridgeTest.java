@@ -1,5 +1,16 @@
 package grpcbridge;
 
+import static grpcbridge.common.TestFactory.newDeleteRequest;
+import static grpcbridge.common.TestFactory.newGetRequest;
+import static grpcbridge.common.TestFactory.newPatchRequest;
+import static grpcbridge.common.TestFactory.newPostRequest;
+import static grpcbridge.common.TestFactory.newPutRequest;
+import static grpcbridge.common.TestFactory.responseFor;
+import static grpcbridge.test.proto.Test.Enum.INVALID;
+import static grpcbridge.util.ProtoJson.parse;
+import static grpcbridge.util.ProtoJson.serialize;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.protobuf.ByteString;
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.Exceptions.ParsingException;
@@ -8,14 +19,19 @@ import grpcbridge.common.TestService;
 import grpcbridge.http.HttpMethod;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
-import grpcbridge.test.proto.Test.*;
-import org.junit.Test;
+import grpcbridge.test.proto.Test.DeleteRequest;
+import grpcbridge.test.proto.Test.DeleteResponse;
+import grpcbridge.test.proto.Test.GetRequest;
+import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.Nested;
+import grpcbridge.test.proto.Test.PatchRequest;
+import grpcbridge.test.proto.Test.PatchResponse;
+import grpcbridge.test.proto.Test.PostRequest;
+import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PutRequest;
+import grpcbridge.test.proto.Test.PutResponse;
 
-import static grpcbridge.common.TestFactory.*;
-import static grpcbridge.test.proto.Test.Enum.INVALID;
-import static grpcbridge.util.ProtoJson.parse;
-import static grpcbridge.util.ProtoJson.serialize;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public class BridgeTest {
     private TestService testService = new TestService();
@@ -208,6 +224,23 @@ public class BridgeTest {
                 .setNested(Nested.newBuilder()
                         .setNestedField("hello")
                         .build())
+                .build()));
+    }
+
+    @Test
+    public void get_repeatedParam() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-repeated?repeated_field=one&repeated_field=two")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .addRepeatedField("one")
+                .addRepeatedField("two")
                 .build()));
     }
 

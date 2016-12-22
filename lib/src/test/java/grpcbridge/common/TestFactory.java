@@ -1,9 +1,19 @@
 package grpcbridge.common;
 
-import com.google.protobuf.ByteString;
-import grpcbridge.test.proto.Test.*;
-
 import static grpcbridge.test.proto.Test.Enum.VALID;
+
+import com.google.protobuf.ByteString;
+import grpcbridge.test.proto.Test.DeleteRequest;
+import grpcbridge.test.proto.Test.DeleteResponse;
+import grpcbridge.test.proto.Test.GetRequest;
+import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.Nested;
+import grpcbridge.test.proto.Test.PatchRequest;
+import grpcbridge.test.proto.Test.PatchResponse;
+import grpcbridge.test.proto.Test.PostRequest;
+import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PutRequest;
+import grpcbridge.test.proto.Test.PutResponse;
 
 public final class TestFactory {
     public static GetRequest newGetRequest() {
@@ -33,6 +43,7 @@ public final class TestFactory {
                 .setEnumField(request.getEnumField())
                 .setBytesField(request.getBytesField())
                 .setNested(request.getNested())
+                .addAllRepeatedField(request.getRepeatedFieldList())
                 .build();
     }
 

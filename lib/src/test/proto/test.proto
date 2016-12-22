@@ -19,6 +19,7 @@ message GetRequest {
   bytes bytes_field = 7;
   Enum enum_field = 8;
   Nested nested = 9;
+  repeated string repeated_field = 10;
 }
 
 message GetResponse {
@@ -31,6 +32,7 @@ message GetResponse {
   bytes bytes_field = 7;
   Enum enum_field = 8;
   Nested nested = 9;
+  repeated string repeated_field = 10;
 }
 
 message PostRequest {
@@ -102,6 +104,12 @@ service TestService {
   rpc GetNestedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-nested/{nested.nested_field}"
+    };
+  }
+
+  rpc GetRepeatedParams (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-repeated?repeated_field={repeated_field}"
     };
   }
 
