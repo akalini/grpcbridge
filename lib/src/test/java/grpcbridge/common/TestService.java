@@ -24,7 +24,9 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     private static final Logger logger = LoggerFactory.getLogger(TestService.class);
 
     @Override
-    public void get(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void get(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         logger.info("Get({})", TextFormat.shortDebugString(request));
         responseObserver.onNext(GetResponse.newBuilder()
                 .setStringField(request.getStringField())
@@ -42,37 +44,51 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
-    public void getWithSuffix(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getWithSuffix(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void getWithParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getWithParams(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void getStatic(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getStatic(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void getMultipleParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getMultipleParams(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void getNestedParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getNestedParams(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void getRepeatedParams(GetRequest request, StreamObserver<GetResponse> responseObserver) {
+    public void getRepeatedParams(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
         get(request, responseObserver);
     }
 
     @Override
-    public void post(PostRequest request, StreamObserver<PostResponse> responseObserver) {
+    public void post(
+            PostRequest request,
+            StreamObserver<PostResponse> responseObserver) {
         logger.info("Post({})", TextFormat.shortDebugString(request));
         responseObserver.onNext(PostResponse.newBuilder()
                 .setStringField(request.getStringField())
@@ -82,12 +98,16 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
-    public void postCustomBody(PostRequest request, StreamObserver<PostResponse> responseObserver) {
+    public void postCustomBody(
+            PostRequest request,
+            StreamObserver<PostResponse> responseObserver) {
         post(request, responseObserver);
     }
 
     @Override
-    public void put(PutRequest request, StreamObserver<PutResponse> responseObserver) {
+    public void put(
+            PutRequest request,
+            StreamObserver<PutResponse> responseObserver) {
         logger.info("Put({})", TextFormat.shortDebugString(request));
         responseObserver.onNext(PutResponse.newBuilder()
                 .setStringField(request.getStringField())
@@ -96,7 +116,9 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
-    public void delete(DeleteRequest request, StreamObserver<DeleteResponse> responseObserver) {
+    public void delete(
+            DeleteRequest request,
+            StreamObserver<DeleteResponse> responseObserver) {
         logger.info("Delete({})", TextFormat.shortDebugString(request));
         responseObserver.onNext(DeleteResponse.newBuilder()
                 .setStringField(request.getStringField())
@@ -105,7 +127,9 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
-    public void patch(PatchRequest request, StreamObserver<PatchResponse> responseObserver) {
+    public void patch(
+            PatchRequest request,
+            StreamObserver<PatchResponse> responseObserver) {
         logger.info("Patch({})", TextFormat.shortDebugString(request));
         responseObserver.onNext(PatchResponse.newBuilder()
                 .setStringField(request.getStringField())

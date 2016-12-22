@@ -59,7 +59,9 @@ public final class BridgeBuilder {
 
         for (ServerServiceDefinition service : services) {
             for (ServerMethodDefinition<?, ?> method : service.getMethods()) {
-                Route route = files.routeFor(service, (ServerMethodDefinition<Message, Message>) method);
+                Route route = files.routeFor(
+                        service,
+                        (ServerMethodDefinition<Message, Message>) method);
                 routes.add(route);
             }
         }

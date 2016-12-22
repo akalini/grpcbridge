@@ -13,7 +13,9 @@ final class AsyncCall extends ServerCall<Message, Message> {
     private final SettableFuture<RpcMessage> delegate;
     private Metadata headers;
 
-    public AsyncCall(MethodDescriptor<Message, Message> method, SettableFuture<RpcMessage> delegate) {
+    public AsyncCall(
+            MethodDescriptor<Message, Message> method,
+            SettableFuture<RpcMessage> delegate) {
         this.method = method;
         this.delegate = delegate;
     }
