@@ -35,7 +35,9 @@ public final class RpcCall {
         SettableFuture<RpcMessage> result = SettableFuture.create();
         ServerCall.Listener<Message> listener = method
                 .getServerCallHandler()
-                .startCall(new AsyncCall(method.getMethodDescriptor(), result), request.getMetadata());
+                .startCall(
+                        new AsyncCall(method.getMethodDescriptor(), result),
+                        request.getMetadata());
 
         listener.onMessage(request.getBody());
         listener.onHalfClose();

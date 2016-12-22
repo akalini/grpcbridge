@@ -6,6 +6,11 @@ import static grpcbridge.common.TestFactory.newPatchRequest;
 import static grpcbridge.common.TestFactory.newPostRequest;
 import static grpcbridge.common.TestFactory.newPutRequest;
 import static grpcbridge.common.TestFactory.responseFor;
+import static grpcbridge.http.HttpMethod.DELETE;
+import static grpcbridge.http.HttpMethod.GET;
+import static grpcbridge.http.HttpMethod.PATCH;
+import static grpcbridge.http.HttpMethod.POST;
+import static grpcbridge.http.HttpMethod.PUT;
 import static grpcbridge.test.proto.Test.Enum.INVALID;
 import static grpcbridge.util.ProtoJson.parse;
 import static grpcbridge.util.ProtoJson.serialize;
@@ -16,7 +21,6 @@ import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
-import grpcbridge.http.HttpMethod;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.test.proto.Test.DeleteRequest;
@@ -35,7 +39,8 @@ import org.junit.Test;
 
 public class BridgeTest {
     private TestService testService = new TestService();
-    private Bridge bridge = Bridge.builder()
+    private Bridge bridge = Bridge
+            .builder()
             .addFile(grpcbridge.test.proto.Test.getDescriptor())
             .addService(testService.bindService())
             .build();
@@ -43,7 +48,8 @@ public class BridgeTest {
     @Test
     public void get() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -59,7 +65,8 @@ public class BridgeTest {
     @Test
     public void get_withParams() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string_field=hello&int_field=987")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?string_field=hello&int_field=987")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -76,7 +83,8 @@ public class BridgeTest {
     @Test
     public void get_withParams_reordered() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?int_field=987&string_field=hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?int_field=987&string_field=hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -93,7 +101,8 @@ public class BridgeTest {
     @Test
     public void get_withParams_camelCase() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?stringField=hello&intField=987")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?stringField=hello&intField=987")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -110,7 +119,8 @@ public class BridgeTest {
     @Test
     public void get_withParams_trainCase() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string-field=hello&int-field=987")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?string-field=hello&int-field=987")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -127,7 +137,8 @@ public class BridgeTest {
     @Test
     public void get_withParams_partial() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get?string_field=hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?string_field=hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -143,7 +154,8 @@ public class BridgeTest {
     @Test
     public void get_withParams_noParams() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -156,7 +168,8 @@ public class BridgeTest {
     @Test
     public void get_withSuffix() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello/suffix")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello/suffix")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -172,7 +185,8 @@ public class BridgeTest {
     @Test
     public void get_static() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-static")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-static")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -189,7 +203,7 @@ public class BridgeTest {
     public void get_multipleParams() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
-                .builder(HttpMethod.GET, "/get-multi/hello/123/321/1.0/3.0/false/bytes/INVALID")
+                .builder(GET, "/get-multi/hello/123/321/1.0/3.0/false/bytes/INVALID")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -212,7 +226,8 @@ public class BridgeTest {
     @Test
     public void get_nestedMessage() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-nested/hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-nested/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -230,7 +245,9 @@ public class BridgeTest {
     @Test
     public void get_repeatedParam() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-repeated?repeated_field=one&repeated_field=two")
+        HttpRequest request = HttpRequest
+
+                .builder(GET, "/get-repeated?repeated_field=one&repeated_field=two")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -247,7 +264,8 @@ public class BridgeTest {
     @Test(expected = ConfigurationException.class)
     public void get_unknownPath() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-unknown-path/hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-unknown-path/hello")
                 .body(serialize(rpcRequest))
                 .build();
         bridge.handle(request);
@@ -256,7 +274,8 @@ public class BridgeTest {
     @Test(expected = ConfigurationException.class)
     public void get_unknownVariable() {
         GetRequest rpcRequest = newGetRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get-unknown-param/hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-unknown-param/hello")
                 .body(serialize(rpcRequest))
                 .build();
         bridge.handle(request);
@@ -265,7 +284,8 @@ public class BridgeTest {
     @Test
     public void post() {
         PostRequest rpcRequest = newPostRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.POST, "/post/hello")
+        HttpRequest request = HttpRequest
+                .builder(POST, "/post/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -280,7 +300,8 @@ public class BridgeTest {
 
     @Test
     public void post_customBody() {
-        HttpRequest request = HttpRequest.builder(HttpMethod.POST, "/post-custom/hello")
+        HttpRequest request = HttpRequest
+                .builder(POST, "/post-custom/hello")
                 .body(Integer.toString(999))
                 .build();
 
@@ -297,7 +318,8 @@ public class BridgeTest {
     @Test
     public void put() {
         PutRequest rpcRequest = newPutRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.PUT, "/put/hello")
+        HttpRequest request = HttpRequest
+                .builder(PUT, "/put/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -313,7 +335,8 @@ public class BridgeTest {
     @Test
     public void delete() {
         DeleteRequest rpcRequest = newDeleteRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.DELETE, "/delete/hello")
+        HttpRequest request = HttpRequest
+                .builder(DELETE, "/delete/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -329,7 +352,8 @@ public class BridgeTest {
     @Test
     public void patch() {
         PatchRequest rpcRequest = newPatchRequest();
-        HttpRequest request = HttpRequest.builder(HttpMethod.PATCH, "/patch/hello")
+        HttpRequest request = HttpRequest
+                .builder(PATCH, "/patch/hello")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -344,13 +368,16 @@ public class BridgeTest {
 
     @Test(expected = RouteNotFoundException.class)
     public void routeNotFound() {
-        HttpRequest request = HttpRequest.builder(HttpMethod.DELETE, "/unknown").build();
+        HttpRequest request = HttpRequest
+                .builder(DELETE, "/unknown")
+                .build();
         bridge.handle(request);
     }
 
     @Test(expected = ParsingException.class)
     public void invalidBody() {
-        HttpRequest request = HttpRequest.builder(HttpMethod.GET, "/get/hello")
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello")
                 .body("__INVALID__")
                 .build();
         bridge.handle(request);

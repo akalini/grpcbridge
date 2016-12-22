@@ -1,5 +1,7 @@
 package grpcbridge.util;
 
+import static java.lang.String.format;
+
 import com.google.common.base.Strings;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
@@ -11,8 +13,6 @@ import grpcbridge.rpc.RpcMessage;
 
 import javax.annotation.Nullable;
 
-import static java.lang.String.format;
-
 /**
  * Helper methods to convert from JSON to protobuf messages and back.
  */
@@ -20,7 +20,9 @@ public final class ProtoJson {
     private ProtoJson() {}
 
     public static RpcMessage parse(HttpRequest httpRequest, Message.Builder builder) {
-        return new RpcMessage(parse(httpRequest.getBody().orElse(null), builder), httpRequest.getHeaders());
+        return new RpcMessage(
+                parse(httpRequest.getBody().orElse(null), builder),
+                httpRequest.getHeaders());
     }
 
     public static RpcMessage parse(HttpResponse httpResponse, Message.Builder builder) {

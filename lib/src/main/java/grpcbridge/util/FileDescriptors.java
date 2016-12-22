@@ -33,7 +33,9 @@ public final class FileDescriptors {
      * @param method method definition
      * @return route for the given service/method combination
      */
-    public Route routeFor(ServerServiceDefinition service, ServerMethodDefinition<Message, Message> method) {
+    public Route routeFor(
+            ServerServiceDefinition service,
+            ServerMethodDefinition<Message, Message> method) {
         for (Descriptors.FileDescriptor file: files) {
             Optional<Route> route = serviceFor(file, service)
                     .flatMap(s -> methodFor(s, method))
@@ -44,7 +46,7 @@ public final class FileDescriptors {
         }
 
         throw new ConfigurationException(String.format(
-                "Proto definition for %s is not found, did you forget to add the matching proto file?",
+                "Proto definition for %s is not found, did you forget to add the proto file?",
                 method.getMethodDescriptor().getFullMethodName()));
     }
 

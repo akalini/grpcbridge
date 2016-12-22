@@ -2,7 +2,7 @@ package grpcbridge.rpc;
 
 import static java.lang.String.format;
 
-import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.route.Variable;
@@ -50,14 +50,17 @@ public class RpcMessage {
         Message.Builder current = start;
 
         for (String segment : var.getFieldPath()) {
-            Descriptors.FieldDescriptor field = current.getDescriptorForType().findFieldByName(segment);
+            FieldDescriptor field = current.getDescriptorForType().findFieldByName(segment);
             if (field == null) {
-                throw new ConfigurationException("Invalid variable path: " + var + ", looking for: " + segment);
+                throw new ConfigurationException(format(
+                        "Invalid variable path: %s, looking for: %s",
+                        var,
+                        segment));
             }
             current = current.getFieldBuilder(field);
         }
 
-        Descriptors.FieldDescriptor field = current.getDescriptorForType().findFieldByName(var.getFieldName());
+        FieldDescriptor field = current.getDescriptorForType().findFieldByName(var.getFieldName());
         if (field == null) {
             throw new ConfigurationException("Invalid variable path: " + var);
         }
