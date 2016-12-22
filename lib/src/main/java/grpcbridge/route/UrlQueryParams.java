@@ -1,13 +1,17 @@
 package grpcbridge.route;
 
-import com.google.common.base.CaseFormat;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+
+import com.google.common.base.CaseFormat;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A parsed out URL UrlQueryParams parameter map.
@@ -18,9 +22,22 @@ final class UrlQueryParams {
     private final Map<String, String> query;
     private final Map<String, String> normalizedKeyMap;
 
-    public UrlQueryParams(Map<String, String> query) {
-        this.query = query;
-        this.normalizedKeyMap = query.keySet()
+    public UrlQueryParams(Map<String, List<String>> pattern) {
+        this.query = pattern.entrySet()
+                .stream()
+                .collect(toMap(
+                        Map.Entry::getKey,
+                        e -> {
+                            List<String> params = e.getValue();
+                            if (params.size() != 1) {
+                                throw new IllegalArgumentException(params.stream().collect(joining(
+                                        ",",
+                                        "Multiple bindings found for " + e.getKey() + ": ",
+                                        "")));
+                            }
+                            return params.get(0);
+                        }));
+        this.normalizedKeyMap = pattern.keySet()
                 .stream()
                 .collect(toMap(
                         UrlQueryParams::toCamelCase,
@@ -50,21 +67,22 @@ final class UrlQueryParams {
      * @param params list of parameters to extract the variables for
      * @return list of the extracted variables
      */
-    public List<Variable> extractVars(Map<String, String> params) {
+    public List<Variable> extractVars(Map<String, List<String>> params) {
         return params.entrySet()
                 .stream()
-                .map(e -> {
+                .flatMap(e -> {
                     String queryKey = normalizedKeyMap.get(toCamelCase(e.getKey()));
                     Matcher matcher = VAR_PATTERN.matcher(query.get(queryKey));
                     if (matcher.matches()) {
                         String protoKey = matcher.group(1);
-                        String protoValue = e.getValue();
-                        return new Variable(protoKey, protoValue);
+                        return e.getValue()
+                                .stream()
+                                .map(v -> new Variable(protoKey, v));
                     } else {
                         return null;
                     }
                 })
-                .filter(o -> o != null)
+                .filter(Objects::nonNull)
                 .collect(toList());
     }
 

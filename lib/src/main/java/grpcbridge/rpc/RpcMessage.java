@@ -1,12 +1,12 @@
 package grpcbridge.rpc;
 
+import static java.lang.String.format;
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.route.Variable;
 import io.grpc.Metadata;
-
-import static java.lang.String.format;
 
 /**
  * gRPC message (request or response) abstraction. Each message is the
@@ -62,7 +62,11 @@ public class RpcMessage {
             throw new ConfigurationException("Invalid variable path: " + var);
         }
 
-        current.setField(field, var.valueAs(field));
+        if (field.isRepeated()) {
+            current.addRepeatedField(field, var.valueAs(field));
+        } else {
+            current.setField(field, var.valueAs(field));
+        }
         this.body = start.build();
     }
 

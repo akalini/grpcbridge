@@ -1,11 +1,14 @@
 package grpcbridge.route;
 
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Parses URL path and query parameters. Normalizes parameters to be camelCase.
@@ -16,7 +19,7 @@ final class UrlPathAndQuery {
     }
 
     private final String path;
-    private final Map<String, String> query;
+    private final Map<String, List<String>> query;
 
     UrlPathAndQuery(String urlPath) {
         String[] pathAndQuery = urlPath.split("\\?");
@@ -31,7 +34,12 @@ final class UrlPathAndQuery {
                         .map(UrlPathAndQuery::toMapEntry)
                         .collect(toMap(
                                 Map.Entry::getKey,
-                                Map.Entry::getValue));
+                                Map.Entry::getValue,
+                                (one, two) -> {
+                                    List<String> result = new ArrayList<>(one);
+                                    result.addAll(two);
+                                    return result;
+                                }));
                 break;
             default:
                 throw new IllegalArgumentException("Invalid URL path: " + urlPath);
@@ -42,14 +50,14 @@ final class UrlPathAndQuery {
         return path;
     }
 
-    public Map<String, String> query() {
+    public Map<String, List<String>> query() {
         return query;
     }
 
-    private static Map.Entry<String, String> toMapEntry(String value) {
+    private static Map.Entry<String, List<String>> toMapEntry(String value) {
         String[] keyAndValue = value.split("=");
         return keyAndValue.length == 1
-                ? new SimpleImmutableEntry<>(keyAndValue[0], "")
-                : new SimpleImmutableEntry<>(keyAndValue[0], keyAndValue[1]);
+                ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
+                : new SimpleImmutableEntry<>(keyAndValue[0], singletonList(keyAndValue[1]));
     }
 }
