@@ -37,7 +37,7 @@ final class AsyncCall extends ServerCall<Message, Message> {
     @Override
     public void close(Status status, Metadata trailers) {
         if (!status.isOk()) {
-            delegate.setException(new StatusRuntimeException(status));
+            delegate.setException(new StatusRuntimeException(status, trailers));
         }
     }
 
