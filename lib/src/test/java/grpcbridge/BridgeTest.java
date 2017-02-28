@@ -2,6 +2,7 @@ package grpcbridge;
 
 import static grpcbridge.common.TestFactory.newDeleteRequest;
 import static grpcbridge.common.TestFactory.newGetRequest;
+import static grpcbridge.common.TestFactory.newGrpcErrorRequest;
 import static grpcbridge.common.TestFactory.newPatchRequest;
 import static grpcbridge.common.TestFactory.newPostRequest;
 import static grpcbridge.common.TestFactory.newPutRequest;
@@ -14,7 +15,9 @@ import static grpcbridge.http.HttpMethod.PUT;
 import static grpcbridge.test.proto.Test.Enum.INVALID;
 import static grpcbridge.util.ProtoJson.parse;
 import static grpcbridge.util.ProtoJson.serialize;
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.google.protobuf.ByteString;
 import grpcbridge.Exceptions.ConfigurationException;
@@ -27,6 +30,7 @@ import grpcbridge.test.proto.Test.DeleteRequest;
 import grpcbridge.test.proto.Test.DeleteResponse;
 import grpcbridge.test.proto.Test.GetRequest;
 import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.GrpcErrorRequest;
 import grpcbridge.test.proto.Test.Nested;
 import grpcbridge.test.proto.Test.PatchRequest;
 import grpcbridge.test.proto.Test.PatchResponse;
@@ -34,6 +38,8 @@ import grpcbridge.test.proto.Test.PostRequest;
 import grpcbridge.test.proto.Test.PostResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
+import io.grpc.Metadata;
+import io.grpc.StatusRuntimeException;
 
 import org.junit.Test;
 
@@ -381,5 +387,37 @@ public class BridgeTest {
                 .body("__INVALID__")
                 .build();
         bridge.handle(request);
+    }
+
+    @Test
+    public void grpcErrorWithMetadata() {
+        GrpcErrorRequest rpcRequest = newGrpcErrorRequest(true);
+        HttpRequest request = HttpRequest
+                .builder(GET, "/grpc-error?add-metadata=true")
+                .body(serialize(rpcRequest))
+                .build();
+        try {
+            bridge.handle(request);
+            fail("Did not throw expected StatusRuntimeException");
+        } catch (StatusRuntimeException ex) {
+            assertThat(ex.getTrailers()).isNotNull();
+            assertThat(ex.getTrailers()
+                    .get(Metadata.Key.of("error-details", ASCII_STRING_MARSHALLER))).isNotNull();
+        }
+    }
+
+    @Test
+    public void grpcErrorWithoutMetadata() {
+        GrpcErrorRequest rpcRequest = newGrpcErrorRequest(true);
+        HttpRequest request = HttpRequest
+                .builder(GET, "/grpc-error?add-metadata=false")
+                .body(serialize(rpcRequest))
+                .build();
+        try {
+            bridge.handle(request);
+            fail("Did not throw expected StatusRuntimeException");
+        } catch (StatusRuntimeException ex) {
+            assertThat(ex.getTrailers()).isNull();
+        }
     }
 }

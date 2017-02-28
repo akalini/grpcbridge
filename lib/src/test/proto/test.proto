@@ -69,6 +69,13 @@ message PatchResponse {
   string string_field = 1;
 }
 
+message GrpcErrorRequest {
+  bool add_metadata = 1;
+}
+
+message GrpcErrorResponse {
+}
+
 
 service TestService {
   rpc Get (GetRequest) returns (GetResponse) {
@@ -155,6 +162,12 @@ service TestService {
   rpc Patch (PatchRequest) returns (PatchResponse) {
     option (google.api.http) = {
         patch: "/patch/{string_field}"
+    };
+  }
+
+  rpc GrpcError (GrpcErrorRequest) returns (GrpcErrorResponse) {
+    option (google.api.http) = {
+        get: "/grpc-error?add_metadata={add_metadata}"
     };
   }
 }
