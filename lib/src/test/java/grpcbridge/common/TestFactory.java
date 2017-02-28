@@ -7,6 +7,7 @@ import grpcbridge.test.proto.Test.DeleteRequest;
 import grpcbridge.test.proto.Test.DeleteResponse;
 import grpcbridge.test.proto.Test.GetRequest;
 import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.GrpcErrorRequest;
 import grpcbridge.test.proto.Test.Nested;
 import grpcbridge.test.proto.Test.PatchRequest;
 import grpcbridge.test.proto.Test.PatchResponse;
@@ -94,6 +95,12 @@ public final class TestFactory {
     public static PatchResponse responseFor(PatchRequest request) {
         return PatchResponse.newBuilder()
                 .setStringField(request.getStringField())
+                .build();
+    }
+
+    public static GrpcErrorRequest newGrpcErrorRequest(boolean addMetadata) {
+        return GrpcErrorRequest.newBuilder()
+                .setAddMetadata(addMetadata)
                 .build();
     }
 }

@@ -1,10 +1,15 @@
 package grpcbridge.common;
 
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+import static io.grpc.Status.FAILED_PRECONDITION;
+
 import com.google.protobuf.TextFormat;
 import grpcbridge.test.proto.Test.DeleteRequest;
 import grpcbridge.test.proto.Test.DeleteResponse;
 import grpcbridge.test.proto.Test.GetRequest;
 import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.GrpcErrorRequest;
+import grpcbridge.test.proto.Test.GrpcErrorResponse;
 import grpcbridge.test.proto.Test.PatchRequest;
 import grpcbridge.test.proto.Test.PatchResponse;
 import grpcbridge.test.proto.Test.PostRequest;
@@ -12,6 +17,8 @@ import grpcbridge.test.proto.Test.PostResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
 import grpcbridge.test.proto.TestServiceGrpc;
+import io.grpc.Metadata;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import org.slf4j.Logger;
@@ -135,5 +142,19 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 .setStringField(request.getStringField())
                 .build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void grpcError(
+            GrpcErrorRequest request,
+            StreamObserver<GrpcErrorResponse> responseObserver) {
+        Metadata trailers = null;
+        if (request.getAddMetadata()) {
+            trailers = new Metadata();
+            trailers.put(Metadata.Key.of("error-details", ASCII_STRING_MARSHALLER), "grpc error");
+        }
+        throw new StatusRuntimeException(
+                FAILED_PRECONDITION.withDescription("Expected GRPC error"),
+                trailers);
     }
 }
