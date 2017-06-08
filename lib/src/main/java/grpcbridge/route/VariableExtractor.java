@@ -58,7 +58,7 @@ final class VariableExtractor {
             return false;
         }
 
-        if (!queryVars.containsAll(pathAndQuery.query().keySet())) {
+        if (!queryVars.containsAll(pathAndQuery.query())) {
             return false;
         }
 

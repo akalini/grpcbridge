@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.toMap;
 
 import com.google.common.base.CaseFormat;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +16,7 @@ import java.util.regex.Pattern;
  * A parsed out URL UrlQueryParams parameter map.
  */
 final class UrlQueryParams {
+    private static final Pattern VALUE_PATTERN = Pattern.compile("([\\w.]+)");
     private static final Pattern VAR_PATTERN = Pattern.compile("\\{([\\w.]+)\\}");
 
     private final Map<String, String> query;
@@ -50,14 +50,29 @@ final class UrlQueryParams {
      * @param params query parameters to check
      * @return true if this query contains all the parameters
      */
-    public boolean containsAll(Collection<String> params) {
+    public boolean containsAll(Map<String, List<String>> params) {
         if (params.isEmpty()) {
             return true;
         }
 
-        return params
+        return params.entrySet()
                 .stream()
-                .allMatch(key -> normalizedKeyMap.containsKey(toCamelCase(key)));
+                .allMatch(e -> {
+                    String queryKey = normalizedKeyMap.get(toCamelCase(e.getKey()));
+                    if (queryKey == null) {
+                        return false;
+                    }
+
+                    String queryValue = query.get(queryKey);
+                    Matcher matcher = VALUE_PATTERN.matcher(queryValue);
+                    if (matcher.matches()) {
+                        return e.getValue()
+                                .stream()
+                                .anyMatch(p -> p.equals(queryValue));
+                    } else {
+                        return true;
+                    }
+                });
     }
 
     /**

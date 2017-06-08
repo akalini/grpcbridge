@@ -206,6 +206,40 @@ public class BridgeTest {
     }
 
     @Test
+    public void get_static_withParam() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-static?param1=value1")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("string")
+                .build()));
+    }
+
+    @Test(expected = RouteNotFoundException.class)
+    public void get_static_withParam_noMatch() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-static?param1=no_match")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("string")
+                .build()));
+    }
+
+    @Test
     public void get_multipleParams() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
