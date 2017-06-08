@@ -1,6 +1,7 @@
 package grpcbridge.route;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
@@ -8,6 +9,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
@@ -20,9 +23,20 @@ public class UrlQueryParamsTest {
 
     @Test
     public void param() {
+        UrlQueryParams query = new UrlQueryParams(ImmutableMap.of("p1", list("{pp1}")));
+        assertThat(query.containsAll(params("p1"))).isTrue();
+        Assertions
+                .assertThat(query.extractVars(ImmutableMap.of("p1", list(""))))
+                .containsExactly(new Variable("pp1", ""));
+    }
+
+    @Test
+    public void param_staticValue() {
         UrlQueryParams query = new UrlQueryParams(ImmutableMap.of("p1", list("v1")));
-        assertThat(query.containsAll(list("p1"))).isTrue();
+        assertThat(query.containsAll(ImmutableMap.of("p1", list("v1")))).isTrue();
+        assertThat(query.containsAll(ImmutableMap.of("p1", list("v2")))).isFalse();
         assertThat(query.extractVars(ImmutableMap.of("p1", list("")))).isEmpty();
+        assertThat(query.extractVars(ImmutableMap.of("p1", list("v1")))).isEmpty();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -33,10 +47,10 @@ public class UrlQueryParamsTest {
     @Test
     public void paramWithValue() {
         UrlQueryParams query = new UrlQueryParams(ImmutableMap.of("p1", list("{pp1}")));
-        assertThat(query.containsAll(list("p1"))).isTrue();
+        assertThat(query.containsAll(params("p1"))).isTrue();
         Assertions
-                .assertThat(query.extractVars(ImmutableMap.of("p1", list(""))))
-                .containsExactly(new Variable("pp1", ""));
+                .assertThat(query.extractVars(ImmutableMap.of("p1", list("v1"))))
+                .containsExactly(new Variable("pp1", "v1"));
     }
 
     @Test
@@ -45,7 +59,7 @@ public class UrlQueryParamsTest {
                 "p1", list("{pp1}"),
                 "p2", list("{pp2}"),
                 "p3", list("{pp3}")));
-        assertThat(query.containsAll(asList("p1", "p2", "p3"))).isTrue();
+        assertThat(query.containsAll(params("p1", "p2", "p3"))).isTrue();
         Assertions
                 .assertThat(query.extractVars(ImmutableMap.of(
                         "p1", list("v1"),
@@ -63,7 +77,7 @@ public class UrlQueryParamsTest {
                 "p1", list("{pp1}"),
                 "p2", list("{pp2}"),
                 "p3", list("{pp3}")));
-        assertThat(query.containsAll(asList("p1", "p2", "p3"))).isTrue();
+        assertThat(query.containsAll(params("p1", "p2", "p3"))).isTrue();
         Assertions
                 .assertThat(query.extractVars(ImmutableMap.of(
                         "p1", list("v1", "v11", "v111"),
@@ -83,7 +97,7 @@ public class UrlQueryParamsTest {
                 "param_one", list("{p_one}"),
                 "param_two", list("{p_two}")));
 
-        assertThat(query.containsAll(asList("param_one", "param_two"))).isTrue();
+        assertThat(query.containsAll(params("param_one", "param_two"))).isTrue();
         Assertions
                 .assertThat(query.extractVars(ImmutableMap.of(
                         "param_one", list("one"),
@@ -92,7 +106,7 @@ public class UrlQueryParamsTest {
                         new Variable("p_one", "one"),
                         new Variable("p_two", "two"));
 
-        assertThat(query.containsAll(asList("param-one", "param-two"))).isTrue();
+        assertThat(query.containsAll(params("param-one", "param-two"))).isTrue();
         Assertions
                 .assertThat(query.extractVars(ImmutableMap.of(
                         "param-one", list("one"),
@@ -101,7 +115,7 @@ public class UrlQueryParamsTest {
                         new Variable("p_one", "one"),
                         new Variable("p_two", "two"));
 
-        assertThat(query.containsAll(asList("paramOne", "paramTwo"))).isTrue();
+        assertThat(query.containsAll(params("paramOne", "paramTwo"))).isTrue();
         Assertions
                 .assertThat(query.extractVars(ImmutableMap.of(
                         "paramOne", list("one"),
@@ -110,6 +124,22 @@ public class UrlQueryParamsTest {
                         new Variable("p_one", "one"),
                         new Variable("p_two", "two"));
     }
+
+    private static Map<String, List<String>> params(String value) {
+        return ImmutableMap.of(value, emptyList());
+    }
+
+    private static Map<String, List<String>> params(String ... values) {
+        return Arrays
+                .stream(values)
+                .collect(toMap(v -> v, v -> emptyList()));
+    }
+
+    /*
+    private static Map<String, List<String>> params(T t) {
+        return Collections.singletonList(t);
+    }
+    */
 
     private static <T> List<T> list(T t) {
         return Collections.singletonList(t);

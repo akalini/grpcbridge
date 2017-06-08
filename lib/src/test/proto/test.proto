@@ -102,6 +102,12 @@ service TestService {
     };
   }
 
+  rpc GetStaticWithParam (GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+        get: "/get-static?param1=value1"
+    };
+  }
+
   rpc GetMultipleParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}"
