@@ -62,7 +62,9 @@ public class RpcMessage {
 
         FieldDescriptor field = current.getDescriptorForType().findFieldByName(var.getFieldName());
         if (field == null) {
-            throw new ConfigurationException("Invalid variable path: " + var);
+            throw new ConfigurationException(format(
+                    "Invalid variable %s in path but not in request proto",
+                    var));
         }
 
         if (field.isRepeated()) {
