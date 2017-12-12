@@ -7,11 +7,12 @@ import java.util.List;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
-
-import grpcbridge.Exceptions.ConfigurationException;
+import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.route.Variable;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor.MethodType;
+
+import java.util.Objects;
 
 /**
  * gRPC message (request or response) abstraction. Each message is the
@@ -88,7 +89,7 @@ public class RpcMessage {
         for (String segment : var.getFieldPath()) {
             FieldDescriptor field = current.getDescriptorForType().findFieldByName(segment);
             if (field == null) {
-                throw new ConfigurationException(format(
+                throw new RouteNotFoundException(format(
                         "Invalid variable path: %s, looking for: %s",
                         var,
                         segment));
@@ -96,10 +97,12 @@ public class RpcMessage {
             current = current.getFieldBuilder(field);
         }
 
-        FieldDescriptor field = current.getDescriptorForType().findFieldByName(var.getFieldName());
-        if (field == null) {
-            throw new ConfigurationException("Invalid variable path: " + var);
-        }
+        FieldDescriptor field = var.getFieldNames()
+                .stream()
+                .map(current.getDescriptorForType()::findFieldByName)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new RouteNotFoundException("Invalid variable path: " + var));
 
         if (field.isRepeated()) {
             current.addRepeatedField(field, var.valueAs(field));

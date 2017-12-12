@@ -86,7 +86,7 @@ service TestService {
 
   rpc GetWithParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get?string_field={string_field}&int_field={int_field}"
+        get: "/get"
     };
   }
 
@@ -99,12 +99,6 @@ service TestService {
   rpc GetStatic (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-static"
-    };
-  }
-
-  rpc GetStaticWithParam (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get-static?param1=value1"
     };
   }
 
@@ -122,7 +116,7 @@ service TestService {
 
   rpc GetRepeatedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-repeated?repeated_field={repeated_field}"
+        get: "/get-repeated"
     };
   }
 
@@ -173,7 +167,7 @@ service TestService {
 
   rpc GrpcError (GrpcErrorRequest) returns (GrpcErrorResponse) {
     option (google.api.http) = {
-        get: "/grpc-error?add_metadata={add_metadata}"
+        get: "/grpc-error"
     };
   }
   

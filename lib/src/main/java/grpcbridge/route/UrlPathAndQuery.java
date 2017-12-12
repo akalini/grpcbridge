@@ -2,6 +2,7 @@ package grpcbridge.route;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.net.PercentEscaper;
@@ -57,6 +58,15 @@ final class UrlPathAndQuery {
 
     public Map<String, List<String>> query() {
         return query;
+    }
+
+    public List<Variable> variables() {
+        return query.entrySet()
+                .stream()
+                .flatMap(p -> p.getValue()
+                        .stream()
+                        .map(v ->  new Variable(p.getKey(), v)))
+                .collect(toList());
     }
 
     private static Map.Entry<String, List<String>> toMapEntry(String value) {

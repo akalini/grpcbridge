@@ -1,12 +1,17 @@
 package grpcbridge.route;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+
+import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-
-import static java.lang.String.format;
 
 /**
  * Describes a variable that can be specified in {@link com.google.api.HttpRule}
@@ -41,9 +46,9 @@ public final class Variable {
      * @return variable path. If variable is {path.to.protobuf.field}, returns
      *      "field" as the result
      */
-    public String getFieldName() {
+    public Collection<String> getFieldNames() {
         String[] path = name.split("\\.");
-        return path[path.length - 1];
+        return allNamesFor(path[path.length - 1]);
     }
 
     /**
@@ -93,5 +98,21 @@ public final class Variable {
 
         Variable other = (Variable) obj;
         return name.equals(other.name) && Objects.equals(value, other.value);
+    }
+
+    private static List<String> allNamesFor(String value) {
+        if (value.contains("-")) {
+            return asList(
+                    value,
+                    CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, value));
+        }
+
+        if (!value.contains("_")) {
+            return asList(
+                    value,
+                    CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, value));
+        }
+
+        return ImmutableList.of(value);
     }
 }

@@ -17,7 +17,6 @@ final class VariableExtractor {
 
     private final Pattern pattern;
     private final List<String> pathVars;
-    private final UrlQueryParams queryVars;
 
     /**
      * Creates new var extractor.
@@ -42,7 +41,6 @@ final class VariableExtractor {
 
         pathPatternBuilder.append(pathAndQuery.path().substring(lastMatched));
         this.pattern = Pattern.compile(pathPatternBuilder.toString());
-        this.queryVars = new UrlQueryParams(pathAndQuery.query());
     }
 
     /**
@@ -55,10 +53,6 @@ final class VariableExtractor {
         UrlPathAndQuery pathAndQuery = UrlPathAndQuery.parse(input);
 
         if (!pattern.matcher(pathAndQuery.path()).matches()) {
-            return false;
-        }
-
-        if (!queryVars.containsAll(pathAndQuery.query())) {
             return false;
         }
 
@@ -83,7 +77,7 @@ final class VariableExtractor {
             }
         }
 
-        result.addAll(queryVars.extractVars(pathAndQuery.query()));
+        result.addAll(pathAndQuery.variables());
 
         return result;
     }

@@ -25,8 +25,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.google.protobuf.ByteString;
-
-import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
@@ -235,7 +233,7 @@ public class BridgeTest {
     public void get_static_withParam() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
-                .builder(GET, "/get-static?param1=value1")
+                .builder(GET, "/get-static?string_field=value1")
                 .body(serialize(rpcRequest))
                 .build();
 
@@ -244,7 +242,7 @@ public class BridgeTest {
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
-                .setStringField("string")
+                .setStringField("value1")
                 .build()));
     }
 
@@ -327,7 +325,7 @@ public class BridgeTest {
                 .build()));
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expected = RouteNotFoundException.class)
     public void get_unknownPath() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
@@ -337,7 +335,7 @@ public class BridgeTest {
         bridge.handle(request);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expected = RouteNotFoundException.class)
     public void get_unknownVariable() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
