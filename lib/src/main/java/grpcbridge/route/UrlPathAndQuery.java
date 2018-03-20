@@ -1,5 +1,6 @@
 package grpcbridge.route;
 
+import static com.google.common.net.UrlEscapers.urlFormParameterEscaper;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toMap;
@@ -64,7 +65,8 @@ final class UrlPathAndQuery {
                     ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
                     : new SimpleImmutableEntry<>(
                             keyAndValue[0],
-                            singletonList(URLDecoder.decode(keyAndValue[1], UTF_8.name())));
+                            singletonList(URLDecoder.decode(urlFormParameterEscaper()
+                                    .escape(keyAndValue[1]), UTF_8.name())));
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
