@@ -1,8 +1,11 @@
 package grpcbridge.route;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toMap;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,8 +59,14 @@ final class UrlPathAndQuery {
 
     private static Map.Entry<String, List<String>> toMapEntry(String value) {
         String[] keyAndValue = value.split("=");
-        return keyAndValue.length == 1
-                ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
-                : new SimpleImmutableEntry<>(keyAndValue[0], singletonList(keyAndValue[1]));
+        try {
+            return keyAndValue.length == 1
+                    ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
+                    : new SimpleImmutableEntry<>(
+                            keyAndValue[0],
+                            singletonList(URLDecoder.decode(keyAndValue[1], UTF_8.name())));
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
