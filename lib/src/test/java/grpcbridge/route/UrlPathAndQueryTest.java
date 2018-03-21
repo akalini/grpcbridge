@@ -51,6 +51,21 @@ public class UrlPathAndQueryTest {
     }
 
     @Test
+    public void paramWithValue_URLEncoded() {
+        UrlPathAndQuery pathAndQuery = UrlPathAndQuery
+                .parse("/simple?p1={%20%22%25%2D%2E%3C%3E%5C%5E%5F%60%7B%7C%7D%7E}");
+        assertThat(pathAndQuery.path()).isEqualTo("/simple");
+        assertThat(pathAndQuery.query()).containsEntry("p1", list("{ \"%-.<>\\^_`{|}~}"));
+    }
+
+    @Test
+    public void paramWithValue_reservedCharacters() {
+        UrlPathAndQuery pathAndQuery = UrlPathAndQuery.parse("/simple?p1={!*'();:@+$,/#[]}");
+        assertThat(pathAndQuery.path()).isEqualTo("/simple");
+        assertThat(pathAndQuery.query()).containsEntry("p1", list("{!*'();:@+$,/#[]}"));
+    }
+
+    @Test
     public void multipleParams() {
         UrlPathAndQuery pathAndQuery = UrlPathAndQuery.parse("/simple?p1={pp1}&p2={pp2}&p3={pp3}");
         assertThat(pathAndQuery.path()).isEqualTo("/simple");
