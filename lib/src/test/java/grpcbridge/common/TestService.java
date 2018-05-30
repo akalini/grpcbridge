@@ -160,8 +160,8 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
             trailers = new Metadata();
             trailers.put(Metadata.Key.of("error-details", ASCII_STRING_MARSHALLER), "grpc error");
         }
-        throw new StatusRuntimeException(
+        responseObserver.onError(new StatusRuntimeException(
                 FAILED_PRECONDITION.withDescription("Expected GRPC error"),
-                trailers);
+                trailers));
     }
 }

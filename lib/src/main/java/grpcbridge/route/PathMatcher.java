@@ -13,7 +13,7 @@ final class PathMatcher {
     private final VariableExtractor path;
 
     public PathMatcher(HttpRule httpRule) {
-        String path;
+        String path = null;
         if (!httpRule.getGet().isEmpty()) {
             this.method = HttpMethod.GET;
             path = httpRule.getGet();
@@ -30,16 +30,23 @@ final class PathMatcher {
             this.method = HttpMethod.PATCH;
             path = httpRule.getPatch();
         } else {
-            throw new UnsupportedOperationException("Unsupported method: " + httpRule);
+            // just ignore RPCs that have no valid HttpRule
+            this.method = null;
         }
-        this.path = new VariableExtractor(path);
+        this.path = path == null ? null : new VariableExtractor(path);
     }
 
     public boolean matches(HttpRequest httpRequest) {
+        if ((method == null) || (path == null)) {
+            return false;
+        }
         return method == httpRequest.getMethod() && path.matches(httpRequest.getPath());
     }
 
     public List<Variable> parse(HttpRequest httpRequest) {
+        if ((method == null) || (path == null)) {
+            return null;
+        }
         return path.extract(httpRequest.getPath());
     }
 

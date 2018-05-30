@@ -1,14 +1,16 @@
 package grpcbridge;
 
-import com.google.protobuf.Descriptors.FileDescriptor;
-import com.google.protobuf.Message;
-import io.grpc.ServerMethodDefinition;
-import io.grpc.ServerServiceDefinition;
-import grpcbridge.route.Route;
-import grpcbridge.util.FileDescriptors;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.protobuf.Descriptors.FileDescriptor;
+import com.google.protobuf.Message;
+
+import grpcbridge.route.Route;
+import grpcbridge.util.FileDescriptors;
+import io.grpc.Channel;
+import io.grpc.ServerMethodDefinition;
+import io.grpc.ServerServiceDefinition;
 
 /**
  * Used to build {@link Bridge} instances. When a protobuf file is compiled
@@ -23,6 +25,7 @@ import java.util.List;
 public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
+    private Channel forwardChannel = null;
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -49,6 +52,17 @@ public final class BridgeBuilder {
     }
 
     /**
+     * Sets a channel to forward the resulting gRPC call to. If this is not set, then the 
+     * call is handled within the same server.
+     * @param forwardChannel
+     * @return
+     */
+    public BridgeBuilder setForwardChannel(Channel forwardChannel) {
+        this.forwardChannel = forwardChannel;
+        return this;
+    }
+
+    /**
      * Creates new instance of the {@link Bridge}.
      *
      * @return built bride instance
@@ -66,6 +80,11 @@ public final class BridgeBuilder {
             }
         }
 
-        return new Bridge(routes);
+        Bridge bridge = new Bridge(routes);
+        if (forwardChannel != null) {
+            bridge.setForwardChannel(forwardChannel);
+        }
+        
+        return bridge;
     }
 }

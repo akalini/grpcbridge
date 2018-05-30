@@ -19,7 +19,15 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import com.google.protobuf.ByteString;
+
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
@@ -38,18 +46,52 @@ import grpcbridge.test.proto.Test.PostRequest;
 import grpcbridge.test.proto.Test.PostResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
+import io.grpc.ManagedChannel;
 import io.grpc.Metadata;
 import io.grpc.StatusRuntimeException;
+import io.grpc.inprocess.InProcessChannelBuilder;
+import io.grpc.inprocess.InProcessServerBuilder;
 
-import org.junit.Test;
-
+@RunWith(Parameterized.class)
 public class BridgeTest {
-    private TestService testService = new TestService();
-    private Bridge bridge = Bridge
-            .builder()
-            .addFile(grpcbridge.test.proto.Test.getDescriptor())
-            .addService(testService.bindService())
-            .build();
+    
+    /**
+     * Run all tests with both a direct bridge and a proxy bridge
+     * @throws IOException 
+     */
+    @Parameterized.Parameters(name 
+            = "{index}: Test with {0} bridge")
+    public static Iterable<Object[]> data() throws IOException {
+        TestService testService = new TestService();
+
+        Bridge bridge = Bridge
+                .builder()
+                .addFile(grpcbridge.test.proto.Test.getDescriptor())
+                .addService(testService.bindService())
+                .build();
+        Bridge proxyBridge;
+        /** Start up a grpc server that will be sent the resulting
+         * grpc calls */
+        InProcessServerBuilder.forName("proxytest").directExecutor()
+            .addService(new TestService()).build().start();
+        ManagedChannel channel = InProcessChannelBuilder.forName("proxytest").directExecutor().build();
+        proxyBridge = Bridge
+                .builder()
+                .addFile(grpcbridge.test.proto.Test.getDescriptor())
+                .addService(testService.bindService())
+                .setForwardChannel(channel)
+                .build();
+        
+        return Arrays.asList(new Object[][] {
+            {"direct", bridge },
+            {"proxy", proxyBridge },
+        });
+    }
+    
+    private Bridge bridge;
+    public BridgeTest(String bridgeType, Bridge bridge) {
+        this.bridge = bridge;
+    }    
 
     @Test
     public void get() {
@@ -451,7 +493,8 @@ public class BridgeTest {
             bridge.handle(request);
             fail("Did not throw expected StatusRuntimeException");
         } catch (StatusRuntimeException ex) {
-            assertThat(ex.getTrailers()).isNull();
+            assertThat(ex.getTrailers().keys().isEmpty()).isTrue();
         }
     }
+    
 }

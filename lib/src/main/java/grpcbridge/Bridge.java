@@ -1,20 +1,30 @@
 package grpcbridge;
 
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import com.google.protobuf.Message;
+
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
 import grpcbridge.util.ProtoJson;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import io.grpc.CallOptions;
+import io.grpc.Channel;
+import io.grpc.ClientCall;
+import io.grpc.ClientCall.Listener;
+import io.grpc.Metadata;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -59,6 +69,7 @@ import static com.google.common.util.concurrent.Uninterruptibles.getUninterrupti
  */
 public final class Bridge {
     private final List<Route> routes;
+    private Channel forwardChannel;
 
     /**
      * Creates new {@link BridgeBuilder} that is used to setup a bridge.
@@ -99,6 +110,24 @@ public final class Bridge {
             }
         }
     }
+    
+    /**
+     * Finds the {@link RpcCall} associated with the given http request
+     * @param httpRequest HTTP request
+     * @return
+     */
+    private RpcCall getRpcCall(HttpRequest httpRequest) {
+        for (Route route : routes) {
+            Optional<RpcCall> call = route.match(httpRequest);
+            if (call.isPresent()) {
+                return call.get();
+            }
+        }
+        throw new Exceptions.RouteNotFoundException(String.format(
+                "Mapper not found: %s %s",
+                httpRequest.getMethod(),
+                httpRequest.getPath()));
+    }
 
     /**
      * Handles incoming HTTP request asynchronously. The request is matched
@@ -110,18 +139,37 @@ public final class Bridge {
      * @return HTTP response future
      */
     public ListenableFuture<HttpResponse> handleAsync(HttpRequest httpRequest) {
-        for (Route route : routes) {
-            Optional<RpcCall> call = route.match(httpRequest);
-            if (call.isPresent()) {
-                ListenableFuture<RpcMessage> response = call.get().execute();
-                return Futures.transform(response, new RpcToHttpMessage());
-            }
+        if (this.forwardChannel != null) {
+            return proxy(httpRequest);
+        } else {
+            ListenableFuture<RpcMessage> response = this.getRpcCall(httpRequest).execute();
+            return Futures.transform(response, new RpcToHttpMessage());
         }
 
-        throw new Exceptions.RouteNotFoundException(String.format(
-                "Mapper not found: %s %s",
-                httpRequest.getMethod(),
-                httpRequest.getPath()));
+    }
+    
+    /**
+     * Handles incoming HTTP request asynchronously. The request is matched
+     * against the set of available routes and if a route is found, the request
+     * is transformed according to the gRPC service method annotations and
+     * then sent as a client request to the {@link Bridge#forwardChannel}
+     * @param httpRequest HTTP request
+     * @return
+     */
+    public ListenableFuture<HttpResponse> proxy(HttpRequest httpRequest) {
+        final SettableFuture<HttpResponse> listener = SettableFuture.create();
+        RpcCall rpc = this.getRpcCall(httpRequest);
+        ClientCall<Message, Message> call = this.forwardChannel.newCall(rpc.getMethod().getMethodDescriptor(), CallOptions.DEFAULT);
+        call.start(new RpcListenerToHttpMessage(listener), httpRequest.getHeaders());
+        call.sendMessage(rpc.getRequest().getBody());
+        call.halfClose();
+        call.request(1);
+        
+        return listener;
+    }
+
+    void setForwardChannel(Channel forwardChannel) {
+        this.forwardChannel = forwardChannel;
     }
 
     /**
@@ -134,6 +182,38 @@ public final class Bridge {
 
         @Override public boolean equals(Object object) {
             return false;
+        }
+    }
+    
+    /**
+     * Listener to the response of an RPC {@link ClientCall}
+     * This will record the message and then transform and send it to the http listener when 
+     * the RPC connection is closed.
+     *
+     */
+    private static class RpcListenerToHttpMessage extends Listener<Message> {
+        private SettableFuture<HttpResponse> httpListener;
+        private Message message;
+        
+        public RpcListenerToHttpMessage(SettableFuture<HttpResponse> httpListener) {
+            this.httpListener = httpListener;
+        }
+        
+        @Override
+        public void onMessage(Message message) {
+            if (this.message == null) {
+                /** Only unary supported */
+                this.message = message;
+            }
+        }
+        
+        @Override
+        public void onClose(Status status, Metadata trailers) {
+            if (status.isOk()) {
+                this.httpListener.set(new RpcToHttpMessage().apply(new RpcMessage(this.message, trailers)));
+            } else {
+                this.httpListener.setException(new StatusRuntimeException(status, trailers));
+            }
         }
     }
 }
