@@ -44,4 +44,14 @@ public final class RpcCall {
 
         return result;
     }
+
+    public RpcMessage getRequest() {
+        return request;
+    }
+
+    public ServerMethodDefinition<Message, Message> getMethod() {
+        return method;
+    }
+    
+    
 }
