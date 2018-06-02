@@ -59,11 +59,11 @@ public class BridgeTest {
             .addService(testService.bindService())
             .build();
     
-
     private ServerInterceptor authCheck = new ServerInterceptor() {
-        
         @Override
-        public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
+        public <ReqT, RespT> Listener<ReqT> interceptCall(
+                ServerCall<ReqT, RespT> call, 
+                Metadata headers,
                 ServerCallHandler<ReqT, RespT> next) {
             if (headers.containsKey(Key.of("auth", Metadata.ASCII_STRING_MARSHALLER))) {
                 return next.startCall(call, headers);
@@ -480,7 +480,6 @@ public class BridgeTest {
     
     @Test
     public void getWithInterceptor() {
-        
         Bridge bridge = Bridge
                 .builder()
                 .addFile(grpcbridge.test.proto.Test.getDescriptor())
