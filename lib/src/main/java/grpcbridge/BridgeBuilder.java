@@ -2,6 +2,9 @@ package grpcbridge;
 
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Message;
+
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
 import io.grpc.ServerMethodDefinition;
 import io.grpc.ServerServiceDefinition;
 import grpcbridge.route.Route;
@@ -23,6 +26,7 @@ import java.util.List;
 public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
+    private final List<ServerInterceptor> interceptors = new ArrayList<>();
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -47,6 +51,16 @@ public final class BridgeBuilder {
         services.add(service);
         return this;
     }
+    
+    /**
+     * Adds an interceptor. This will apply to ALL services behind this bridge
+     * @param interceptor The interceptor
+     * @return this builder instance
+     */
+    public BridgeBuilder addInterceptor(ServerInterceptor interceptor) {
+        interceptors.add(interceptor);
+        return this;
+    }
 
     /**
      * Creates new instance of the {@link Bridge}.
@@ -58,6 +72,9 @@ public final class BridgeBuilder {
         List<Route> routes = new ArrayList<>();
 
         for (ServerServiceDefinition service : services) {
+            if (!interceptors.isEmpty()) {
+                service = ServerInterceptors.intercept(service, interceptors);
+            }
             for (ServerMethodDefinition<?, ?> method : service.getMethods()) {
                 Route route = files.routeFor(
                         service,

@@ -19,7 +19,10 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import org.junit.Test;
+
 import com.google.protobuf.ByteString;
+
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
@@ -39,9 +42,14 @@ import grpcbridge.test.proto.Test.PostResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
 import io.grpc.Metadata;
+import io.grpc.Metadata.Key;
+import io.grpc.ServerCall;
+import io.grpc.ServerCall.Listener;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import io.grpc.Status;
+import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
-
-import org.junit.Test;
 
 public class BridgeTest {
     private TestService testService = new TestService();
@@ -50,6 +58,21 @@ public class BridgeTest {
             .addFile(grpcbridge.test.proto.Test.getDescriptor())
             .addService(testService.bindService())
             .build();
+    
+
+    private ServerInterceptor authCheck = new ServerInterceptor() {
+        
+        @Override
+        public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
+                ServerCallHandler<ReqT, RespT> next) {
+            if (headers.containsKey(Key.of("auth", Metadata.ASCII_STRING_MARSHALLER))) {
+                return next.startCall(call, headers);
+            } else {
+                call.close(Status.UNAUTHENTICATED.withDescription("No auth metdata"), headers);
+                return new ServerCall.Listener() {};
+            }
+        }
+    };
 
     @Test
     public void get() {
@@ -453,5 +476,47 @@ public class BridgeTest {
         } catch (StatusRuntimeException ex) {
             assertThat(ex.getTrailers()).isNull();
         }
+    }
+    
+    @Test
+    public void getWithInterceptor() {
+        
+        Bridge bridge = Bridge
+                .builder()
+                .addFile(grpcbridge.test.proto.Test.getDescriptor())
+                .addService(testService.bindService())
+                .addInterceptor(authCheck)
+                .build();
+
+        /** Try without Auth header */
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello")
+                .body(serialize(rpcRequest))
+                .build();
+
+        try {
+            bridge.handle(request);
+            fail("Did not throw expected StatusRuntimeException");
+        } catch (StatusRuntimeException ex) {
+            assertThat(ex.getStatus().getCode()).isEqualTo(Code.UNAUTHENTICATED);
+        }
+
+        /** Next put auth header */
+        Metadata headers = new Metadata();
+        headers.put(Key.of("auth", Metadata.ASCII_STRING_MARSHALLER), "token");
+        rpcRequest = newGetRequest();
+        request = HttpRequest
+                .builder(GET, "/get/hello")
+                .headers(headers)
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .build()));
     }
 }
