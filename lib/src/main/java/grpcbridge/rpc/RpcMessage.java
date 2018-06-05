@@ -2,33 +2,44 @@ package grpcbridge.rpc;
 
 import static java.lang.String.format;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
+
 import grpcbridge.Exceptions.ConfigurationException;
 import grpcbridge.route.Variable;
 import io.grpc.Metadata;
+import io.grpc.MethodDescriptor.MethodType;
 
 /**
  * gRPC message (request or response) abstraction. Each message is the
  * request or response protobuf and the headers or trailers metadata.
  */
 public class RpcMessage {
-    private Message body;
+    private List<Message> body;
     private final Metadata metadata;
+    private MethodType methodType;
 
     /**
      * @param body request or response protobuf message
      * @param metadata headers or trailers metadata
      */
     public RpcMessage(Message body, Metadata metadata) {
+        this(Arrays.asList(body), metadata, MethodType.UNARY);
+    }
+    
+    public RpcMessage(List<Message> body, Metadata metadata, MethodType methodType) {
         this.body = body;
         this.metadata = metadata;
+        this.methodType = methodType;
     }
 
     /**
      * @return request or response protobuf message
      */
-    public Message getBody() {
+    public List<Message> getBody() {
         return body;
     }
 
@@ -39,13 +50,38 @@ public class RpcMessage {
         return metadata;
     }
 
+    public MethodType getMethodType() {
+        return methodType;
+    }
+
     /**
      * Applies the specified variable to the underlying protobuf message.
+     * If this is a stream RpcMessage, then this will set the var on every message.
+     * To set on a single message use {@link RpcMessage#setVar(int, Variable)}
      *
      * @param var variable to set
      */
     public void setVar(Variable var) {
-        Message.Builder start = body.toBuilder();
+        for (int i = 0; i < this.body.size(); i++) {
+            setVar(i, var);
+        }
+    }
+
+    /**
+     * Applies the specified variable to the underlying protobuf message.
+     *
+     * @param messageIndex The index of the message in the stream to set the variable on
+     * @param var variable to set
+     * 
+     * throws {@link IllegalArgumentException} when an invalid index is given
+     */
+    public void setVar(int messageIndex, Variable var) {
+        if ((messageIndex < 0) || (messageIndex >= body.size())) {
+            throw new IllegalArgumentException("No message found for index " + messageIndex);
+        }
+        
+        Message message = this.body.get(messageIndex);
+        Message.Builder start = message.toBuilder();
 
         Message.Builder current = start;
 
@@ -70,7 +106,7 @@ public class RpcMessage {
         } else {
             current.setField(field, var.valueAs(field));
         }
-        this.body = start.build();
+        this.body.set(messageIndex, start.build());
     }
 
     @Override

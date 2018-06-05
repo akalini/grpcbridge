@@ -176,4 +176,10 @@ service TestService {
         get: "/grpc-error?add_metadata={add_metadata}"
     };
   }
+  
+  rpc GetStream (GetRequest) returns (stream GetResponse) {
+    option (google.api.http) = {
+        get: "/get-stream/{string_field}?int_field={int_field}"
+    };
+  }
 }

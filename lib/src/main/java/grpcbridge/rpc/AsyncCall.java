@@ -1,5 +1,8 @@
 package grpcbridge.rpc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.Message;
 import io.grpc.*;
@@ -12,6 +15,7 @@ final class AsyncCall extends ServerCall<Message, Message> {
     private final MethodDescriptor<Message, Message> method;
     private final SettableFuture<RpcMessage> delegate;
     private Metadata headers;
+    private List<Message> messages = new ArrayList<Message>();
 
     public AsyncCall(
             MethodDescriptor<Message, Message> method,
@@ -31,13 +35,15 @@ final class AsyncCall extends ServerCall<Message, Message> {
 
     @Override
     public void sendMessage(Message message) {
-        delegate.set(new RpcMessage(message, headers));
+        this.messages.add(message);
     }
 
     @Override
     public void close(Status status, Metadata trailers) {
         if (!status.isOk()) {
             delegate.setException(new StatusRuntimeException(status, trailers));
+        } else {
+            delegate.set(new RpcMessage(this.messages, headers, method.getType())); // send all messages on close
         }
     }
 
