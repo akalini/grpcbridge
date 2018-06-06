@@ -38,8 +38,9 @@ public final class RpcCall {
                 .startCall(
                         new AsyncCall(method.getMethodDescriptor(), result),
                         request.getMetadata());
-
-        listener.onMessage(request.getBody());
+        for (Message message : request.getBody()) {
+            listener.onMessage(message);
+        }
         listener.onHalfClose();
 
         return result;

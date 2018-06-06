@@ -14,10 +14,13 @@ import static grpcbridge.http.HttpMethod.POST;
 import static grpcbridge.http.HttpMethod.PUT;
 import static grpcbridge.test.proto.Test.Enum.INVALID;
 import static grpcbridge.util.ProtoJson.parse;
+import static grpcbridge.util.ProtoJson.parseStream;
 import static grpcbridge.util.ProtoJson.serialize;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -517,5 +520,23 @@ public class BridgeTest {
                 .toBuilder()
                 .setStringField("hello")
                 .build()));
+    }
+    
+    @Test
+    public void getStream() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get-stream/hello?int_field=2")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        
+        List<GetResponse> responses = parseStream(response.getBody(), GetResponse.newBuilder());
+        assertThat(responses.size()).isEqualTo(2);
+        assertThat(responses.get(0).getStringField()).isEqualTo("hello");
+        assertThat(responses.get(0).getIntField()).isEqualTo(0);
+        assertThat(responses.get(1).getStringField()).isEqualTo("hello");
+        assertThat(responses.get(1).getIntField()).isEqualTo(1);
     }
 }

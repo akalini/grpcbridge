@@ -164,4 +164,27 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 FAILED_PRECONDITION.withDescription("Expected GRPC error"),
                 trailers);
     }
+
+    @Override
+    public void getStream(
+            GetRequest request,
+            StreamObserver<GetResponse> responseObserver) {
+        
+        logger.info("Get({})", TextFormat.shortDebugString(request));
+        for (int i = 0; i < request.getIntField(); i++) {
+            responseObserver.onNext(GetResponse.newBuilder()
+                    .setStringField(request.getStringField())
+                    .setIntField(i)
+                    .setLongField(request.getLongField())
+                    .setFloatField(request.getFloatField())
+                    .setDoubleField(request.getDoubleField())
+                    .setBoolField(request.getBoolField())
+                    .setEnumField(request.getEnumField())
+                    .setBytesField(request.getBytesField())
+                    .setNested(request.getNested())
+                    .addAllRepeatedField(request.getRepeatedFieldList())
+                    .build());
+        }
+        responseObserver.onCompleted();
+    }
 }
