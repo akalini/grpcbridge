@@ -67,17 +67,17 @@ public final class ProtoJson {
     }
 
     public static HttpResponse serialize(RpcMessage message) {
-        String httpBody;
         if (message.getMethodType().serverSendsOneMessage()) {
-            httpBody = !message.getBody().isEmpty() ? serialize(message.getBody().get(0)) : "";
+            String httpBody = !message.getBody().isEmpty() ? serialize(message.getBody().get(0)) : "";
+            return new HttpResponse(httpBody, message.getMetadata());
         } else {
-            List<String> messagesBody = new ArrayList<String>();
-            for (Message msg : message.getBody()) {
-                messagesBody.add(serialize(msg));
+            StringBuilder builder = new StringBuilder("[");
+            for (int i = 0; i < message.getBody().size(); i++) {
+                builder.append((i > 0 ? "," : "") + serialize(message.getBody().get(i)));
             }
-            httpBody = "[" + Joiner.on(",").join(messagesBody) + "]";
+            builder.append("]");
+            return new HttpResponse(builder.toString(), message.getMetadata());
         }
-        return new HttpResponse(httpBody, message.getMetadata());
     }
 
     public static String serialize(Message message) {
