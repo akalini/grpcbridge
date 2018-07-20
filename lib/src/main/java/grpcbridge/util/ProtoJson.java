@@ -10,6 +10,7 @@ import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.rpc.RpcMessage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +64,11 @@ public final class ProtoJson {
         return (T) builder.build();
     }
 
-    public static HttpResponse serialize(RpcMessage message) {
+    public static HttpResponse serialize(@Nonnull RpcMessage message) {
         return serialize(false, message);
     }
 
-    public static HttpResponse serialize(boolean preserveProtoFieldNames, RpcMessage message) {
+    public static HttpResponse serialize(boolean preserveProtoFieldNames, @Nonnull RpcMessage message) {
         if (message.getMethodType().serverSendsOneMessage()) {
             String httpBody = !message.getBody().isEmpty() ? serialize(preserveProtoFieldNames,
                     message.getBody().get(0))
@@ -84,11 +85,11 @@ public final class ProtoJson {
         }
     }
 
-    public static String serialize(Message message) {
+    public static String serialize(@Nonnull Message message) {
         return serialize(false, message);
     }
 
-    public static String serialize(boolean preserveProtoFieldNames, Message message) {
+    public static String serialize(boolean preserveProtoFieldNames, @Nonnull Message message) {
         try {
             JsonFormat.Printer printer = JsonFormat.printer();
             if (preserveProtoFieldNames) {

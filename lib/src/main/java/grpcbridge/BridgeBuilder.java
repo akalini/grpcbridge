@@ -65,7 +65,8 @@ public final class BridgeBuilder {
 
     /**
      * Set whether you want to preserver proto field names
-     * @param preserveProtoFieldNames If set to true it will not convert field names to camelCase
+     * @param preserveProtoFieldNames If set to true it will use the exact field name casing from
+     *                               proto file when serializing to json
      * @return this builder instance
      */
     public BridgeBuilder preserveProtoFieldNames(boolean preserveProtoFieldNames) {
