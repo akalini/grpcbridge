@@ -1,24 +1,22 @@
 package grpcbridge.util;
 
-import static java.lang.String.format;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
-
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.rpc.RpcMessage;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * Helper methods to convert from JSON to protobuf messages and back.
@@ -37,7 +35,10 @@ public final class ProtoJson {
     }
 
     @SuppressWarnings("rawtypes")
-    public static <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
+    public static <T extends Message> List<T> parseStream(
+            @Nullable String body,
+            T.Builder builder
+    ) {
         List<T> messages = new ArrayList<>();
         if (!Strings.isNullOrEmpty(body)) {
             /** Parses the containing json which is not gRPC parsable
@@ -66,23 +67,39 @@ public final class ProtoJson {
         return (T) builder.build();
     }
 
-    public static HttpResponse serialize(RpcMessage message) {
+    public static HttpResponse serialize(@Nonnull RpcMessage message) {
+        return serialize(JsonFormat.printer(), message);
+    }
+
+    public static HttpResponse serialize(
+            @Nonnull JsonFormat.Printer printer,
+            @Nonnull RpcMessage message
+    ) {
         if (message.getMethodType().serverSendsOneMessage()) {
-            String httpBody = !message.getBody().isEmpty() ? serialize(message.getBody().get(0)) : "";
+            String httpBody = !message.getBody().isEmpty() ? serialize(printer,
+                    message.getBody().get(0))
+                    : "";
             return new HttpResponse(httpBody, message.getMetadata());
         } else {
             StringBuilder builder = new StringBuilder("[");
             for (int i = 0; i < message.getBody().size(); i++) {
-                builder.append((i > 0 ? "," : "") + serialize(message.getBody().get(i)));
+                builder.append((i > 0 ? "," : ""));
+                builder.append(
+                        serialize(printer, message.getBody().get(i))
+                );
             }
             builder.append("]");
             return new HttpResponse(builder.toString(), message.getMetadata());
         }
     }
 
-    public static String serialize(Message message) {
+    public static String serialize(@Nonnull Message message) {
+        return serialize(JsonFormat.printer(), message);
+    }
+
+    public static String serialize(@Nonnull JsonFormat.Printer printer, @Nonnull Message message) {
         try {
-            return JsonFormat.printer().print(message);
+            return printer.print(message);
         } catch (InvalidProtocolBufferException e) {
             throw new ParsingException(format("Failed to serialize a message: {%s}", message), e);
         }

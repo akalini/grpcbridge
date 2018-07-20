@@ -3,6 +3,7 @@ package grpcbridge;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Message;
 
+import com.google.protobuf.util.JsonFormat;
 import io.grpc.ServerInterceptor;
 import io.grpc.ServerInterceptors;
 import io.grpc.ServerMethodDefinition;
@@ -27,6 +28,7 @@ public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
     private final List<ServerInterceptor> interceptors = new ArrayList<>();
+    private JsonFormat.Printer printer = JsonFormat.printer();
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -63,6 +65,16 @@ public final class BridgeBuilder {
     }
 
     /**
+     * Set whether you want to preserver proto field names
+     * @param printer Printer used for serializing to json
+     * @return this builder instance
+     */
+    public BridgeBuilder printer(JsonFormat.Printer printer) {
+        this.printer = printer;
+        return this;
+    }
+
+    /**
      * Creates new instance of the {@link Bridge}.
      *
      * @return built bride instance
@@ -83,6 +95,6 @@ public final class BridgeBuilder {
             }
         }
 
-        return new Bridge(routes);
+        return new Bridge(routes, printer);
     }
 }
