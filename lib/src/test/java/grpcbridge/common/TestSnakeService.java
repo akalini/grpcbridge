@@ -10,9 +10,16 @@ import io.grpc.stub.StreamObserver;
 public class TestSnakeService extends SnakeTestServiceGrpc.SnakeTestServiceImplBase {
 
     @Override
-    public void snake(TestSnakeCase.SnakeRequest request, StreamObserver<TestSnakeCase.SnakeResponse> responseObserver) {
-        responseObserver.onNext(TestSnakeCase.SnakeResponse.newBuilder().setStatusCode("OK").build
-                ());
+    public void snake(
+            TestSnakeCase.SnakeRequest request,
+            StreamObserver<TestSnakeCase.SnakeResponse> responseObserver
+    ) {
+        responseObserver.onNext(
+                TestSnakeCase.SnakeResponse
+                        .newBuilder()
+                        .setStatusCode("OK")
+                        .build()
+        );
         responseObserver.onCompleted();
     }
 }

@@ -2,6 +2,7 @@ package grpcbridge;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.protobuf.util.JsonFormat;
 import grpcbridge.common.TestSnakeService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
@@ -18,9 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SnakeCaseBridgeTest {
     private TestSnakeService testService = new TestSnakeService();
+    final JsonFormat.Printer printer = JsonFormat.printer().preservingProtoFieldNames();
     private Bridge bridge = Bridge
             .builder()
-            .preserveProtoFieldNames(true)
+            .printer(printer)
             .addFile(grpcbridge.test.proto.TestSnakeCase.getDescriptor())
             .addService(testService.bindService())
             .build();
@@ -32,7 +34,7 @@ public class SnakeCaseBridgeTest {
         TestSnakeCase.SnakeRequest rpcRequest = TestSnakeCase.SnakeRequest.newBuilder()
                 .setFirstName("John")
                 .setLastName("Doe").build();
-        String rawBody = serialize(true, rpcRequest);
+        String rawBody = serialize(printer, rpcRequest);
         Map<String, String> bodyJson = gson.fromJson(rawBody, type);
         assertThat(bodyJson.get("first_name")).isEqualTo("John");
         assertThat(bodyJson.get("last_name")).isEqualTo("Doe");

@@ -3,6 +3,7 @@ package grpcbridge;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.protobuf.util.JsonFormat;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.route.Route;
@@ -59,7 +60,7 @@ import static com.google.common.util.concurrent.Uninterruptibles.getUninterrupti
  */
 public final class Bridge {
     private final List<Route> routes;
-    private final boolean preserveProtoFieldNames;
+    private final JsonFormat.Printer printer;
 
     /**
      * Creates new {@link BridgeBuilder} that is used to setup a bridge.
@@ -76,9 +77,20 @@ public final class Bridge {
      *
      * @param routes list of available routes
      */
-    Bridge(List<Route> routes, boolean preserveProtoFieldNames) {
+    Bridge(List<Route> routes) {
+        this(routes, JsonFormat.printer());
+    }
+
+    /**
+     * Creates a new bridge, use {@link BridgeBuilder} to create bridge
+     * instances.
+     *
+     * @param routes    list of available routes
+     * @param printer   printer used for serializing to json
+     */
+    Bridge(List<Route> routes, JsonFormat.Printer printer) {
         this.routes = routes;
-        this.preserveProtoFieldNames = preserveProtoFieldNames;
+        this.printer = printer;
     }
 
     /**
@@ -116,7 +128,7 @@ public final class Bridge {
             Optional<RpcCall> call = route.match(httpRequest);
             if (call.isPresent()) {
                 ListenableFuture<RpcMessage> response = call.get().execute();
-                return Futures.transform(response, new RpcToHttpMessage(preserveProtoFieldNames));
+                return Futures.transform(response, new RpcToHttpMessage(printer));
             }
         }
 
@@ -130,12 +142,12 @@ public final class Bridge {
      * Translates gRPC responses to the HTTP responses.
      */
     private static class RpcToHttpMessage implements Function<RpcMessage, HttpResponse> {
-        private boolean preserveProtoFieldNames;
-        RpcToHttpMessage(boolean preserveProtoFieldNames) {
-            this.preserveProtoFieldNames = preserveProtoFieldNames;
+        private final JsonFormat.Printer printer;
+        RpcToHttpMessage(JsonFormat.Printer printer) {
+            this.printer = printer;
         }
         @Override public HttpResponse apply(RpcMessage response) {
-            return ProtoJson.serialize(preserveProtoFieldNames, response);
+            return ProtoJson.serialize(printer, response);
         }
 
         @Override public boolean equals(Object object) {

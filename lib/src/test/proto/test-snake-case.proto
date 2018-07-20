@@ -13,11 +13,10 @@ message SnakeResponse {
 }
 
 service SnakeTestService {
-
     rpc snake (SnakeRequest) returns (SnakeResponse) {
         option (google.api.http) = {
-        post: "/snake/"
-        body: "*"
-    };
+            post: "/snake/"
+            body: "*"
+        };
     }
 }
