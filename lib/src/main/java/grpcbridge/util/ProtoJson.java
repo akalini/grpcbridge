@@ -1,24 +1,21 @@
 package grpcbridge.util;
 
-import static java.lang.String.format;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
-
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.rpc.RpcMessage;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * Helper methods to convert from JSON to protobuf messages and back.
@@ -67,13 +64,20 @@ public final class ProtoJson {
     }
 
     public static HttpResponse serialize(RpcMessage message) {
+        return serialize(false, message);
+    }
+
+    public static HttpResponse serialize(boolean preserveProtoFieldNames, RpcMessage message) {
         if (message.getMethodType().serverSendsOneMessage()) {
-            String httpBody = !message.getBody().isEmpty() ? serialize(message.getBody().get(0)) : "";
+            String httpBody = !message.getBody().isEmpty() ? serialize(preserveProtoFieldNames,
+                    message.getBody().get(0))
+                    : "";
             return new HttpResponse(httpBody, message.getMetadata());
         } else {
             StringBuilder builder = new StringBuilder("[");
             for (int i = 0; i < message.getBody().size(); i++) {
-                builder.append((i > 0 ? "," : "") + serialize(message.getBody().get(i)));
+                builder.append((i > 0 ? "," : "") + serialize(preserveProtoFieldNames, message
+                        .getBody().get(i)));
             }
             builder.append("]");
             return new HttpResponse(builder.toString(), message.getMetadata());
@@ -81,8 +85,16 @@ public final class ProtoJson {
     }
 
     public static String serialize(Message message) {
+        return serialize(false, message);
+    }
+
+    public static String serialize(boolean preserveProtoFieldNames, Message message) {
         try {
-            return JsonFormat.printer().print(message);
+            JsonFormat.Printer printer = JsonFormat.printer();
+            if (preserveProtoFieldNames) {
+                printer = printer.preservingProtoFieldNames();
+            }
+            return printer.print(message);
         } catch (InvalidProtocolBufferException e) {
             throw new ParsingException(format("Failed to serialize a message: {%s}", message), e);
         }

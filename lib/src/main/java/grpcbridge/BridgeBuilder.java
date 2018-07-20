@@ -27,6 +27,7 @@ public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
     private final List<ServerInterceptor> interceptors = new ArrayList<>();
+    private boolean preserveProtoFieldNames = false;
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -63,6 +64,16 @@ public final class BridgeBuilder {
     }
 
     /**
+     * Set whether you want to preserver proto field names
+     * @param preserveProtoFieldNames If set to true it will not convert field names to camelCase
+     * @return this builder instance
+     */
+    public BridgeBuilder preserveProtoFieldNames(boolean preserveProtoFieldNames) {
+        this.preserveProtoFieldNames = preserveProtoFieldNames;
+        return this;
+    }
+
+    /**
      * Creates new instance of the {@link Bridge}.
      *
      * @return built bride instance
@@ -83,6 +94,6 @@ public final class BridgeBuilder {
             }
         }
 
-        return new Bridge(routes);
+        return new Bridge(routes, preserveProtoFieldNames);
     }
 }

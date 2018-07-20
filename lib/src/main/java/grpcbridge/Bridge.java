@@ -59,6 +59,7 @@ import static com.google.common.util.concurrent.Uninterruptibles.getUninterrupti
  */
 public final class Bridge {
     private final List<Route> routes;
+    private final boolean preserveProtoFieldNames;
 
     /**
      * Creates new {@link BridgeBuilder} that is used to setup a bridge.
@@ -75,8 +76,9 @@ public final class Bridge {
      *
      * @param routes list of available routes
      */
-    Bridge(List<Route> routes) {
+    Bridge(List<Route> routes, boolean preserveProtoFieldNames) {
         this.routes = routes;
+        this.preserveProtoFieldNames = preserveProtoFieldNames;
     }
 
     /**
@@ -114,7 +116,7 @@ public final class Bridge {
             Optional<RpcCall> call = route.match(httpRequest);
             if (call.isPresent()) {
                 ListenableFuture<RpcMessage> response = call.get().execute();
-                return Futures.transform(response, new RpcToHttpMessage());
+                return Futures.transform(response, new RpcToHttpMessage(preserveProtoFieldNames));
             }
         }
 
@@ -128,8 +130,12 @@ public final class Bridge {
      * Translates gRPC responses to the HTTP responses.
      */
     private static class RpcToHttpMessage implements Function<RpcMessage, HttpResponse> {
+        private boolean preserveProtoFieldNames;
+        RpcToHttpMessage(boolean preserveProtoFieldNames) {
+            this.preserveProtoFieldNames = preserveProtoFieldNames;
+        }
         @Override public HttpResponse apply(RpcMessage response) {
-            return ProtoJson.serialize(response);
+            return ProtoJson.serialize(preserveProtoFieldNames, response);
         }
 
         @Override public boolean equals(Object object) {

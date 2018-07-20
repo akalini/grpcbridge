@@ -1,0 +1,23 @@
+syntax = "proto3";
+package grpcbridge.test.proto;
+
+import "google/api/annotations.proto";
+
+message SnakeRequest {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+message SnakeResponse {
+    string status_code = 1;
+}
+
+service SnakeTestService {
+
+    rpc snake (SnakeRequest) returns (SnakeResponse) {
+        option (google.api.http) = {
+        post: "/snake/"
+        body: "*"
+    };
+    }
+}
