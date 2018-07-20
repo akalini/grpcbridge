@@ -1,5 +1,24 @@
 package grpcbridge;
 
+import static grpcbridge.common.TestFactory.newDeleteRequest;
+import static grpcbridge.common.TestFactory.newGetRequest;
+import static grpcbridge.common.TestFactory.newGrpcErrorRequest;
+import static grpcbridge.common.TestFactory.newPatchRequest;
+import static grpcbridge.common.TestFactory.newPostRequest;
+import static grpcbridge.common.TestFactory.newPutRequest;
+import static grpcbridge.common.TestFactory.responseFor;
+import static grpcbridge.http.HttpMethod.DELETE;
+import static grpcbridge.http.HttpMethod.GET;
+import static grpcbridge.http.HttpMethod.PATCH;
+import static grpcbridge.http.HttpMethod.POST;
+import static grpcbridge.http.HttpMethod.PUT;
+import static grpcbridge.test.proto.Test.Enum.INVALID;
+import static grpcbridge.util.ProtoJson.parse;
+import static grpcbridge.util.ProtoJson.parseStream;
+import static grpcbridge.util.ProtoJson.serialize;
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import com.google.protobuf.ByteString;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
@@ -30,26 +49,6 @@ import io.grpc.StatusRuntimeException;
 import org.junit.Test;
 
 import java.util.List;
-
-import static grpcbridge.common.TestFactory.newDeleteRequest;
-import static grpcbridge.common.TestFactory.newGetRequest;
-import static grpcbridge.common.TestFactory.newGrpcErrorRequest;
-import static grpcbridge.common.TestFactory.newPatchRequest;
-import static grpcbridge.common.TestFactory.newPostRequest;
-import static grpcbridge.common.TestFactory.newPutRequest;
-import static grpcbridge.common.TestFactory.responseFor;
-import static grpcbridge.http.HttpMethod.DELETE;
-import static grpcbridge.http.HttpMethod.GET;
-import static grpcbridge.http.HttpMethod.PATCH;
-import static grpcbridge.http.HttpMethod.POST;
-import static grpcbridge.http.HttpMethod.PUT;
-import static grpcbridge.test.proto.Test.Enum.INVALID;
-import static grpcbridge.util.ProtoJson.parse;
-import static grpcbridge.util.ProtoJson.parseStream;
-import static grpcbridge.util.ProtoJson.serialize;
-import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 public class BridgeTest {
     private TestService testService = new TestService();
