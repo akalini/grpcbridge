@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SnakeCaseBridgeTest {
     private TestSnakeService testService = new TestSnakeService();
-    final JsonFormat.Printer printer = JsonFormat.printer().preservingProtoFieldNames();
+    private final JsonFormat.Printer printer = JsonFormat.printer().preservingProtoFieldNames();
     private Bridge bridge = Bridge
             .builder()
             .printer(printer)
