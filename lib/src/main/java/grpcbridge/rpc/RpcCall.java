@@ -3,6 +3,7 @@ package grpcbridge.rpc;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.Message;
+import com.google.protobuf.util.JsonFormat;
 import io.grpc.ServerCall;
 import io.grpc.ServerMethodDefinition;
 

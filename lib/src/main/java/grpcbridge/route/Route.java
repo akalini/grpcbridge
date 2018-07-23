@@ -5,6 +5,8 @@ import com.google.api.HttpRule;
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.Message;
+import com.google.protobuf.util.JsonFormat;
+import grpcbridge.GrpcbridgeOptions;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
@@ -30,6 +32,23 @@ public final class Route {
     public Route(MethodDescriptor descriptor, ServerMethodDefinition<Message, Message> impl) {
         this.descriptor = descriptor;
         this.impl = impl;
+    }
+
+    /**
+     * Return JSON printer for the route.
+     *
+     * @return JSON printer
+     */
+    public JsonFormat.Printer getPrinter() {
+        JsonFormat.Printer printer = JsonFormat.printer();
+        boolean preserveFieldNames = descriptor
+                .getService()
+                .getOptions()
+                .getExtension(GrpcbridgeOptions.preserveFieldNames);
+        if (preserveFieldNames) {
+            printer = printer.preservingProtoFieldNames();
+        }
+        return printer;
     }
 
     /**
