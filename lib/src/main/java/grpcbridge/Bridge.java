@@ -1,5 +1,7 @@
 package grpcbridge;
 
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -14,8 +16,6 @@ import grpcbridge.util.ProtoJson;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -60,7 +60,6 @@ import static com.google.common.util.concurrent.Uninterruptibles.getUninterrupti
  */
 public final class Bridge {
     private final List<Route> routes;
-    private final JsonFormat.Printer printer;
 
     /**
      * Creates new {@link BridgeBuilder} that is used to setup a bridge.
@@ -78,19 +77,7 @@ public final class Bridge {
      * @param routes list of available routes
      */
     Bridge(List<Route> routes) {
-        this(routes, JsonFormat.printer());
-    }
-
-    /**
-     * Creates a new bridge, use {@link BridgeBuilder} to create bridge
-     * instances.
-     *
-     * @param routes    list of available routes
-     * @param printer   printer used for serializing to json
-     */
-    Bridge(List<Route> routes, JsonFormat.Printer printer) {
         this.routes = routes;
-        this.printer = printer;
     }
 
     /**
@@ -125,9 +112,11 @@ public final class Bridge {
      */
     public ListenableFuture<HttpResponse> handleAsync(HttpRequest httpRequest) {
         for (Route route : routes) {
-            Optional<RpcCall> call = route.match(httpRequest);
-            if (call.isPresent()) {
-                ListenableFuture<RpcMessage> response = call.get().execute();
+            Optional<RpcCall> optionalCall = route.match(httpRequest);
+            if (optionalCall.isPresent()) {
+                RpcCall call = optionalCall.get();
+                ListenableFuture<RpcMessage> response = call.execute();
+                JsonFormat.Printer printer = route.getPrinter();
                 return Futures.transform(response, new RpcToHttpMessage(printer));
             }
         }
@@ -143,9 +132,11 @@ public final class Bridge {
      */
     private static class RpcToHttpMessage implements Function<RpcMessage, HttpResponse> {
         private final JsonFormat.Printer printer;
+
         RpcToHttpMessage(JsonFormat.Printer printer) {
             this.printer = printer;
         }
+
         @Override public HttpResponse apply(RpcMessage response) {
             return ProtoJson.serialize(printer, response);
         }
