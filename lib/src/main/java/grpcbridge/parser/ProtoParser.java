@@ -18,7 +18,7 @@ public abstract class ProtoParser implements Parser {
     private static final String ANY = "*/*";
     protected abstract String contentType();
     protected abstract String packMultiple(List<String> serializedItems);
-    protected  abstract <T extends Message> T parse(@Nullable String body, T.Builder builder);
+    public abstract <T extends Message> T parse(@Nullable String body, T.Builder builder);
 
 
 

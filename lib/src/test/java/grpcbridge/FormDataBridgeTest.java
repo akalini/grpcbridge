@@ -2,7 +2,7 @@ package grpcbridge;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.google.protobuf.Message;
+import com.google.protobuf.util.JsonFormat;
 import grpcbridge.common.TestSnakeService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
@@ -12,14 +12,13 @@ import grpcbridge.test.proto.TestSnakeCase;
 import io.grpc.Metadata;
 import org.junit.Test;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Map;
 
 import static grpcbridge.http.HttpMethod.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FormDataBridgeTest {
+public class FormDataBridgeTest implements ProtoParseTest {
 
     private TestSnakeService testService = new TestSnakeService();
     private Bridge bridge = Bridge
@@ -59,9 +58,5 @@ public class FormDataBridgeTest {
         TestSnakeCase.SnakeResponse rpcResponse = parse(raw,
             TestSnakeCase.SnakeResponse.newBuilder());
         assertThat(rpcResponse.getStatusCode()).isEqualTo("OK");
-    }
-
-    private  <T extends Message> T parse(@Nullable String body, T.Builder builder) {
-        return ProtoJsonParser.INSTANCE.parse(body, builder);
     }
 }

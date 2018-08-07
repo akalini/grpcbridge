@@ -87,7 +87,7 @@ public final class ProtoXMLParser extends ProtoParser {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected  <T extends Message> T parse(@Nullable String body, T.Builder builder) {
+    public   <T extends Message> T parse(@Nullable String body, T.Builder builder) {
         if (!Strings.isNullOrEmpty(body)) {
             try {
                 XmlMapper mapper = new XmlMapper();

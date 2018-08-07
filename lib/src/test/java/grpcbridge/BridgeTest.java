@@ -2,7 +2,6 @@ package grpcbridge;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
-import com.google.protobuf.util.JsonFormat;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
@@ -16,7 +15,6 @@ import io.grpc.ServerCall.Listener;
 import io.grpc.Status.Code;
 import org.junit.Test;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -27,15 +25,13 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-public class BridgeTest {
+public class BridgeTest implements ProtoParseTest {
     private TestService testService = new TestService();
     private Bridge bridge = Bridge
             .builder()
             .addFile(grpcbridge.test.proto.Test.getDescriptor())
             .addService(testService.bindService())
             .build();
-
-    private JsonFormat.Printer printer = JsonFormat.printer();
     
     private ServerInterceptor authCheck = new ServerInterceptor() {
         @Override
@@ -517,14 +513,6 @@ public class BridgeTest {
         assertThat(responses.get(0).getIntField()).isEqualTo(0);
         assertThat(responses.get(1).getStringField()).isEqualTo("hello");
         assertThat(responses.get(1).getIntField()).isEqualTo(1);
-    }
-
-    private String serialize(@Nonnull Message message) {
-        return ProtoJsonParser.INSTANCE.serialize(printer, message);
-    }
-
-    private <T extends Message> T parse(@Nullable String body, T.Builder builder) {
-        return ProtoJsonParser.INSTANCE.parse(body, builder);
     }
 
     private <T extends Message> List<T> parseStream(

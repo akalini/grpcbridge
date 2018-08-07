@@ -82,7 +82,7 @@ public final class ProtoFormDataParser extends ProtoParser {
     }
 
     @Override
-    protected <T extends Message> T parse(@Nullable String body, Message.Builder builder) {
+    public <T extends Message> T parse(@Nullable String body, Message.Builder builder) {
         if (Strings.isNullOrEmpty(body)) {
             return (T) builder.build();
         }
