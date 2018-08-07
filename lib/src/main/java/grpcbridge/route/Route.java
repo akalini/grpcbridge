@@ -56,6 +56,13 @@ public final class Route {
         return printer;
     }
 
+    public String preferredResponseType() {
+        return descriptor
+            .getService()
+            .getOptions()
+            .getExtension(GrpcbridgeOptions.preferredResponseType);
+    }
+
     /**
      * Matches HTTP request against the gRPC method definition. If the route
      * containsAll returns an {@link RpcCall} instance that can be used to invoke

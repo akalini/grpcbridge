@@ -132,15 +132,22 @@ public final class Bridge {
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
                 ListenableFuture<RpcMessage> response = call.execute();
+                String preferredResponseType = route.preferredResponseType();
+                List<String> supportedTypes = new ArrayList<>();
+                if (!preferredResponseType.isEmpty()) supportedTypes.add(preferredResponseType);
+
                 Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
                     "accept",
                     Metadata.ASCII_STRING_MARSHALLER));
+                if (acceptedTypes != null) {
+                    acceptedTypes.forEach(supportedTypes::add);
+                }
                 final Parser parser;
-                if (acceptedTypes == null) {
+                if (supportedTypes.isEmpty()) {
                     parser = ProtoJsonParser.INSTANCE;
                 } else {
                     parser = parsers.stream()
-                        .filter( it -> it.accept(acceptedTypes))
+                        .filter( it -> it.accept(supportedTypes))
                         .findFirst()
                         .orElse(null);
                 }

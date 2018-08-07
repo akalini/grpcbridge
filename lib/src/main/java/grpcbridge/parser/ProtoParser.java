@@ -10,6 +10,7 @@ import io.grpc.Metadata;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,10 +23,8 @@ public abstract class ProtoParser implements Parser {
 
 
     @Override
-    public boolean accept(Iterable<String> accepted) {
-        final List<String> list = new ArrayList<>();
-        accepted.forEach(list::add);
-        return list.stream().anyMatch(it -> supportedTypes().contains(it) || ANY.equals(it));
+    public boolean accept(Collection<String> accepted) {
+        return accepted.stream().anyMatch(it -> supportedTypes().contains(it) || ANY.equals(it));
     }
 
     protected List<String> supportedTypes() {

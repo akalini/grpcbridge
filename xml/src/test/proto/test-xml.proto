@@ -20,6 +20,7 @@ message Transaction {
 service XmlTestService {
   // Preserves snake case fields defined in protos.
   option (grpcbridge.preserve_field_names) = true;
+  option (grpcbridge.preferred_response_type) = "text/xml";
 
   rpc accountEvent (XmlRequest) returns (AccountEvent) {
     option (google.api.http) = {

@@ -103,13 +103,6 @@ public final class ProtoFormDataParser extends ProtoParser {
         return ProtoJsonParser.INSTANCE.parse(json, builder);
     }
 
-    @Override
-    public boolean accept(Iterable<String> accepted) {
-        List<String> list = new ArrayList<>();
-        accepted.forEach(list::add);
-        return list.stream().anyMatch(it -> it.equals(URL_ENCODED_FORM));
-    }
-
     /**
      * Translates gRPC responses to the HTTP responses.
      */

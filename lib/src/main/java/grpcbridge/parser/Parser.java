@@ -10,12 +10,13 @@ import grpcbridge.rpc.RpcMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 public interface Parser {
 
     Function<RpcMessage, HttpResponse> rpcToHttpTransformer(Route route);
 
-    boolean accept(Iterable<String> accepted);
+    boolean accept(Collection<String> accepted);
 
     RpcMessage parse(HttpRequest httpRequest, Message.Builder builder);
 

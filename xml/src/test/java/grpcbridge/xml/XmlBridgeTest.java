@@ -62,13 +62,12 @@ public class XmlBridgeTest {
     }
 
     @Test
-    public void handleXml2Request() throws IOException {
+    public void handleXmlWithoutAcceptRequest() throws IOException {
         Metadata headers = new Metadata();
         headers.put(
             Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
             "application/x-www-form-urlencoded"
         );
-        headers.put(Metadata.Key.of("accept", Metadata.ASCII_STRING_MARSHALLER), "text/xml");
 
         String rawBody = "first_name=John&last_name=Doe";
 
