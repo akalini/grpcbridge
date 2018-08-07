@@ -10,9 +10,11 @@ import grpcbridge.GrpcbridgeOptions;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
+import grpcbridge.parser.Parser;
 import io.grpc.ServerMethodDefinition;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,13 +25,16 @@ import java.util.Optional;
 public final class Route {
     private final MethodDescriptor descriptor;
     private final ServerMethodDefinition<Message, Message> impl;
+    private final List<Parser> parsers;
 
     /**
      * @param descriptor methods descriptor from the protobuf file
      * @param impl the corresponding gRPC method definition backed by the
      *             bound implementation
      */
-    public Route(MethodDescriptor descriptor, ServerMethodDefinition<Message, Message> impl) {
+    public Route(List<Parser> parsers, MethodDescriptor descriptor,
+                 ServerMethodDefinition<Message, Message> impl) {
+        this.parsers = parsers;
         this.descriptor = descriptor;
         this.impl = impl;
     }
@@ -67,7 +72,7 @@ public final class Route {
         PathMatcher pathMatcher = new PathMatcher(httpRule);
 
         if (pathMatcher.matches(httpRequest)) {
-            BodyParser bodyParser = new BodyParser(httpRule, newRpcRequest());
+            BodyParser bodyParser = new BodyParser(parsers, httpRule, newRpcRequest());
             RpcMessage rpcRequest = bodyParser.extract(httpRequest);
             pathMatcher.parse(httpRequest).forEach(rpcRequest::setVar);
             return Optional.of(new RpcCall(impl, rpcRequest));

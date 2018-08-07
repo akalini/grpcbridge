@@ -4,6 +4,7 @@ import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Message;
 import grpcbridge.route.Route;
 import grpcbridge.util.FileDescriptors;
+import grpcbridge.parser.Parser;
 import io.grpc.ServerInterceptor;
 import io.grpc.ServerInterceptors;
 import io.grpc.ServerMethodDefinition;
@@ -26,6 +27,7 @@ public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
     private final List<ServerInterceptor> interceptors = new ArrayList<>();
+    private final List<Parser> parsers = new ArrayList<>();
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -36,6 +38,17 @@ public final class BridgeBuilder {
      */
     public BridgeBuilder addFile(FileDescriptor file) {
         files.addFile(file);
+        return this;
+    }
+
+    /**
+     * Adds protobuf message parser.
+     *
+     * @param parser message body parser
+     * @return this builder instance
+     */
+    public BridgeBuilder addParser(Parser parser) {
+        parsers.add(parser);
         return this;
     }
 
@@ -76,12 +89,13 @@ public final class BridgeBuilder {
             }
             for (ServerMethodDefinition<?, ?> method : service.getMethods()) {
                 Route route = files.routeFor(
+                        parsers,
                         service,
                         (ServerMethodDefinition<Message, Message>) method);
                 routes.add(route);
             }
         }
 
-        return new Bridge(routes);
+        return new Bridge(routes, parsers);
     }
 }

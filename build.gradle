@@ -1,10 +1,11 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
     }
 
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
     }
 }
 
@@ -13,36 +14,38 @@ allprojects {
     apply plugin: 'com.google.protobuf'
     apply plugin: 'idea'
 
+    version = '1.2.3'
+
     repositories {
         jcenter()
     }
 
     ext {
         ver = [
-            protobuf: '3.0.0',
-            grpc: '0.15.0'
+            protobuf: '3.5.1',
+            grpc: '1.11.0'
         ]
     }
 
     dependencies {
         compile 'org.slf4j:slf4j-api:1.7.21'
 
-        compile group: 'com.google.protobuf', name: 'protobuf-java', version: ver.protobuf
-        compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: ver.protobuf
-        compile group: 'io.grpc', name: 'grpc-protobuf', version: ver.grpc
+        compile "com.google.protobuf:protobuf-java:${ver.protobuf}"
+        compile "com.google.protobuf:protobuf-java-util:${ver.protobuf}"
+        compile "io.grpc:grpc-protobuf:${ver.grpc}"
 
         testCompile 'junit:junit:4.12'
-        testCompile 'org.assertj:assertj-core-java8:1.0.0m1'
+        testCompile 'org.assertj:assertj-core:3.10.0'
     }
 
     protobuf {
         protoc {
-            artifact = 'com.google.protobuf:protoc:' + ver.protobuf
+            artifact = "com.google.protobuf:protoc:${ver.protobuf}"
         }
 
         plugins {
             grpc {
-                artifact = 'io.grpc:protoc-gen-grpc-java:' + ver.grpc
+                artifact = "io.grpc:protoc-gen-grpc-java:${ver.grpc}"
             }
         }
 
@@ -55,10 +58,10 @@ allprojects {
 
     idea {
         module {
-            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
-            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/grpc");
-            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/java");
-            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/grpc");
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/grpc")
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/java")
+            sourceDirs += file("${protobuf.generatedFilesBaseDir}/test/grpc")
         }
     }
 }

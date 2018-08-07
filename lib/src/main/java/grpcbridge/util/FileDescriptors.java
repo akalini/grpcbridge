@@ -2,6 +2,7 @@ package grpcbridge.util;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
+import grpcbridge.parser.Parser;
 import io.grpc.ServerMethodDefinition;
 import io.grpc.ServerServiceDefinition;
 import grpcbridge.Exceptions.ConfigurationException;
@@ -34,12 +35,13 @@ public final class FileDescriptors {
      * @return route for the given service/method combination
      */
     public Route routeFor(
+            List<Parser> parsers,
             ServerServiceDefinition service,
             ServerMethodDefinition<Message, Message> method) {
         for (Descriptors.FileDescriptor file: files) {
             Optional<Route> route = serviceFor(file, service)
                     .flatMap(s -> methodFor(s, method))
-                    .map(m -> new Route(m, method));
+                    .map(m -> new Route(parsers, m, method));
             if (route.isPresent()) {
                 return route.get();
             }

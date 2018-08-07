@@ -1,20 +1,20 @@
 package grpcbridge;
 
 import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static java.lang.String.format;
 
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.protobuf.util.JsonFormat;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.util.ProtoJson;
+import grpcbridge.parser.Parser;
+import grpcbridge.parser.ProtoJsonParser;
+import io.grpc.Metadata;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -60,6 +60,7 @@ import java.util.concurrent.ExecutionException;
  */
 public final class Bridge {
     private final List<Route> routes;
+    private final List<Parser> parsers;
 
     /**
      * Creates new {@link BridgeBuilder} that is used to setup a bridge.
@@ -75,9 +76,24 @@ public final class Bridge {
      * instances.
      *
      * @param routes list of available routes
+     * @param parsers list of parsers used for deserializing and serializing
+     */
+    Bridge(List<Route> routes, List<Parser> parsers) {
+        this.routes = routes;
+        this.parsers = parsers;
+        if (this.parsers.isEmpty()) {
+            this.parsers.add(ProtoJsonParser.INSTANCE);
+        }
+    }
+
+    /**
+     * Creates a new bridge, use {@link BridgeBuilder} to create bridge
+     * instances.
+     *
+     * @param routes list of available routes
      */
     Bridge(List<Route> routes) {
-        this.routes = routes;
+        this(routes, Arrays.asList(ProtoJsonParser.INSTANCE));
     }
 
     /**
@@ -116,33 +132,33 @@ public final class Bridge {
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
                 ListenableFuture<RpcMessage> response = call.execute();
-                JsonFormat.Printer printer = route.getPrinter();
-                return Futures.transform(response, new RpcToHttpMessage(printer));
+                Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
+                    "accept",
+                    Metadata.ASCII_STRING_MARSHALLER));
+                final Parser parser;
+                if (acceptedTypes == null) {
+                    parser = ProtoJsonParser.INSTANCE;
+                } else {
+                    parser = parsers.stream()
+                        .filter( it -> it.accept(acceptedTypes))
+                        .findFirst()
+                        .orElse(null);
+                }
+                if (parser == null) {
+                    throw new Exceptions.BridgeException(
+                        format(
+                            "does not support any of the accepted content types: %s",
+                            acceptedTypes
+                        )
+                    );
+                }
+                return Futures.transform(response, parser.rpcToHttpTransformer(route));
             }
         }
 
-        throw new Exceptions.RouteNotFoundException(String.format(
+        throw new Exceptions.RouteNotFoundException(format(
                 "Mapper not found: %s %s",
                 httpRequest.getMethod(),
                 httpRequest.getPath()));
-    }
-
-    /**
-     * Translates gRPC responses to the HTTP responses.
-     */
-    private static class RpcToHttpMessage implements Function<RpcMessage, HttpResponse> {
-        private final JsonFormat.Printer printer;
-
-        RpcToHttpMessage(JsonFormat.Printer printer) {
-            this.printer = printer;
-        }
-
-        @Override public HttpResponse apply(RpcMessage response) {
-            return ProtoJson.serialize(printer, response);
-        }
-
-        @Override public boolean equals(Object object) {
-            return false;
-        }
     }
 }
