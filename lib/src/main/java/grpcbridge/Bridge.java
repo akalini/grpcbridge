@@ -135,7 +135,7 @@ public final class Bridge {
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
                 ListenableFuture<RpcMessage> response = call.execute();
-                final Parser parser = Parsers.findBestResponse(
+                final Parser parser = Parsers.findBestParserForResponse(
                         parsers,
                         httpRequest,
                         route.preferredResponseType()

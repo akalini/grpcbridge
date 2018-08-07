@@ -74,7 +74,7 @@ final class BodyParser {
         return request.getBody()
                 .map(requestBody -> {
                     if (bodyExtractor == null) {
-                        final Parser parser = Parsers.findBestRequestParser(parsers, request);
+                        final Parser parser = Parsers.findBestParserForRequest(parsers, request);
                         return parser.parse(request, blank.toBuilder());
                     } else {
                         RpcMessage result = new RpcMessage(blank, request.getHeaders());

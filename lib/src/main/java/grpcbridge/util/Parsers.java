@@ -14,14 +14,16 @@ public class Parsers {
 
     private Parsers() {}
 
-    public static @Nonnull Parser findBestRequestParser(
+    public static @Nonnull
+    Parser findBestParserForRequest(
             List<Parser> parsers,
             HttpRequest httpRequest
     ) {
         return findBestParserForHeader(parsers, httpRequest, "content-type", null);
     }
 
-    public static @Nonnull Parser findBestResponse(
+    public static @Nonnull
+    Parser findBestParserForResponse(
         List<Parser> parsers,
         HttpRequest httpRequest,
         String preferredType
