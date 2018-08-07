@@ -34,10 +34,10 @@ public class XmlBridgeTest {
     public void handleXmlRequest() throws IOException {
         Metadata headers = new Metadata();
         headers.put(
-            Metadata.Key.of("Content-Type", Metadata.ASCII_STRING_MARSHALLER),
+            Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
             "application/x-www-form-urlencoded"
         );
-        headers.put(Metadata.Key.of("Accept", Metadata.ASCII_STRING_MARSHALLER), "text/xml");
+        headers.put(Metadata.Key.of("accept", Metadata.ASCII_STRING_MARSHALLER), "text/xml");
 
         String rawBody = "first_name=John&last_name=Doe";
 
@@ -50,7 +50,7 @@ public class XmlBridgeTest {
         HttpResponse response = bridge.handle(request);
         String raw = response.getBody();
 
-        assertThat(response.getTrailers().get(Metadata.Key.of("Content-Type",
+        assertThat(response.getTrailers().get(Metadata.Key.of("content-type",
         Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml");
         Map<String, Object> xml = new XmlMapper().readValue(raw,
             new TypeReference<Map<String, Object>>() {});
@@ -65,10 +65,10 @@ public class XmlBridgeTest {
     public void handleXml2Request() throws IOException {
         Metadata headers = new Metadata();
         headers.put(
-            Metadata.Key.of("Content-Type", Metadata.ASCII_STRING_MARSHALLER),
+            Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
             "application/x-www-form-urlencoded"
         );
-        headers.put(Metadata.Key.of("Accept", Metadata.ASCII_STRING_MARSHALLER), "text/xml");
+        headers.put(Metadata.Key.of("accept", Metadata.ASCII_STRING_MARSHALLER), "text/xml");
 
         String rawBody = "first_name=John&last_name=Doe";
 
@@ -83,7 +83,7 @@ public class XmlBridgeTest {
         assertThat(raw).startsWith("<Transaction>");
         assertThat(raw).endsWith("</Transaction>");
 
-        assertThat(response.getTrailers().get(Metadata.Key.of("Content-Type",
+        assertThat(response.getTrailers().get(Metadata.Key.of("content-type",
             Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml");
         Map<String, Object> xml = new XmlMapper().readValue(raw,
             new TypeReference<Map<String, Object>>() {});

@@ -79,7 +79,7 @@ final class BodyParser {
                 .map(requestBody -> {
                     if (bodyExtractor == null) {
                         String contentType = request.getHeaders().get(
-                                Metadata.Key.of("Content-Type",
+                                Metadata.Key.of("content-type",
                                 Metadata.ASCII_STRING_MARSHALLER)
                         );
                         final Parser parser;
