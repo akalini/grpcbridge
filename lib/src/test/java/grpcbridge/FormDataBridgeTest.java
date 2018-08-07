@@ -2,7 +2,6 @@ package grpcbridge;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.google.protobuf.util.JsonFormat;
 import grpcbridge.common.TestSnakeService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
@@ -35,8 +34,10 @@ public class FormDataBridgeTest implements ProtoParseTest {
         final Gson gson = new Gson();
 
         Metadata headers = new Metadata();
-        headers.put(Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
-            "application/x-www-form-urlencoded");
+        headers.put(
+                Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
+                "application/x-www-form-urlencoded"
+        );
 
         String rawBody = "first_name=John&last_name=Doe";
 

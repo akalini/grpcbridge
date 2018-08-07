@@ -1,5 +1,6 @@
 package grpcbridge.parser;
 
+import com.google.common.base.Function;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.http.HttpRequest;
@@ -16,11 +17,18 @@ import java.util.List;
 
 public abstract class ProtoParser implements Parser {
     private static final String ANY = "*/*";
+
     protected abstract String contentType();
+
     protected abstract String packMultiple(List<String> serializedItems);
+
     public abstract <T extends Message> T parse(@Nullable String body, T.Builder builder);
 
-
+    protected abstract String serialize(
+            @Nullable Integer index,
+            @Nonnull JsonFormat.Printer printer,
+            @Nonnull Message message
+    );
 
     @Override
     public boolean accept(Collection<String> accepted) {
@@ -40,8 +48,8 @@ public abstract class ProtoParser implements Parser {
 
     @Override
     public HttpResponse serialize(
-        @Nonnull JsonFormat.Printer printer,
-        @Nonnull RpcMessage message
+            @Nonnull JsonFormat.Printer printer,
+            @Nonnull RpcMessage message
     ) {
         if (message.getMethodType().serverSendsOneMessage()) {
             String httpBody = !message.getBody().isEmpty() ? serialize(printer,
@@ -58,6 +66,16 @@ public abstract class ProtoParser implements Parser {
     }
 
     @Override
+    public Function<RpcMessage, HttpResponse> serializeAsync(JsonFormat.Printer printer) {
+        return new Function<RpcMessage, HttpResponse>() {
+            @Nullable
+            @Override
+            public HttpResponse apply(@Nullable RpcMessage response) {
+                return serialize(printer, response);
+            }
+        };
+    }
+
     public String serialize(@Nonnull JsonFormat.Printer printer, @Nonnull Message message) {
         return serialize(null, printer, message);
     }

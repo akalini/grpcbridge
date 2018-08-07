@@ -8,9 +8,9 @@ import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.GrpcbridgeOptions;
 import grpcbridge.http.HttpRequest;
+import grpcbridge.parser.Parser;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.parser.Parser;
 import io.grpc.ServerMethodDefinition;
 
 import java.io.ByteArrayInputStream;
@@ -28,12 +28,17 @@ public final class Route {
     private final List<Parser> parsers;
 
     /**
+     * @param parsers list of parsers used for parsing http request body into gRPC messages and
+     *                serializing gRPC messages to http compatible response body
      * @param descriptor methods descriptor from the protobuf file
      * @param impl the corresponding gRPC method definition backed by the
      *             bound implementation
      */
-    public Route(List<Parser> parsers, MethodDescriptor descriptor,
-                 ServerMethodDefinition<Message, Message> impl) {
+    public Route(
+            List<Parser> parsers,
+            MethodDescriptor descriptor,
+            ServerMethodDefinition<Message, Message> impl
+    ) {
         this.parsers = parsers;
         this.descriptor = descriptor;
         this.impl = impl;

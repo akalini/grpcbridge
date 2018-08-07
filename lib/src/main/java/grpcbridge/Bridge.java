@@ -1,21 +1,23 @@
 package grpcbridge;
 
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static java.lang.String.format;
-
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
+import grpcbridge.parser.Parser;
+import grpcbridge.parser.ProtoJsonParser;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.parser.Parser;
-import grpcbridge.parser.ProtoJsonParser;
-import io.grpc.Metadata;
+import grpcbridge.util.Parsers;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static java.lang.String.format;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -63,20 +65,12 @@ public final class Bridge {
     private final List<Parser> parsers;
 
     /**
-     * Creates new {@link BridgeBuilder} that is used to setup a bridge.
-     *
-     * @return builder instance
-     */
-    public static BridgeBuilder builder() {
-        return new BridgeBuilder();
-    }
-
-    /**
      * Creates a new bridge, use {@link BridgeBuilder} to create bridge
      * instances.
      *
      * @param routes list of available routes
-     * @param parsers list of parsers used for deserializing and serializing
+     * @param parsers list of parsers used for parsing http request body into gRPC messages and
+     *                serializing gRPC messages to http compatible response body
      */
     Bridge(List<Route> routes, List<Parser> parsers) {
         this.routes = routes;
@@ -94,6 +88,15 @@ public final class Bridge {
      */
     Bridge(List<Route> routes) {
         this(routes, Arrays.asList(ProtoJsonParser.INSTANCE));
+    }
+
+    /**
+     * Creates new {@link BridgeBuilder} that is used to setup a bridge.
+     *
+     * @return builder instance
+     */
+    public static BridgeBuilder builder() {
+        return new BridgeBuilder();
     }
 
     /**
@@ -132,40 +135,17 @@ public final class Bridge {
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
                 ListenableFuture<RpcMessage> response = call.execute();
-                String preferredResponseType = route.preferredResponseType();
-                List<String> supportedTypes = new ArrayList<>();
-                if (!preferredResponseType.isEmpty()) supportedTypes.add(preferredResponseType);
-
-                Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
-                    "accept",
-                    Metadata.ASCII_STRING_MARSHALLER));
-                if (acceptedTypes != null) {
-                    acceptedTypes.forEach(supportedTypes::add);
-                }
-                final Parser parser;
-                if (supportedTypes.isEmpty()) {
-                    parser = ProtoJsonParser.INSTANCE;
-                } else {
-                    parser = parsers.stream()
-                        .filter( it -> it.accept(supportedTypes))
-                        .findFirst()
-                        .orElse(null);
-                }
-                if (parser == null) {
-                    throw new Exceptions.BridgeException(
-                        format(
-                            "does not support any of the accepted content types: %s",
-                            acceptedTypes
-                        )
-                    );
-                }
-                return Futures.transform(response, parser.rpcToHttpTransformer(route));
+                final Parser parser = Parsers.findBestResponse(
+                        parsers,
+                        httpRequest,
+                        route.preferredResponseType()
+                );
+                return Futures.transform(response, parser.serializeAsync(route.getPrinter()));
             }
         }
 
-        throw new Exceptions.RouteNotFoundException(format(
-                "Mapper not found: %s %s",
-                httpRequest.getMethod(),
-                httpRequest.getPath()));
+        throw new Exceptions.RouteNotFoundException(
+                format("Mapper not found: %s %s", httpRequest.getMethod(), httpRequest.getPath())
+        );
     }
 }

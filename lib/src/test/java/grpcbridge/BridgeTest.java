@@ -57,8 +57,7 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = parse(response.getBody(),
-            GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -75,8 +74,7 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = parse(response.getBody(),
-            GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -94,8 +92,7 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = parse(response.getBody(),
-            GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -113,8 +110,7 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = parse(response.getBody(),
-            GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -515,10 +511,7 @@ public class BridgeTest implements ProtoParseTest {
         assertThat(responses.get(1).getIntField()).isEqualTo(1);
     }
 
-    private <T extends Message> List<T> parseStream(
-        @Nullable String body,
-        T.Builder builder
-    ) {
+    private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
         return ProtoJsonParser.INSTANCE.parseStream(body, builder);
     }
 }

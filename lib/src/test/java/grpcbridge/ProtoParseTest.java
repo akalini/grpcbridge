@@ -9,12 +9,15 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface ProtoParseTest {
+
     default ProtoParser parser() {
         return ProtoJsonParser.INSTANCE;
     }
+
     default JsonFormat.Printer printer() {
         return JsonFormat.printer();
     }
+
     default String serialize(@Nonnull Message message) {
         return parser().serialize(printer(), message);
     }

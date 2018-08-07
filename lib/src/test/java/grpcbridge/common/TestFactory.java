@@ -28,8 +28,9 @@ public final class TestFactory {
                 .setEnumField(VALID)
                 .setBytesField(ByteString.copyFrom("bytes".getBytes()))
                 .setNested(
-                    Nested.newBuilder()
-                    .setNestedField("nested")
+                    Nested
+                        .newBuilder()
+                        .setNestedField("nested")
                 )
                 .build();
 

@@ -1,6 +1,5 @@
 package grpcbridge.parser;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -9,13 +8,13 @@ import com.google.protobuf.util.JsonFormat;
 import grpcbridge.Exceptions;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.http.HttpRequest;
-import grpcbridge.http.HttpResponse;
-import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -56,7 +55,6 @@ public final class ProtoJsonParser extends ProtoParser {
         }
         return messages;
     }
-    
 
     @SuppressWarnings("unchecked")
     @Override
@@ -72,18 +70,18 @@ public final class ProtoJsonParser extends ProtoParser {
     }
 
     @Override
-    public String serialize(@Nullable Integer index, @Nonnull JsonFormat.Printer printer,
-                            @Nonnull Message message) {
+    public String serialize(
+            @Nullable Integer index,
+            @Nonnull JsonFormat.Printer printer,
+            @Nonnull Message message
+    ) {
         try {
             return printer.print(message);
         } catch (InvalidProtocolBufferException e) {
-            throw new Exceptions.ParsingException(format("Failed to serialize a message: {%s}", message), e);
+            throw new Exceptions.ParsingException(
+                    format("Failed to serialize a message: {%s}", message), e
+            );
         }
-    }
-
-    @Override
-    public Function<RpcMessage, HttpResponse> rpcToHttpTransformer(Route route) {
-        return new RpcToJsonHttpMessage(route);
     }
 
     @Override
@@ -98,24 +96,5 @@ public final class ProtoJsonParser extends ProtoParser {
         }
         builder.append("]");
         return builder.toString();
-    }
-
-    /**
-     * Translates gRPC responses to the HTTP responses.
-     */
-    private class RpcToJsonHttpMessage implements Function<RpcMessage, HttpResponse> {
-        private final Route route;
-
-        RpcToJsonHttpMessage(Route route) {
-            this.route = route;
-        }
-
-        @Override public HttpResponse apply(RpcMessage response) {
-            return serialize(route.getPrinter(), response);
-        }
-
-        @Override public boolean equals(Object object) {
-            return false;
-        }
     }
 }

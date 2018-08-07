@@ -3,18 +3,14 @@ package grpcbridge.route;
 import com.google.api.HttpRule;
 import com.google.common.base.Strings;
 import com.google.protobuf.Message;
-import grpcbridge.Exceptions;
 import grpcbridge.http.HttpRequest;
-import grpcbridge.rpc.RpcMessage;
 import grpcbridge.parser.Parser;
-import grpcbridge.parser.ProtoJsonParser;
-import io.grpc.Metadata;
+import grpcbridge.rpc.RpcMessage;
+import grpcbridge.util.Parsers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
-
-import static java.lang.String.format;
+import java.util.List;
 
 /**
  * Parses HTTP request body as a protobuf message. The parsing is done based
@@ -78,28 +74,7 @@ final class BodyParser {
         return request.getBody()
                 .map(requestBody -> {
                     if (bodyExtractor == null) {
-                        String contentType = request.getHeaders().get(
-                                Metadata.Key.of("content-type",
-                                Metadata.ASCII_STRING_MARSHALLER)
-                        );
-                        final Parser parser;
-                        if (contentType == null) {
-                            parser = ProtoJsonParser.INSTANCE;
-                        } else {
-                            parser = parsers
-                                .stream()
-                                .filter(it -> it.accept(Collections.singletonList(contentType)))
-                                .findFirst()
-                                .orElse(null);
-                            if (parser == null) {
-                                throw new Exceptions.BridgeException(
-                                    format(
-                                        "content type not supported: %s",
-                                        contentType
-                                    )
-                                );
-                            }
-                        }
+                        final Parser parser = Parsers.findBestRequestParser(parsers, request);
                         return parser.parse(request, blank.toBuilder());
                     } else {
                         RpcMessage result = new RpcMessage(blank, request.getHeaders());
