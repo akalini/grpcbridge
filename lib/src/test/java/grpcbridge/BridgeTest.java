@@ -17,6 +17,7 @@ import io.grpc.Status.Code;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static grpcbridge.common.TestFactory.*;
@@ -60,7 +61,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(),
+        GetResponse rpcResponse = parse(response.getBody(),
             GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
@@ -78,7 +79,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(),
+        GetResponse rpcResponse = parse(response.getBody(),
             GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
@@ -97,7 +98,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(),
+        GetResponse rpcResponse = parse(response.getBody(),
             GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
@@ -116,7 +117,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(),
+        GetResponse rpcResponse = parse(response.getBody(),
             GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
@@ -135,7 +136,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -153,7 +154,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -170,7 +171,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest));
     }
@@ -184,7 +185,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -201,7 +202,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -218,7 +219,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -235,7 +236,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -252,7 +253,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(GetResponse.newBuilder()
                 .setStringField("hello")
@@ -276,7 +277,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -296,7 +297,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -334,7 +335,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        PostResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), PostResponse.newBuilder());
+        PostResponse rpcResponse = parse(response.getBody(), PostResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -350,7 +351,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        PostResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), PostResponse.newBuilder());
+        PostResponse rpcResponse = parse(response.getBody(), PostResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(PostResponse
                 .newBuilder()
@@ -368,7 +369,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        PutResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), PutResponse.newBuilder());
+        PutResponse rpcResponse = parse(response.getBody(), PutResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -385,7 +386,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        DeleteResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), DeleteResponse.newBuilder());
+        DeleteResponse rpcResponse = parse(response.getBody(), DeleteResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -402,7 +403,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        PatchResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), PatchResponse.newBuilder());
+        PatchResponse rpcResponse = parse(response.getBody(), PatchResponse.newBuilder());
 
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
@@ -493,7 +494,7 @@ public class BridgeTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = ProtoJsonParser.INSTANCE.parse(response.getBody(), GetResponse.newBuilder());
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
                 .setStringField("hello")
@@ -510,7 +511,7 @@ public class BridgeTest {
 
         HttpResponse response = bridge.handle(request);
         
-        List<GetResponse> responses = ProtoJsonParser.INSTANCE.parseStream(response.getBody(), GetResponse.newBuilder());
+        List<GetResponse> responses = parseStream(response.getBody(), GetResponse.newBuilder());
         assertThat(responses.size()).isEqualTo(2);
         assertThat(responses.get(0).getStringField()).isEqualTo("hello");
         assertThat(responses.get(0).getIntField()).isEqualTo(0);
@@ -520,5 +521,16 @@ public class BridgeTest {
 
     private String serialize(@Nonnull Message message) {
         return ProtoJsonParser.INSTANCE.serialize(printer, message);
+    }
+
+    private <T extends Message> T parse(@Nullable String body, T.Builder builder) {
+        return ProtoJsonParser.INSTANCE.parse(body, builder);
+    }
+
+    private <T extends Message> List<T> parseStream(
+        @Nullable String body,
+        T.Builder builder
+    ) {
+        return ProtoJsonParser.INSTANCE.parseStream(body, builder);
     }
 }
