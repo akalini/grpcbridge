@@ -1,6 +1,5 @@
 package grpcbridge.parser;
 
-import com.google.common.base.Function;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.http.HttpRequest;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class ProtoParser implements Parser {
     private static final String ANY = "*/*";

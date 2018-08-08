@@ -1,6 +1,5 @@
 package grpcbridge;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
@@ -11,11 +10,12 @@ import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
 import grpcbridge.util.Parsers;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import static com.google.common.util.concurrent.Futures.transform;
 import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
 import static java.lang.String.format;
 
@@ -87,7 +87,7 @@ public final class Bridge {
      * @param routes list of available routes
      */
     Bridge(List<Route> routes) {
-        this(routes, Arrays.asList(ProtoJsonParser.INSTANCE));
+        this(routes, Collections.singletonList(ProtoJsonParser.INSTANCE));
     }
 
     /**
@@ -140,7 +140,7 @@ public final class Bridge {
                         httpRequest,
                         route.preferredResponseType()
                 );
-                return Futures.transform(response, parser.serializeAsync(route.getPrinter()));
+                return transform(response, parser.serializeAsync(route.getPrinter())::apply);
             }
         }
 
