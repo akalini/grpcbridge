@@ -46,7 +46,7 @@ final class VariableExtractor {
     /**
      * Checks if the input containsAll the variable extractor pattern.
      *
-     * @param input input to parse
+     * @param input input to deserialize
      * @return true if the variable extractor containsAll the input
      */
     public boolean matches(String input) {
@@ -62,7 +62,7 @@ final class VariableExtractor {
     /**
      * Extracts the variables from the specified input.
      *
-     * @param input input to parse
+     * @param input input to deserialize
      * @return list of extracted variables
      */
     public List<Variable> extract(String input) {

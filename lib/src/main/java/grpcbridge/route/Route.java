@@ -8,6 +8,7 @@ import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.GrpcbridgeOptions;
 import grpcbridge.http.HttpRequest;
+import grpcbridge.parser.Deserializer;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
 import io.grpc.ServerMethodDefinition;
@@ -21,7 +22,7 @@ import java.util.Optional;
  * method.
  */
 public final class Route {
-    private final MethodDescriptor descriptor;
+    public final MethodDescriptor descriptor;
     private final ServerMethodDefinition<Message, Message> impl;
 
     /**
@@ -29,7 +30,10 @@ public final class Route {
      * @param impl the corresponding gRPC method definition backed by the
      *             bound implementation
      */
-    public Route(MethodDescriptor descriptor, ServerMethodDefinition<Message, Message> impl) {
+    public Route(
+            MethodDescriptor descriptor,
+            ServerMethodDefinition<Message, Message> impl
+    ) {
         this.descriptor = descriptor;
         this.impl = impl;
     }
@@ -61,13 +65,13 @@ public final class Route {
      *      corresponding gPRC method, {@link Optional#empty()} if the route
      *      has not matched
      */
-    public Optional<RpcCall> match(HttpRequest httpRequest) {
+    public Optional<RpcCall> match(Deserializer deserializer, HttpRequest httpRequest) {
         DescriptorProtos.MethodOptions options = descriptor.getOptions();
         HttpRule httpRule = options.getExtension(AnnotationsProto.http);
         PathMatcher pathMatcher = new PathMatcher(httpRule);
 
         if (pathMatcher.matches(httpRequest)) {
-            BodyParser bodyParser = new BodyParser(httpRule, newRpcRequest());
+            BodyParser bodyParser = new BodyParser(deserializer, httpRule, newRpcRequest());
             RpcMessage rpcRequest = bodyParser.extract(httpRequest);
             pathMatcher.parse(httpRequest).forEach(rpcRequest::setVar);
             return Optional.of(new RpcCall(impl, rpcRequest));

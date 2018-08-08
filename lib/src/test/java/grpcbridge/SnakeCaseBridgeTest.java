@@ -1,10 +1,5 @@
 package grpcbridge;
 
-import static grpcbridge.http.HttpMethod.POST;
-import static grpcbridge.util.ProtoJson.parse;
-import static grpcbridge.util.ProtoJson.serialize;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.protobuf.util.JsonFormat;
@@ -13,15 +8,22 @@ import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.test.proto.TestSnakeCase.SnakeRequest;
 import grpcbridge.test.proto.TestSnakeCase.SnakeResponse;
+import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import org.junit.Test;
+import static grpcbridge.http.HttpMethod.POST;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class SnakeCaseBridgeTest {
+public class SnakeCaseBridgeTest implements ProtoParseTest {
     private TestSnakeService testService = new TestSnakeService();
-    private final JsonFormat.Printer printer = JsonFormat.printer().preservingProtoFieldNames();
+
+    @Override
+    public JsonFormat.Printer printer() {
+        return JsonFormat.printer().preservingProtoFieldNames();
+    }
+
     private Bridge bridge = Bridge
             .builder()
             .addFile(grpcbridge.test.proto.TestSnakeCase.getDescriptor())
@@ -37,7 +39,7 @@ public class SnakeCaseBridgeTest {
                 .setFirstName("John")
                 .setLastName("Doe").build();
 
-        String rawBody = serialize(printer, rpcRequest);
+        String rawBody = serialize(rpcRequest);
         Map<String, String> bodyJson = gson.fromJson(rawBody, type);
         assertThat(bodyJson.get("first_name")).isEqualTo("John");
         assertThat(bodyJson.get("last_name")).isEqualTo("Doe");

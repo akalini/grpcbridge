@@ -1,56 +1,32 @@
 package grpcbridge;
 
-import static grpcbridge.common.TestFactory.newDeleteRequest;
-import static grpcbridge.common.TestFactory.newGetRequest;
-import static grpcbridge.common.TestFactory.newGrpcErrorRequest;
-import static grpcbridge.common.TestFactory.newPatchRequest;
-import static grpcbridge.common.TestFactory.newPostRequest;
-import static grpcbridge.common.TestFactory.newPutRequest;
-import static grpcbridge.common.TestFactory.responseFor;
-import static grpcbridge.http.HttpMethod.DELETE;
-import static grpcbridge.http.HttpMethod.GET;
-import static grpcbridge.http.HttpMethod.PATCH;
-import static grpcbridge.http.HttpMethod.POST;
-import static grpcbridge.http.HttpMethod.PUT;
-import static grpcbridge.test.proto.Test.Enum.INVALID;
-import static grpcbridge.util.ProtoJson.parse;
-import static grpcbridge.util.ProtoJson.parseStream;
-import static grpcbridge.util.ProtoJson.serialize;
-import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Message;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
-import grpcbridge.test.proto.Test.DeleteRequest;
-import grpcbridge.test.proto.Test.DeleteResponse;
-import grpcbridge.test.proto.Test.GetRequest;
-import grpcbridge.test.proto.Test.GetResponse;
-import grpcbridge.test.proto.Test.GrpcErrorRequest;
-import grpcbridge.test.proto.Test.Nested;
-import grpcbridge.test.proto.Test.PatchRequest;
-import grpcbridge.test.proto.Test.PatchResponse;
-import grpcbridge.test.proto.Test.PostRequest;
-import grpcbridge.test.proto.Test.PostResponse;
-import grpcbridge.test.proto.Test.PutRequest;
-import grpcbridge.test.proto.Test.PutResponse;
-import io.grpc.Metadata;
+import grpcbridge.parser.ProtoJsonConverter;
+import grpcbridge.test.proto.Test.*;
+import io.grpc.*;
 import io.grpc.Metadata.Key;
-import io.grpc.ServerCall;
 import io.grpc.ServerCall.Listener;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
-import io.grpc.Status;
 import io.grpc.Status.Code;
-import io.grpc.StatusRuntimeException;
 import org.junit.Test;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class BridgeTest {
+import static grpcbridge.common.TestFactory.*;
+import static grpcbridge.http.HttpMethod.*;
+import static grpcbridge.test.proto.Test.Enum.INVALID;
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+public class BridgeTest implements ProtoParseTest {
+
     private TestService testService = new TestService();
     private Bridge bridge = Bridge
             .builder()
@@ -534,5 +510,9 @@ public class BridgeTest {
         assertThat(responses.get(0).getIntField()).isEqualTo(0);
         assertThat(responses.get(1).getStringField()).isEqualTo("hello");
         assertThat(responses.get(1).getIntField()).isEqualTo(1);
+    }
+
+    private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
+        return ProtoJsonConverter.INSTANCE.parseStream(body, builder);
     }
 }

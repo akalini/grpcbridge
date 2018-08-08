@@ -1,0 +1,39 @@
+syntax = "proto3";
+package grpcbridge.test.proto;
+
+import "google/api/annotations.proto";
+import "grpcbridge/grpcbridge-options.proto";
+
+message XmlRequest {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message AccountEvent {
+  string status_code = 1;
+}
+
+message Transaction {
+  string status_code = 1;
+}
+
+service XmlTestService {
+  // Preserves snake case fields defined in protos.
+  option (grpcbridge.preserve_field_names) = true;
+  // When set, it will use this as it's prefered response type if a supporting parser is active.
+  option (grpcbridge.preferred_response_type) = "text/xml";
+
+  rpc accountEvent (XmlRequest) returns (AccountEvent) {
+    option (google.api.http) = {
+            post: "/account-event/"
+            body: "*"
+        };
+  }
+
+  rpc tx (XmlRequest) returns (Transaction) {
+      option (google.api.http) = {
+            post: "/tx/"
+            body: "*"
+        };
+  }
+}

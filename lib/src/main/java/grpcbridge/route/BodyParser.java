@@ -4,9 +4,10 @@ import com.google.api.HttpRule;
 import com.google.common.base.Strings;
 import com.google.protobuf.Message;
 import grpcbridge.http.HttpRequest;
+import grpcbridge.parser.Deserializer;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.util.ProtoJson;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -36,6 +37,7 @@ final class BodyParser {
 
     private final @Nullable VariableExtractor bodyExtractor;
     private final Message blank;
+    private final Deserializer deserializer;
 
     /**
      * Creates new parser.
@@ -45,7 +47,8 @@ final class BodyParser {
      * @param blank an empty protobuf instance that is used to create new
      *              request instances
      */
-    public BodyParser(HttpRule httpRule, Message blank) {
+    public BodyParser(@Nonnull Deserializer deserializer, HttpRule httpRule, Message blank) {
+        this.deserializer = deserializer;
         String bodyPattern = Strings.emptyToNull(httpRule.getBody());
         if (bodyPattern == null) {
             this.bodyExtractor = null;
@@ -62,14 +65,14 @@ final class BodyParser {
     /**
      * Extracts gPRC message from the given request.
      *
-     * @param request HTTP request to parse
+     * @param request HTTP request to deserialize
      * @return parsed out gRPC message
      */
     public RpcMessage extract(HttpRequest request) {
         return request.getBody()
                 .map(requestBody -> {
                     if (bodyExtractor == null) {
-                        return ProtoJson.parse(request, blank.toBuilder());
+                        return deserializer.deserialize(request, blank.toBuilder());
                     } else {
                         RpcMessage result = new RpcMessage(blank, request.getHeaders());
                         bodyExtractor.extract(requestBody).forEach(result::setVar);

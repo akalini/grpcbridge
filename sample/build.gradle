@@ -6,8 +6,8 @@ dependencies {
     compile project(':lib')
     compile 'ch.qos.logback:logback-classic:1.1.7'
 
-    compile group: 'io.grpc', name: 'grpc-netty', version: ver.grpc
-    compile group: 'io.grpc', name: 'grpc-stub', version: ver.grpc
+    compile "io.grpc:grpc-netty:${ver.grpc}"
+    compile "io.grpc:grpc-stub:${ver.grpc}"
 
     compile "com.sparkjava:spark-core:2.5"
 }

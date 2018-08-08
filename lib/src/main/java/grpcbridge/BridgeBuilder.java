@@ -2,6 +2,8 @@ package grpcbridge;
 
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Message;
+import grpcbridge.parser.Deserializer;
+import grpcbridge.parser.Serializer;
 import grpcbridge.route.Route;
 import grpcbridge.util.FileDescriptors;
 import io.grpc.ServerInterceptor;
@@ -26,6 +28,8 @@ public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
     private final List<ServerInterceptor> interceptors = new ArrayList<>();
+    private final List<Serializer> serializers = new ArrayList<>();
+    private final List<Deserializer> deserializers = new ArrayList<>();
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -36,6 +40,28 @@ public final class BridgeBuilder {
      */
     public BridgeBuilder addFile(FileDescriptor file) {
         files.addFile(file);
+        return this;
+    }
+
+    /**
+     * Adds gRPC message to http content type serializer
+     *
+     * @param serializer convert gRPC to http content type
+     * @return this builder instance
+     */
+    public BridgeBuilder addSerializer(Serializer serializer) {
+        serializers.add(serializer);
+        return this;
+    }
+
+    /**
+     * Add Http content type to gRPC message deserializer
+     *
+     * @param deserializer convert http body to gRPC
+     * @return this builder instance
+     */
+    public BridgeBuilder addDeserializer(Deserializer deserializer) {
+        deserializers.add(deserializer);
         return this;
     }
 
@@ -82,6 +108,6 @@ public final class BridgeBuilder {
             }
         }
 
-        return new Bridge(routes);
+        return new Bridge(routes, serializers, deserializers);
     }
 }

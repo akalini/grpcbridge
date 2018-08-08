@@ -73,7 +73,7 @@ option java_package = "com.google.api";
 //     Verb     = ":" LITERAL ;
 //
 // `*` matches a single path component, `**` zero or more path components, and
-// `LITERAL` a constant.  A `Variable` can parse an entire path as specified
+// `LITERAL` a constant.  A `Variable` can deserialize an entire path as specified
 // again by a template; this nested template must not contain further variables.
 // If no template is given with a variable, it matches a single path component.
 // The notation `{var}` is henceforth equivalent to `{var=*}`.

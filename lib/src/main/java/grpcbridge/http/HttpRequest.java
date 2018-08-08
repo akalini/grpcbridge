@@ -122,4 +122,10 @@ public final class HttpRequest {
     @Override public String toString() {
         return format("HttRequest(%s %s %s)", method, path, body.orElse(null));
     }
+
+    public HttpRequest.Builder newBuilder() {
+        return new HttpRequest.Builder(method, path)
+            .headers(headers)
+            .body(body.orElse(null));
+    }
 }
