@@ -2,16 +2,16 @@ package grpcbridge;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
-import grpcbridge.parser.ProtoJsonParser;
-import grpcbridge.parser.ProtoParser;
+import grpcbridge.parser.ProtoConverter;
+import grpcbridge.parser.ProtoJsonConverter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface ProtoParseTest {
 
-    default ProtoParser parser() {
-        return ProtoJsonParser.INSTANCE;
+    default ProtoConverter parser() {
+        return ProtoJsonConverter.INSTANCE;
     }
 
     default JsonFormat.Printer printer() {

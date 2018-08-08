@@ -7,7 +7,7 @@ import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
-import grpcbridge.parser.ProtoJsonParser;
+import grpcbridge.parser.ProtoJsonConverter;
 import grpcbridge.test.proto.Test.*;
 import io.grpc.*;
 import io.grpc.Metadata.Key;
@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class BridgeTest implements ProtoParseTest {
+
     private TestService testService = new TestService();
     private Bridge bridge = Bridge
             .builder()
@@ -512,6 +513,6 @@ public class BridgeTest implements ProtoParseTest {
     }
 
     private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
-        return ProtoJsonParser.INSTANCE.parseStream(body, builder);
+        return ProtoJsonConverter.INSTANCE.parseStream(body, builder);
     }
 }

@@ -2,9 +2,10 @@ package grpcbridge;
 
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Message;
+import grpcbridge.parser.Deserializer;
+import grpcbridge.parser.Serializer;
 import grpcbridge.route.Route;
 import grpcbridge.util.FileDescriptors;
-import grpcbridge.parser.Parser;
 import io.grpc.ServerInterceptor;
 import io.grpc.ServerInterceptors;
 import io.grpc.ServerMethodDefinition;
@@ -27,7 +28,8 @@ public final class BridgeBuilder {
     private final FileDescriptors files = new FileDescriptors();
     private final List<ServerServiceDefinition> services = new ArrayList<>();
     private final List<ServerInterceptor> interceptors = new ArrayList<>();
-    private final List<Parser> parsers = new ArrayList<>();
+    private final List<Serializer> serializers = new ArrayList<>();
+    private final List<Deserializer> deserializers = new ArrayList<>();
 
     /**
      * Adds protobuf file descriptor. Call this method for each of the protobuf
@@ -42,13 +44,24 @@ public final class BridgeBuilder {
     }
 
     /**
-     * Adds protobuf message parser.
+     * Adds gRPC message to http content type serializer
      *
-     * @param parser message body parser
+     * @param serializer convert gRPC to http content type
      * @return this builder instance
      */
-    public BridgeBuilder addParser(Parser parser) {
-        parsers.add(parser);
+    public BridgeBuilder addSerializer(Serializer serializer) {
+        serializers.add(serializer);
+        return this;
+    }
+
+    /**
+     * Add Http content type to gRPC message deserializer
+     *
+     * @param deserializer convert http body to gRPC
+     * @return this builder instance
+     */
+    public BridgeBuilder addDeserializer(Deserializer deserializer) {
+        deserializers.add(deserializer);
         return this;
     }
 
@@ -89,13 +102,12 @@ public final class BridgeBuilder {
             }
             for (ServerMethodDefinition<?, ?> method : service.getMethods()) {
                 Route route = files.routeFor(
-                        parsers,
                         service,
                         (ServerMethodDefinition<Message, Message>) method);
                 routes.add(route);
             }
         }
 
-        return new Bridge(routes, parsers);
+        return new Bridge(routes, serializers, deserializers);
     }
 }

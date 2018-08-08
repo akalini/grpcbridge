@@ -5,8 +5,8 @@ import com.google.gson.reflect.TypeToken;
 import grpcbridge.common.TestSnakeService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
-import grpcbridge.parser.ProtoFormDataParser;
-import grpcbridge.parser.ProtoJsonParser;
+import grpcbridge.parser.ProtoFormDataConverter;
+import grpcbridge.parser.ProtoJsonConverter;
 import grpcbridge.test.proto.TestSnakeCase;
 import io.grpc.Metadata;
 import org.junit.Test;
@@ -22,11 +22,11 @@ public class FormDataBridgeTest implements ProtoParseTest {
     private TestSnakeService testService = new TestSnakeService();
     private Bridge bridge = Bridge
         .builder()
-        .addFile(grpcbridge.test.proto.TestSnakeCase.getDescriptor())
-        .addService(testService.bindService())
-        .addParser(ProtoJsonParser.INSTANCE)
-        .addParser(ProtoFormDataParser.INSTANCE)
-        .build();
+            .addFile(grpcbridge.test.proto.TestSnakeCase.getDescriptor())
+            .addService(testService.bindService())
+            .addSerializer(ProtoJsonConverter.INSTANCE)
+            .addDeserializer(ProtoFormDataConverter.INSTANCE)
+            .build();
 
     @Test
     public void handleFormDataRequest() {

@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class ProtoParser implements Parser {
+public abstract class ProtoConverter implements Serializer, Deserializer {
+
     private static final String ANY = "*/*";
 
     protected abstract String contentType();
@@ -31,8 +32,13 @@ public abstract class ProtoParser implements Parser {
     );
 
     @Override
-    public boolean accept(Collection<String> accepted) {
+    public boolean supportsAny(Collection<String> accepted) {
         return accepted.stream().anyMatch(it -> supportedTypes().contains(it) || ANY.equals(it));
+    }
+
+    @Override
+    public boolean supported(String contentType) {
+        return supportedTypes().contains(contentType);
     }
 
     protected List<String> supportedTypes() {
@@ -40,7 +46,7 @@ public abstract class ProtoParser implements Parser {
     }
 
     @Override
-    public RpcMessage parse(HttpRequest httpRequest, Message.Builder builder) {
+    public RpcMessage deserialize(HttpRequest httpRequest, Message.Builder builder) {
         return new RpcMessage(
             parse(httpRequest.getBody().orElse(null), builder),
             httpRequest.getHeaders());

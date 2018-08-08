@@ -22,14 +22,16 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public final class ProtoFormDataParser extends ProtoParser {
+public final class ProtoFormDataConverter extends ProtoConverter {
 
-    public static final ProtoFormDataParser INSTANCE = new ProtoFormDataParser();
+    public static final ProtoFormDataConverter INSTANCE = new ProtoFormDataConverter();
     private static final Gson gson = new Gson();
     private static final Type type = new TypeToken<Map<String, String>>() {}.getType();
+
     private static final String URL_ENCODED_FORM = "application/x-www-form-urlencoded";
 
-    private ProtoFormDataParser() {}
+    private ProtoFormDataConverter() {
+    }
 
     @Override
     public String serialize(Integer index, JsonFormat.Printer printer, @Nonnull Message message) {
@@ -86,6 +88,6 @@ public final class ProtoFormDataParser extends ProtoParser {
                                 }
                         ));
         String json = gson.toJson(pairs);
-        return ProtoJsonParser.INSTANCE.parse(json, builder);
+        return ProtoJsonConverter.INSTANCE.parse(json, builder);
     }
 }

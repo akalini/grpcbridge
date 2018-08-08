@@ -1,15 +1,18 @@
 package grpcbridge;
 
+import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
-import grpcbridge.parser.Parser;
-import grpcbridge.parser.ProtoJsonParser;
+import grpcbridge.parser.Deserializer;
+import grpcbridge.parser.ProtoJsonConverter;
+import grpcbridge.parser.Serializer;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.util.Parsers;
+import io.grpc.Metadata;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -62,22 +65,21 @@ import static java.lang.String.format;
  */
 public final class Bridge {
     private final List<Route> routes;
-    private final List<Parser> parsers;
+    private final List<Serializer> serializers;
+    private final List<Deserializer> deserializers;
 
     /**
      * Creates a new bridge, use {@link BridgeBuilder} to create bridge
      * instances.
      *
      * @param routes list of available routes
-     * @param parsers list of parsers used for parsing http request body into gRPC messages and
-     *                serializing gRPC messages to http compatible response body
+     * @param serializers used for converting gRPC messages to http content type
+     * @param deserializers used for converting from http content type to gRPC
      */
-    Bridge(List<Route> routes, List<Parser> parsers) {
+    Bridge(List<Route> routes, List<Serializer> serializers, List<Deserializer> deserializers) {
         this.routes = routes;
-        this.parsers = parsers;
-        if (this.parsers.isEmpty()) {
-            this.parsers.add(ProtoJsonParser.INSTANCE);
-        }
+        this.serializers = serializers;
+        this.deserializers = deserializers;
     }
 
     /**
@@ -87,7 +89,7 @@ public final class Bridge {
      * @param routes list of available routes
      */
     Bridge(List<Route> routes) {
-        this(routes, Collections.singletonList(ProtoJsonParser.INSTANCE));
+        this(routes, Collections.emptyList(), Collections.emptyList());
     }
 
     /**
@@ -130,22 +132,51 @@ public final class Bridge {
      * @return HTTP response future
      */
     public ListenableFuture<HttpResponse> handleAsync(HttpRequest httpRequest) {
+        final Deserializer deserializer = getDeserializer(httpRequest);
         for (Route route : routes) {
-            Optional<RpcCall> optionalCall = route.match(httpRequest);
+            Optional<RpcCall> optionalCall = route.match(deserializer, httpRequest);
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
                 ListenableFuture<RpcMessage> response = call.execute();
-                final Parser parser = Parsers.findBestParserForResponse(
-                        parsers,
-                        httpRequest,
-                        route.preferredResponseType()
-                );
-                return transform(response, parser.serializeAsync(route.getPrinter())::apply);
+                final Serializer serializer = getSerializer(route, httpRequest);
+                return transform(response, serializer.serializeAsync(route.getPrinter())::apply);
             }
         }
 
         throw new Exceptions.RouteNotFoundException(
                 format("Mapper not found: %s %s", httpRequest.getMethod(), httpRequest.getPath())
         );
+    }
+
+    private Deserializer getDeserializer(HttpRequest httpRequest) {
+
+        final String contentType = httpRequest.getHeaders().get(Metadata.Key.of(
+                "content-type",
+                Metadata.ASCII_STRING_MARSHALLER));
+        if (contentType == null) return ProtoJsonConverter.INSTANCE;
+        return deserializers.stream()
+                .filter(it -> it.supported(contentType))
+                .findFirst()
+                .orElse(ProtoJsonConverter.INSTANCE);
+    }
+
+    private Serializer getSerializer(Route route, HttpRequest httpRequest) {
+        List<String> supportedTypes = new ArrayList<>();
+        String preferredType = route.descriptor
+                .getService()
+                .getOptions()
+                .getExtension(GrpcbridgeOptions.preferredResponseType);
+        if (!Strings.isNullOrEmpty(preferredType)) supportedTypes.add(preferredType);
+
+        Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
+                "accept",
+                Metadata.ASCII_STRING_MARSHALLER));
+        if (acceptedTypes != null) {
+            acceptedTypes.forEach(supportedTypes::add);
+        }
+        return serializers.stream()
+                .filter(it -> it.supportsAny(supportedTypes))
+                .findFirst()
+                .orElse(ProtoJsonConverter.INSTANCE);
     }
 }

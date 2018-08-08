@@ -5,9 +5,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import grpcbridge.Bridge;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
+import grpcbridge.parser.ProtoFormDataConverter;
 import grpcbridge.test.proto.TestXml;
-import grpcbridge.parser.ProtoFormDataParser;
-import grpcbridge.parser.ProtoJsonParser;
 import grpcbridge.xml.common.TestXMLService;
 import io.grpc.Metadata;
 import org.junit.Test;
@@ -23,12 +22,11 @@ public class XmlBridgeTest {
     private TestXMLService testService = new TestXMLService();
     private Bridge bridge = Bridge
         .builder()
-        .addFile(TestXml.getDescriptor())
-        .addService(testService.bindService())
-        .addParser(ProtoJsonParser.INSTANCE)
-        .addParser(ProtoFormDataParser.INSTANCE)
-        .addParser(ProtoXMLParser.INSTANCE)
-        .build();
+            .addFile(TestXml.getDescriptor())
+            .addService(testService.bindService())
+            .addDeserializer(ProtoFormDataConverter.INSTANCE)
+            .addSerializer(ProtoXMLConverter.INSTANCE)
+            .build();
 
     @Test
     public void handleXmlRequest() throws IOException {

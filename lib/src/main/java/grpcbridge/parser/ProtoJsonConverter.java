@@ -21,16 +21,17 @@ import static java.lang.String.format;
 /**
  * Helper methods to convert from JSON to protobuf messages and back.
  */
-public final class ProtoJsonParser extends ProtoParser {
+public final class ProtoJsonConverter extends ProtoConverter {
 
     public static final String JSON = "application/json";
 
-    public static final ProtoJsonParser INSTANCE = new ProtoJsonParser();
+    public static final ProtoJsonConverter INSTANCE = new ProtoJsonConverter();
 
-    private ProtoJsonParser() {}
+    private ProtoJsonConverter() {
+    }
 
     @Override
-    public RpcMessage parse(HttpRequest httpRequest, Message.Builder builder) {
+    public RpcMessage deserialize(HttpRequest httpRequest, Message.Builder builder) {
         return new RpcMessage(
                 parse(httpRequest.getBody().orElse(null), builder),
                 httpRequest.getHeaders());
@@ -45,7 +46,7 @@ public final class ProtoJsonParser extends ProtoParser {
         if (!Strings.isNullOrEmpty(body)) {
             /** Parses the containing json which is not gRPC parsable
              * then splits them into individual json strings for each message so JsonFormat
-             * can be used to parse them */
+             * can be used to deserialize them */
             Gson gson = new Gson();
             Map[] jsonMsgs = gson.fromJson(body, Map[].class);
             for (Map message : jsonMsgs) {
@@ -63,7 +64,7 @@ public final class ProtoJsonParser extends ProtoParser {
             try {
                 JsonFormat.parser().merge(body, builder);
             } catch (InvalidProtocolBufferException e) {
-                throw new ParsingException(format("Failed to parse a message: {%s}", body), e);
+                throw new ParsingException(format("Failed to deserialize a message: {%s}", body), e);
             }
         }
         return (T) builder.build();

@@ -4,13 +4,11 @@ import com.google.api.HttpRule;
 import com.google.common.base.Strings;
 import com.google.protobuf.Message;
 import grpcbridge.http.HttpRequest;
-import grpcbridge.parser.Parser;
+import grpcbridge.parser.Deserializer;
 import grpcbridge.rpc.RpcMessage;
-import grpcbridge.util.Parsers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Parses HTTP request body as a protobuf message. The parsing is done based
@@ -39,7 +37,7 @@ final class BodyParser {
 
     private final @Nullable VariableExtractor bodyExtractor;
     private final Message blank;
-    private final @Nonnull List<Parser> parsers;
+    private final Deserializer deserializer;
 
     /**
      * Creates new parser.
@@ -49,8 +47,8 @@ final class BodyParser {
      * @param blank an empty protobuf instance that is used to create new
      *              request instances
      */
-    public BodyParser(@Nonnull List<Parser> parsers, HttpRule httpRule, Message blank) {
-        this.parsers = parsers;
+    public BodyParser(@Nonnull Deserializer deserializer, HttpRule httpRule, Message blank) {
+        this.deserializer = deserializer;
         String bodyPattern = Strings.emptyToNull(httpRule.getBody());
         if (bodyPattern == null) {
             this.bodyExtractor = null;
@@ -67,15 +65,14 @@ final class BodyParser {
     /**
      * Extracts gPRC message from the given request.
      *
-     * @param request HTTP request to parse
+     * @param request HTTP request to deserialize
      * @return parsed out gRPC message
      */
     public RpcMessage extract(HttpRequest request) {
         return request.getBody()
                 .map(requestBody -> {
                     if (bodyExtractor == null) {
-                        final Parser parser = Parsers.findBestParserForRequest(parsers, request);
-                        return parser.parse(request, blank.toBuilder());
+                        return deserializer.deserialize(request, blank.toBuilder());
                     } else {
                         RpcMessage result = new RpcMessage(blank, request.getHeaders());
                         bodyExtractor.extract(requestBody).forEach(result::setVar);

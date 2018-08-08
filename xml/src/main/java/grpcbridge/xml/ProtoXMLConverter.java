@@ -9,7 +9,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.Exceptions;
-import grpcbridge.parser.ProtoParser;
+import grpcbridge.parser.ProtoConverter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,18 +21,20 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-public final class ProtoXMLParser extends ProtoParser {
+public final class ProtoXMLConverter extends ProtoConverter {
+
     private static final XmlMapper MAPPER = new XmlMapper();
     private static final String TEXT_XML = "text/xml";
-    public static ProtoXMLParser INSTANCE = new ProtoXMLParser();
+    public static ProtoXMLConverter INSTANCE = new ProtoXMLConverter();
+    private static List<String> SUPPORTED = Arrays.asList(
+            TEXT_XML,
+            "application/xml"
+    );
     private static Type type = new TypeToken<Map<String, Object>>() {
     }.getType();
-    private static List<String> SUPPORTED = Arrays.asList(
-        TEXT_XML,
-        "application/xml"
-    );
 
-    private ProtoXMLParser() {}
+    private ProtoXMLConverter() {
+    }
 
     @Override
     protected List<String> supportedTypes() {
@@ -62,7 +64,9 @@ public final class ProtoXMLParser extends ProtoParser {
                 Gson gson = new Gson();
                 JsonFormat.parser().merge(gson.toJson(msg), builder);
             } catch (IOException e) {
-                throw new Exceptions.ParsingException(format("Failed to parse a message: {%s}", body), e);
+                throw new Exceptions.ParsingException(
+                        format("Failed to deserialize a message: {%s}", body), e
+                );
             }
         }
         return (T) builder.build();
