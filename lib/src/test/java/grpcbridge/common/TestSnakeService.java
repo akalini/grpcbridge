@@ -15,7 +15,7 @@ public class TestSnakeService extends SnakeTestServiceImplBase {
         responseObserver.onNext(
                 TestSnakeCase.SnakeResponse
                         .newBuilder()
-                        .setStatusCode("OK")
+                        .setStatusCode(TestSnakeCase.Status.SUCCESS)
                         .build()
         );
         responseObserver.onCompleted();

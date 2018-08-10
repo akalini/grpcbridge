@@ -5,22 +5,29 @@ import "google/api/annotations.proto";
 import "grpcbridge/grpcbridge-options.proto";
 
 message SnakeRequest {
-  string first_name = 1;
-  string last_name = 2;
+    string first_name = 1;
+    string last_name = 2;
 }
 
 message SnakeResponse {
-  string status_code = 1;
+    Status status_code = 1;
+}
+
+enum Status {
+    SUCCESS = 0;
+    FAIL = 1;
 }
 
 service SnakeTestService {
-  // Preserves snake case fields defined in protos.
-  option (grpcbridge.preserve_field_names) = true;
+    // Preserves snake case fields defined in protos.
+    option (grpcbridge.preserve_field_names) = true;
+    option (grpcbridge.include_default_values) = true;
 
-  rpc snake (SnakeRequest) returns (SnakeResponse) {
-    option (google.api.http) = {
+    rpc snake (SnakeRequest) returns (SnakeResponse) {
+        option (grpcbridge.serialize_enum_as_number) = true;
+        option (google.api.http) = {
             post: "/snake/"
             body: "*"
         };
-  }
+    }
 }

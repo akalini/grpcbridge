@@ -52,6 +52,20 @@ public final class Route {
         if (preserveFieldNames) {
             printer = printer.preservingProtoFieldNames();
         }
+
+        boolean includeDefaultValues = descriptor
+                .getService()
+                .getOptions()
+                .getExtension(GrpcbridgeOptions.includeDefaultValues);
+        if (includeDefaultValues) {
+            printer = printer.includingDefaultValueFields();
+        }
+        boolean serializeEnumAsNumber = descriptor
+                .getOptions()
+                .getExtension(GrpcbridgeOptions.serializeEnumAsNumber);
+        if (serializeEnumAsNumber) {
+            printer = printer.printingEnumsAsInts();
+        }
         return printer;
     }
 

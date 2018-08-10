@@ -54,10 +54,10 @@ public class FormDataBridgeTest implements ProtoParseTest {
             Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("application/json");
 
         Map<String, String> json = gson.fromJson(raw, type);
-        assertThat(json.get("status_code")).isEqualTo("OK");
+        assertThat(json.get("status_code")).isEqualTo("0");
 
         TestSnakeCase.SnakeResponse rpcResponse = parse(raw,
             TestSnakeCase.SnakeResponse.newBuilder());
-        assertThat(rpcResponse.getStatusCode()).isEqualTo("OK");
+        assertThat(rpcResponse.getStatusCode()).isEqualTo(TestSnakeCase.Status.SUCCESS);
     }
 }
