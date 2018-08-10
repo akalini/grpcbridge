@@ -1,29 +1,6 @@
-plugins {
-    id "com.jfrog.bintray" version "1.7"
-    id 'maven'
-    id 'maven-publish'
-}
+apply plugin: 'grpcbridge.gradle.publish'
 
-group = 'grpcbridge'
 archivesBaseName = 'grpcbridge'
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        lib(MavenPublication) {
-            from components.java
-            groupId group
-            artifactId 'grpcbridge'
-            version version
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-}
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
@@ -32,24 +9,4 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.slf4j:slf4j-simple:1.7.21'
-}
-
-bintray {
-    user = 'akalini'
-    key = System.getenv('BINTRAY_KEY')
-    publications = ['lib']
-
-    pkg {
-        repo = 'maven'
-        name = project.group
-        userOrg = 'akalini'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/akalini/grpcbridge'
-
-        version {
-            name = project.version
-            desc = 'Expose your gRPC based API as a set of HTTP RESTful endpoints. HTTP framework agnostic.'
-            released  = new Date()
-        }
-    }
 }

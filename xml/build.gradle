@@ -1,4 +1,5 @@
-group = 'grpcbridge'
+apply plugin: 'grpcbridge.gradle.publish'
+
 archivesBaseName = 'grpcbridge-xml'
 
 dependencies {
