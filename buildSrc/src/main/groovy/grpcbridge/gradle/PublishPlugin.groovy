@@ -13,12 +13,10 @@ class PublishPlugin implements Plugin<Project> {
         project.apply plugin: 'maven'
         project.apply plugin: 'maven-publish'
 
-
         project.bintray {
             user = 'akalini'
             key = System.getenv('BINTRAY_KEY')
-            publications = [project.name]
-
+            publications = ['mavenJava']
             pkg {
                 repo = 'maven'
                 name = project.group
@@ -40,7 +38,7 @@ class PublishPlugin implements Plugin<Project> {
 
         project.publishing {
             publications {
-                lib(MavenPublication) {
+                mavenJava(MavenPublication) {
                     from project.components.java
                     groupId project.group
                     artifactId project.archivesBaseName
