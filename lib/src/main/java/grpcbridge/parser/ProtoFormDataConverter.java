@@ -73,7 +73,7 @@ public final class ProtoFormDataConverter extends ProtoConverter {
             return (T) builder.build();
         }
         Map<String, String> pairs =
-                Splitter.on('&').withKeyValueSeparator('=').split(body).entrySet()
+                Splitter.on('&').omitEmptyStrings().withKeyValueSeparator('=').split(body).entrySet()
                         .parallelStream()
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
