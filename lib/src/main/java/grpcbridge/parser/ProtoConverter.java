@@ -48,7 +48,7 @@ public abstract class ProtoConverter implements Serializer, Deserializer {
     @Override
     public boolean supported(MediaType contentType) {
         for (MediaType mediaType : supportedTypes()) {
-            boolean supported = mediaType.is(mediaType);
+            boolean supported = mediaType.is(contentType);
             if (supported) return true;
         }
         return false;
