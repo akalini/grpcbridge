@@ -1,5 +1,6 @@
 package grpcbridge;
 
+import com.google.common.base.Charsets;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import grpcbridge.Exceptions.ParsingException;
@@ -513,6 +514,6 @@ public class BridgeTest implements ProtoParseTest {
     }
 
     private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
-        return ProtoJsonConverter.INSTANCE.parseStream(body, builder);
+        return ProtoJsonConverter.INSTANCE.parseStream(body, Charsets.UTF_8, builder);
     }
 }

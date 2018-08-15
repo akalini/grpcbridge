@@ -3,6 +3,7 @@ package grpcbridge.xml;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Strings;
+import com.google.common.net.MediaType;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -15,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -26,15 +28,15 @@ import static java.lang.String.format;
 public final class ProtoXMLConverter extends ProtoConverter {
 
     private static final XmlMapper MAPPER = new XmlMapper();
-    private static final String TEXT_XML = "text/xml";
+    private static final MediaType contentType = MediaType.XML_UTF_8;
     private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Type LIST_TYPE = new TypeToken<List<Object>>() {
     }.getType();
     public static ProtoXMLConverter INSTANCE = new ProtoXMLConverter();
-    private static List<String> SUPPORTED = Arrays.asList(
-            TEXT_XML,
-            "application/xml"
+    private static List<MediaType> SUPPORTED = Arrays.asList(
+            contentType,
+            MediaType.APPLICATION_XML_UTF_8
     );
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Map.class, new JsonDeserializer<Map<String, Object>>() {
@@ -77,13 +79,13 @@ public final class ProtoXMLConverter extends ProtoConverter {
     }
 
     @Override
-    protected List<String> supportedTypes() {
+    protected List<MediaType> supportedTypes() {
         return SUPPORTED;
     }
 
     @Override
-    protected String contentType() {
-        return TEXT_XML;
+    protected MediaType contentType() {
+        return contentType;
     }
 
     @Override
@@ -96,7 +98,10 @@ public final class ProtoXMLConverter extends ProtoConverter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public   <T extends Message> T parse(@Nullable String body, T.Builder builder) {
+    public <T extends Message> T parse(
+            @Nullable String body,
+            Charset charset,
+            T.Builder builder) {
         if (!Strings.isNullOrEmpty(body)) {
             try {
                 XmlMapper mapper = new XmlMapper();

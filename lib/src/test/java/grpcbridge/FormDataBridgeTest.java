@@ -36,7 +36,7 @@ public class FormDataBridgeTest implements ProtoParseTest {
         Metadata headers = new Metadata();
         headers.put(
                 Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
-                "application/x-www-form-urlencoded"
+                "application/x-www-form-urlencoded; charset=utf-8"
         );
 
         String rawBody = "first_name=John&last_name=Doe";
@@ -51,7 +51,7 @@ public class FormDataBridgeTest implements ProtoParseTest {
         String raw = response.getBody();
 
         assertThat(response.getTrailers().get(Metadata.Key.of("content-type",
-            Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("application/json");
+                Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("application/json; charset=utf-8");
 
         Map<String, String> json = gson.fromJson(raw, type);
         assertThat(json.get("status_code")).isEqualTo("0");

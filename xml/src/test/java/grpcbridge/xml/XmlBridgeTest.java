@@ -50,7 +50,7 @@ public class XmlBridgeTest {
         String raw = response.getBody();
 
         assertThat(response.getTrailers().get(Metadata.Key.of("content-type",
-        Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml");
+                Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml; charset=utf-8");
         Map<String, Object> xml = new XmlMapper().readValue(raw,
             new TypeReference<Map<String, Object>>() {});
 
@@ -82,7 +82,7 @@ public class XmlBridgeTest {
         assertThat(raw).endsWith("</Transaction>");
 
         assertThat(response.getTrailers().get(Metadata.Key.of("content-type",
-            Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml");
+                Metadata.ASCII_STRING_MARSHALLER))).isEqualTo("text/xml; charset=utf-8");
         Map<String, String> xml = new XmlMapper().readValue(raw,
                 new TypeReference<Map<String, String>>() {
                 });
