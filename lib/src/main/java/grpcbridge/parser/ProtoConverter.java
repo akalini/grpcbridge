@@ -22,8 +22,6 @@ import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
 public abstract class ProtoConverter implements Serializer, Deserializer {
 
-    private static final String ANY = "*/*";
-
     protected abstract MediaType contentType();
 
     protected abstract String packMultiple(List<String> serializedItems);
@@ -61,8 +59,7 @@ public abstract class ProtoConverter implements Serializer, Deserializer {
     @Override
     public RpcMessage deserialize(
             HttpRequest httpRequest,
-            Message.Builder builder
-    ) {
+            Message.Builder builder) {
         String contentType = httpRequest
                 .getHeaders()
                 .get(Metadata.Key.of("content-type", ASCII_STRING_MARSHALLER));
@@ -73,7 +70,7 @@ public abstract class ProtoConverter implements Serializer, Deserializer {
         }
         return new RpcMessage(
                 parse(httpRequest.getBody().orElse(null), charset, builder),
-            httpRequest.getHeaders());
+                httpRequest.getHeaders());
     }
 
     @Override

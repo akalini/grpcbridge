@@ -168,8 +168,9 @@ public final class Bridge {
                 .getService()
                 .getOptions()
                 .getExtension(GrpcbridgeOptions.preferredResponseType);
-        if (!Strings.isNullOrEmpty(preferredType))
+        if (!Strings.isNullOrEmpty(preferredType)) {
             supportedTypes.add(MediaType.parse(preferredType));
+        }
 
         Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
                 "accept",
