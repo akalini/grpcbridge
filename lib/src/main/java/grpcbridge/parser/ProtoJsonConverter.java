@@ -33,8 +33,7 @@ public final class ProtoJsonConverter extends ProtoConverter {
     public <T extends Message> List<T> parseStream(
             @Nullable String body,
             Charset charset,
-            T.Builder builder
-    ) {
+            T.Builder builder) {
         List<T> messages = new ArrayList<>();
         if (!Strings.isNullOrEmpty(body)) {
             /** Parses the containing json which is not gRPC parsable
@@ -67,8 +66,7 @@ public final class ProtoJsonConverter extends ProtoConverter {
     public String serialize(
             @Nullable Integer index,
             @Nonnull JsonFormat.Printer printer,
-            @Nonnull Message message
-    ) {
+            @Nonnull Message message) {
         try {
             return printer.print(message);
         } catch (InvalidProtocolBufferException e) {
