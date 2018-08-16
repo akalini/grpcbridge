@@ -29,14 +29,12 @@ public abstract class ProtoConverter implements Serializer, Deserializer {
     public abstract <T extends Message> T parse(
             @Nullable String body,
             Charset charset,
-            T.Builder builder
-    );
+            T.Builder builder);
 
     protected abstract String serialize(
             @Nullable Integer index,
             @Nonnull JsonFormat.Printer printer,
-            @Nonnull Message message
-    );
+            @Nonnull Message message);
 
     @Override
     public boolean supportsAny(Collection<MediaType> accepted) {
