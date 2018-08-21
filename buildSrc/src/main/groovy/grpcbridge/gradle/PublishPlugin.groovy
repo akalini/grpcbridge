@@ -17,6 +17,7 @@ class PublishPlugin implements Plugin<Project> {
             user = 'akalini'
             key = System.getenv('BINTRAY_KEY')
             publications = ['mavenJava']
+            publish = true
             pkg {
                 repo = 'maven'
                 name = project.group
