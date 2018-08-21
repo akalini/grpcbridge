@@ -6,6 +6,7 @@ import com.google.protobuf.util.JsonFormat;
 import grpcbridge.common.TestSnakeService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
+import grpcbridge.test.proto.TestSnakeCase;
 import grpcbridge.test.proto.TestSnakeCase.SnakeRequest;
 import grpcbridge.test.proto.TestSnakeCase.SnakeResponse;
 import org.junit.Test;
@@ -18,21 +19,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SnakeCaseBridgeTest implements ProtoParseTest {
     private TestSnakeService testService = new TestSnakeService();
-
-    @Override
-    public JsonFormat.Printer printer() {
-        return JsonFormat.printer().preservingProtoFieldNames();
-    }
-
     private Bridge bridge = Bridge
             .builder()
             .addFile(grpcbridge.test.proto.TestSnakeCase.getDescriptor())
             .addService(testService.bindService())
             .build();
 
+    @Override
+    public JsonFormat.Printer printer() {
+        return JsonFormat.printer().preservingProtoFieldNames();
+    }
+
     @Test
     public void preserveSnakeCaseTest() {
-        final Type type = new TypeToken<Map<String, String>>() {}.getType();
+        final Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         final Gson gson = new Gson();
 
         SnakeRequest rpcRequest = SnakeRequest.newBuilder()
@@ -53,9 +54,9 @@ public class SnakeCaseBridgeTest implements ProtoParseTest {
         String raw = response.getBody();
 
         Map<String, String> json = new Gson().fromJson(raw, type);
-        assertThat(json.get("status_code")).isEqualTo("OK");
+        assertThat(json.get("status_code")).isEqualTo("0");
 
         SnakeResponse rpcResponse = parse(raw, SnakeResponse.newBuilder());
-        assertThat(rpcResponse.getStatusCode()).isEqualTo("OK");
+        assertThat(rpcResponse.getStatusCode()).isEqualTo(TestSnakeCase.Status.SUCCESS);
     }
 }

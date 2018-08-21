@@ -16,7 +16,7 @@ public class TestXMLService extends XmlTestServiceGrpc.XmlTestServiceImplBase {
         responseObserver.onNext(
                 TestXml.AccountEvent
                         .newBuilder()
-                        .setStatusCode("OK")
+                        .setStatusCode(TestXml.Status.SUCCESS)
                     .build()
         );
         responseObserver.onCompleted();
@@ -30,7 +30,10 @@ public class TestXMLService extends XmlTestServiceGrpc.XmlTestServiceImplBase {
         responseObserver.onNext(
             TestXml.Transaction
                 .newBuilder()
-                .setStatusCode("OK")
+                    .setStatusCode(TestXml.Status.SUCCESS)
+                    .setDescription("test transaction")
+                    .setHasMoney(true)
+                    .setAmount(25.50)
                 .build()
         );
         responseObserver.onCompleted();

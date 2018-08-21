@@ -1,5 +1,7 @@
 package grpcbridge.parser;
 
+import com.google.common.base.Charsets;
+import com.google.common.net.MediaType;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.http.HttpRequest;
@@ -9,47 +11,64 @@ import io.grpc.Metadata;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+
 public abstract class ProtoConverter implements Serializer, Deserializer {
 
-    private static final String ANY = "*/*";
-
-    protected abstract String contentType();
+    protected abstract MediaType contentType();
 
     protected abstract String packMultiple(List<String> serializedItems);
 
-    public abstract <T extends Message> T parse(@Nullable String body, T.Builder builder);
+    public abstract <T extends Message> T parse(
+            @Nullable String body,
+            Charset charset,
+            T.Builder builder);
 
     protected abstract String serialize(
             @Nullable Integer index,
             @Nonnull JsonFormat.Printer printer,
-            @Nonnull Message message
-    );
+            @Nonnull Message message);
 
     @Override
-    public boolean supportsAny(Collection<String> accepted) {
-        return accepted.stream().anyMatch(it -> supportedTypes().contains(it) || ANY.equals(it));
+    public boolean supportsAny(Collection<MediaType> accepted) {
+        return accepted.stream().anyMatch(it -> supported(it));
     }
 
     @Override
-    public boolean supported(String contentType) {
-        return supportedTypes().contains(contentType);
+    public boolean supported(MediaType contentType) {
+        for (MediaType mediaType : supportedTypes()) {
+            boolean supported = mediaType.is(contentType);
+            if (supported) return true;
+        }
+        return false;
     }
 
-    protected List<String> supportedTypes() {
+    protected List<MediaType> supportedTypes() {
         return Collections.singletonList(contentType());
     }
 
     @Override
-    public RpcMessage deserialize(HttpRequest httpRequest, Message.Builder builder) {
+    public RpcMessage deserialize(
+            HttpRequest httpRequest,
+            Message.Builder builder) {
+        String contentType = httpRequest
+                .getHeaders()
+                .get(Metadata.Key.of("content-type", ASCII_STRING_MARSHALLER));
+        Charset charset = Charsets.UTF_8;
+        if (contentType != null) {
+            MediaType type = MediaType.parse(contentType);
+            charset = type.charset().or(Charsets.UTF_8);
+        }
         return new RpcMessage(
-            parse(httpRequest.getBody().orElse(null), builder),
-            httpRequest.getHeaders());
+                parse(httpRequest.getBody().orElse(null), charset, builder),
+                httpRequest.getHeaders());
     }
 
     @Override
@@ -88,7 +107,8 @@ public abstract class ProtoConverter implements Serializer, Deserializer {
 
     private Metadata withContentType(Metadata headers) {
         headers.put(
-            Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER), contentType()
+                Metadata.Key.of("content-type", ASCII_STRING_MARSHALLER),
+                contentType().toString()
         );
         return headers;
     }

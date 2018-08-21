@@ -1,6 +1,7 @@
 package grpcbridge;
 
 import com.google.common.base.Strings;
+import com.google.common.net.MediaType;
 import com.google.common.util.concurrent.ListenableFuture;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
@@ -154,25 +155,28 @@ public final class Bridge {
                 "content-type",
                 Metadata.ASCII_STRING_MARSHALLER));
         if (contentType == null) return ProtoJsonConverter.INSTANCE;
+        MediaType mediaType = MediaType.parse(contentType);
         return deserializers.stream()
-                .filter(it -> it.supported(contentType))
+                .filter(it -> it.supported(mediaType))
                 .findFirst()
                 .orElse(ProtoJsonConverter.INSTANCE);
     }
 
     private Serializer getSerializer(Route route, HttpRequest httpRequest) {
-        List<String> supportedTypes = new ArrayList<>();
+        List<MediaType> supportedTypes = new ArrayList<>();
         String preferredType = route.descriptor
                 .getService()
                 .getOptions()
                 .getExtension(GrpcbridgeOptions.preferredResponseType);
-        if (!Strings.isNullOrEmpty(preferredType)) supportedTypes.add(preferredType);
+        if (!Strings.isNullOrEmpty(preferredType)) {
+            supportedTypes.add(MediaType.parse(preferredType));
+        }
 
         Iterable<String> acceptedTypes = httpRequest.getHeaders().getAll(Metadata.Key.of(
                 "accept",
                 Metadata.ASCII_STRING_MARSHALLER));
         if (acceptedTypes != null) {
-            acceptedTypes.forEach(supportedTypes::add);
+            acceptedTypes.forEach(it -> supportedTypes.add(MediaType.parse(it)));
         }
         return serializers.stream()
                 .filter(it -> it.supportsAny(supportedTypes))

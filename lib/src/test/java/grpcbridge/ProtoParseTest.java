@@ -1,5 +1,6 @@
 package grpcbridge;
 
+import com.google.common.base.Charsets;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import grpcbridge.parser.ProtoConverter;
@@ -23,6 +24,6 @@ public interface ProtoParseTest {
     }
 
     default <T extends Message> T parse(@Nullable String body, T.Builder builder) {
-        return parser().parse(body, builder);
+        return parser().parse(body, Charsets.UTF_8, builder);
     }
 }

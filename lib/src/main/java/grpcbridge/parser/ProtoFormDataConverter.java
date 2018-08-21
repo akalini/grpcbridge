@@ -1,8 +1,10 @@
 package grpcbridge.parser;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.net.MediaType;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -16,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +31,8 @@ public final class ProtoFormDataConverter extends ProtoConverter {
     private static final Gson gson = new Gson();
     private static final Type type = new TypeToken<Map<String, String>>() {}.getType();
 
-    private static final String URL_ENCODED_FORM = "application/x-www-form-urlencoded";
+    private static final MediaType contentType =
+            MediaType.FORM_DATA.withCharset(Charsets.UTF_8);
 
     private ProtoFormDataConverter() {
     }
@@ -43,7 +47,10 @@ public final class ProtoFormDataConverter extends ProtoConverter {
                             it -> index == null ? it.getKey() : format("{%s}[%s]", it.getKey(), index),
                             it -> {
                                 try {
-                                    return URLEncoder.encode(it.getValue(), "UTF-8");
+                                    return URLEncoder.encode(
+                                            it.getValue(),
+                                            contentType.charset().or(Charsets.UTF_8).name()
+                                    );
                                 } catch (UnsupportedEncodingException e) {
                                     throw new Exceptions.ParsingException(
                                             format("Failed to serialize a message: {%s}", message), e
@@ -59,7 +66,9 @@ public final class ProtoFormDataConverter extends ProtoConverter {
     }
 
     @Override
-    protected String contentType() { return URL_ENCODED_FORM; }
+    protected MediaType contentType() {
+        return contentType;
+    }
 
     @Override
     protected String packMultiple(List<String> serializedItems) {
@@ -68,18 +77,22 @@ public final class ProtoFormDataConverter extends ProtoConverter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Message> T parse(@Nullable String body, Message.Builder builder) {
+    public <T extends Message> T parse(
+            @Nullable String body,
+            Charset charset,
+            Message.Builder builder
+    ) {
         if (Strings.isNullOrEmpty(body)) {
             return (T) builder.build();
         }
         Map<String, String> pairs =
-                Splitter.on('&').withKeyValueSeparator('=').split(body).entrySet()
+                Splitter.on('&').omitEmptyStrings().withKeyValueSeparator('=').split(body).entrySet()
                         .parallelStream()
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
                                 it -> {
                                     try {
-                                        return URLDecoder.decode(it.getValue(), "UTF-8");
+                                        return URLDecoder.decode(it.getValue(), charset.name());
                                     } catch (UnsupportedEncodingException e) {
                                         throw new Exceptions.ParsingException(
                                                 format("Failed to serialize a body: {%s}", body), e
@@ -88,6 +101,6 @@ public final class ProtoFormDataConverter extends ProtoConverter {
                                 }
                         ));
         String json = gson.toJson(pairs);
-        return ProtoJsonConverter.INSTANCE.parse(json, builder);
+        return ProtoJsonConverter.INSTANCE.parse(json, charset, builder);
     }
 }
