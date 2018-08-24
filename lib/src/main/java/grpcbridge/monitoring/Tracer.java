@@ -6,6 +6,7 @@ import static io.opencensus.contrib.http.util.HttpPropagationUtil.getCloudTraceF
 import grpcbridge.http.HttpRequest;
 import grpcbridge.route.Route;
 import io.grpc.Metadata.Key;
+import io.grpc.StatusRuntimeException;
 import io.opencensus.common.Scope;
 import io.opencensus.trace.AttributeValue;
 import io.opencensus.trace.Span;
@@ -52,7 +53,8 @@ public final class Tracer {
                                     .orElse(null);
                         }
                     });
-                } catch (SpanContextParseException ignored) {}
+                } catch (SpanContextParseException ignored) {
+                }
             }
 
             try (Scope ignored = Tracing.getTracer()
@@ -67,6 +69,8 @@ public final class Tracer {
                         AttributeValue.stringAttributeValue(route.getMethod()));
                 return action.call();
             }
+        } catch (StatusRuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
