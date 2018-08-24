@@ -33,27 +33,27 @@ public final class Tracer {
         try {
             TextFormat formatter = getCloudTraceFormat();
 
+            SpanContext context = SpanContext.INVALID;
+
             // If trace id header is not present exit early. This is because the
             // code below throws exception if the header is not present and we
             // don't want to have to catch an exception for the happy path.
             if (formatter.fields()
                     .stream()
-                    .noneMatch(header -> request.getHeaders().containsKey(key(header)))) {
-                return action.call();
+                    .anyMatch(header -> request.getHeaders().containsKey(key(header)))) {
+                try {
+                    context = formatter.extract(request, new TextFormat.Getter<HttpRequest>() {
+                        @Override
+                        public String get(HttpRequest carrier, String key) {
+                            return formatter.fields().stream()
+                                    .map(header -> carrier.getHeaders().get(key(header)))
+                                    .filter(Objects::nonNull)
+                                    .findFirst()
+                                    .orElse(null);
+                        }
+                    });
+                } catch (SpanContextParseException ignored) {}
             }
-
-            SpanContext context = null;
-            try {
-                context = formatter.extract(request, new TextFormat.Getter<HttpRequest>() {
-                    @Override public String get(HttpRequest carrier, String key) {
-                        return formatter.fields().stream()
-                                .map(header -> carrier.getHeaders().get(key(header)))
-                                .filter(Objects::nonNull)
-                                .findFirst()
-                                .orElse(null);
-                    }
-                });
-            } catch (SpanContextParseException ignored) {}
 
             try (Scope ignored = Tracing.getTracer()
                     .spanBuilderWithRemoteParent("grpcbridge/http", context)
