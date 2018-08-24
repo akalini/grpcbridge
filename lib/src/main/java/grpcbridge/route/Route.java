@@ -39,6 +39,22 @@ public final class Route {
     }
 
     /**
+     * @return gRPC service name
+     */
+    public String getService() {
+        return descriptor.getService().getFullName();
+    }
+
+    /**
+     * @return gRPC method name
+     */
+    public String getMethod() {
+        return descriptor
+                .getFullName()
+                .substring(descriptor.getService().getFullName().length() + 1);
+    }
+
+    /**
      * Return JSON printer for the route.
      *
      * @return JSON printer

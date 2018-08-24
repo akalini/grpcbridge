@@ -1,5 +1,10 @@
 package grpcbridge;
 
+import static com.google.common.util.concurrent.Futures.transform;
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static grpcbridge.monitoring.Tracer.trace;
+import static java.lang.String.format;
+
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -18,10 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-
-import static com.google.common.util.concurrent.Futures.transform;
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static java.lang.String.format;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -74,13 +75,9 @@ public final class Bridge {
      * instances.
      *
      * @param routes list of available routes
-     * @param serializers used for converting gRPC messages to http content type
-     * @param deserializers used for converting from http content type to gRPC
      */
-    Bridge(List<Route> routes, List<Serializer> serializers, List<Deserializer> deserializers) {
-        this.routes = routes;
-        this.serializers = serializers;
-        this.deserializers = deserializers;
+    Bridge(List<Route> routes) {
+        this(routes, Collections.emptyList(), Collections.emptyList());
     }
 
     /**
@@ -88,9 +85,13 @@ public final class Bridge {
      * instances.
      *
      * @param routes list of available routes
+     * @param serializers used for converting gRPC messages to http content type
+     * @param deserializers used for converting from http content type to gRPC
      */
-    Bridge(List<Route> routes) {
-        this(routes, Collections.emptyList(), Collections.emptyList());
+    Bridge(List<Route> routes, List<Serializer> serializers, List<Deserializer> deserializers) {
+        this.routes = routes;
+        this.serializers = serializers;
+        this.deserializers = deserializers;
     }
 
     /**
@@ -137,10 +138,14 @@ public final class Bridge {
         for (Route route : routes) {
             Optional<RpcCall> optionalCall = route.match(deserializer, httpRequest);
             if (optionalCall.isPresent()) {
-                RpcCall call = optionalCall.get();
-                ListenableFuture<RpcMessage> response = call.execute();
-                final Serializer serializer = getSerializer(route, httpRequest);
-                return transform(response, serializer.serializeAsync(route.getPrinter())::apply);
+                return trace(route, httpRequest, () -> {
+                    RpcCall call = optionalCall.get();
+                    ListenableFuture<RpcMessage> response = call.execute();
+                    Serializer serializer = getSerializer(route, httpRequest);
+                    return transform(
+                            response,
+                            serializer.serializeAsync(route.getPrinter())::apply);
+                });
             }
         }
 

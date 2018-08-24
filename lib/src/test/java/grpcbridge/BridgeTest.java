@@ -1,5 +1,22 @@
 package grpcbridge;
 
+import static grpcbridge.common.TestFactory.newDeleteRequest;
+import static grpcbridge.common.TestFactory.newGetRequest;
+import static grpcbridge.common.TestFactory.newGrpcErrorRequest;
+import static grpcbridge.common.TestFactory.newPatchRequest;
+import static grpcbridge.common.TestFactory.newPostRequest;
+import static grpcbridge.common.TestFactory.newPutRequest;
+import static grpcbridge.common.TestFactory.responseFor;
+import static grpcbridge.http.HttpMethod.DELETE;
+import static grpcbridge.http.HttpMethod.GET;
+import static grpcbridge.http.HttpMethod.PATCH;
+import static grpcbridge.http.HttpMethod.POST;
+import static grpcbridge.http.HttpMethod.PUT;
+import static grpcbridge.test.proto.Test.Enum.INVALID;
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import com.google.common.base.Charsets;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
@@ -9,22 +26,32 @@ import grpcbridge.common.TestService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.parser.ProtoJsonConverter;
-import grpcbridge.test.proto.Test.*;
-import io.grpc.*;
+import grpcbridge.test.proto.Test.DeleteRequest;
+import grpcbridge.test.proto.Test.DeleteResponse;
+import grpcbridge.test.proto.Test.GetRequest;
+import grpcbridge.test.proto.Test.GetResponse;
+import grpcbridge.test.proto.Test.GrpcErrorRequest;
+import grpcbridge.test.proto.Test.Nested;
+import grpcbridge.test.proto.Test.PatchRequest;
+import grpcbridge.test.proto.Test.PatchResponse;
+import grpcbridge.test.proto.Test.PostRequest;
+import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PutRequest;
+import grpcbridge.test.proto.Test.PutResponse;
+import io.grpc.Metadata;
 import io.grpc.Metadata.Key;
+import io.grpc.ServerCall;
 import io.grpc.ServerCall.Listener;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import io.grpc.Status;
 import io.grpc.Status.Code;
-import org.junit.Test;
+import io.grpc.StatusRuntimeException;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
-import static grpcbridge.common.TestFactory.*;
-import static grpcbridge.http.HttpMethod.*;
-import static grpcbridge.test.proto.Test.Enum.INVALID;
-import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import org.junit.Test;
 
 public class BridgeTest implements ProtoParseTest {
 
@@ -41,7 +68,7 @@ public class BridgeTest implements ProtoParseTest {
                 ServerCall<ReqT, RespT> call, 
                 Metadata headers,
                 ServerCallHandler<ReqT, RespT> next) {
-            if (headers.containsKey(Key.of("auth", Metadata.ASCII_STRING_MARSHALLER))) {
+            if (headers.containsKey(Key.of("auth", ASCII_STRING_MARSHALLER))) {
                 return next.startCall(call, headers);
             } else {
                 call.close(Status.UNAUTHENTICATED.withDescription("No auth metadata"), headers);
@@ -479,7 +506,7 @@ public class BridgeTest implements ProtoParseTest {
 
         /* Next put auth header */
         Metadata headers = new Metadata();
-        headers.put(Key.of("auth", Metadata.ASCII_STRING_MARSHALLER), "token");
+        headers.put(Key.of("auth", ASCII_STRING_MARSHALLER), "token");
         rpcRequest = newGetRequest();
         request = HttpRequest
                 .builder(GET, "/get/hello")
@@ -511,6 +538,28 @@ public class BridgeTest implements ProtoParseTest {
         assertThat(responses.get(0).getIntField()).isEqualTo(0);
         assertThat(responses.get(1).getStringField()).isEqualTo("hello");
         assertThat(responses.get(1).getIntField()).isEqualTo(1);
+    }
+
+    @Test
+    public void get_withTracing() {
+        GetRequest rpcRequest = newGetRequest();
+        Metadata headers = new Metadata();
+        headers.put(
+                Key.of("X-Cloud-Trace-Context", ASCII_STRING_MARSHALLER),
+                "105445aa7843bc8bf206b12000100000/123");
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello")
+                .headers(headers)
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("hello")
+                .build()));
     }
 
     private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {
