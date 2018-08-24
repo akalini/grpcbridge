@@ -1,10 +1,6 @@
 package grpcbridge;
 
-import static com.google.common.util.concurrent.Futures.transform;
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static grpcbridge.monitoring.Tracer.trace;
-import static java.lang.String.format;
-
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -23,6 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+
+import static com.google.common.util.concurrent.Futures.transform;
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static grpcbridge.monitoring.Tracer.trace;
+import static java.lang.String.format;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -181,7 +182,9 @@ public final class Bridge {
                 "accept",
                 Metadata.ASCII_STRING_MARSHALLER));
         if (acceptedTypes != null) {
-            acceptedTypes.forEach(it -> supportedTypes.add(MediaType.parse(it)));
+            acceptedTypes.forEach(it -> Splitter.on(',').trimResults()
+                    .split(it)
+                    .forEach(type -> supportedTypes.add(MediaType.parse(type))));
         }
         return serializers.stream()
                 .filter(it -> it.supportsAny(supportedTypes))
