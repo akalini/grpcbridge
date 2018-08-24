@@ -38,6 +38,10 @@ public class FormDataBridgeTest implements ProtoParseTest {
                 Metadata.Key.of("content-type", Metadata.ASCII_STRING_MARSHALLER),
                 "application/x-www-form-urlencoded; charset=utf-8"
         );
+        headers.put(
+                Metadata.Key.of("accept", Metadata.ASCII_STRING_MARSHALLER),
+                "application/x-www-form-urlencoded, text/xml"
+        );
 
         String rawBody = "first_name=John&last_name=Doe";
 
