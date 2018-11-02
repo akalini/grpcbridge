@@ -14,7 +14,7 @@ allprojects {
     apply plugin: 'com.google.protobuf'
     apply plugin: 'idea'
 
-    version = '1.2.9'
+    version = '1.2.10'
     group = 'grpcbridge'
 
     repositories {
@@ -24,7 +24,7 @@ allprojects {
     ext {
         ver = [
                 protobuf   : '3.6.1',
-                grpc       : '1.13.2',
+                grpc       : '1.16.1',
                 opencensus : '0.15.0',
         ]
     }

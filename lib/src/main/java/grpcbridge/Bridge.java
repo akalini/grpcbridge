@@ -1,9 +1,15 @@
 package grpcbridge;
 
+import static com.google.common.util.concurrent.Futures.transform;
+import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
+import static grpcbridge.monitoring.Tracer.trace;
+import static java.lang.String.format;
+
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.parser.Deserializer;
@@ -19,11 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-
-import static com.google.common.util.concurrent.Futures.transform;
-import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static grpcbridge.monitoring.Tracer.trace;
-import static java.lang.String.format;
 
 /**
  * HTTP to gPRC bridge implementation. The bridge is not HTTP library dependent.
@@ -136,6 +137,7 @@ public final class Bridge {
      */
     public ListenableFuture<HttpResponse> handleAsync(HttpRequest httpRequest) {
         final Deserializer deserializer = getDeserializer(httpRequest);
+
         for (Route route : routes) {
             Optional<RpcCall> optionalCall = route.match(deserializer, httpRequest);
             if (optionalCall.isPresent()) {
@@ -145,7 +147,8 @@ public final class Bridge {
                     Serializer serializer = getSerializer(route, httpRequest);
                     return transform(
                             response,
-                            serializer.serializeAsync(route.getPrinter())::apply);
+                            serializer.serializeAsync(route.getPrinter())::apply,
+                            MoreExecutors.directExecutor());
                 });
             }
         }
