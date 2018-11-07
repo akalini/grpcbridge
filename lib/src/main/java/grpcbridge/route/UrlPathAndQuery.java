@@ -69,18 +69,18 @@ final class UrlPathAndQuery {
                 .collect(toList());
     }
 
+    static String decode(String path) {
+        try {
+            return URLDecoder.decode(new PercentEscaper("%", false).escape(path), UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static Map.Entry<String, List<String>> toMapEntry(String value) {
         String[] keyAndValue = value.split("=");
-        try {
-            return keyAndValue.length == 1
-                    ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
-                    : new SimpleImmutableEntry<>(
-                            keyAndValue[0],
-                            singletonList(URLDecoder.decode(
-                                    new PercentEscaper("%", false).escape(keyAndValue[1]),
-                                    UTF_8.name())));
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+        return keyAndValue.length == 1
+                ? new SimpleImmutableEntry<>(keyAndValue[0], singletonList(""))
+                : new SimpleImmutableEntry<>(keyAndValue[0], singletonList(decode(keyAndValue[1])));
     }
 }

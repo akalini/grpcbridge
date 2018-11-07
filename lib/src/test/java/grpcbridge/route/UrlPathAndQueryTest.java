@@ -75,6 +75,12 @@ public class UrlPathAndQueryTest {
                 .containsEntry("p3", list("{pp3}"));
     }
 
+    @Test
+    public void decode() {
+        assertThat(UrlPathAndQuery.decode("%20%22%25%2D%2E%3C%3E%5C%5E%5F%60%7B%7C%7D%7E"))
+                .isEqualTo(" \"%-.<>\\^_`{|}~");
+    }
+
     private static <T> List<T> list(T t) {
         return Collections.singletonList(t);
     }

@@ -1,5 +1,7 @@
 package grpcbridge.route;
 
+import static grpcbridge.route.UrlPathAndQuery.decode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -73,7 +75,7 @@ final class VariableExtractor {
         Matcher pathMatcher = pattern.matcher(pathAndQuery.path());
         if (pathMatcher.matches()) {
             for (int i = 0; i < pathVars.size(); i++) {
-                result.add(new Variable(pathVars.get(i), pathMatcher.group(1 + i)));
+                result.add(new Variable(pathVars.get(i), decode(pathMatcher.group(1 + i))));
             }
         }
 

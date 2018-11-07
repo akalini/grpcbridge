@@ -61,11 +61,11 @@ public class BridgeTest implements ProtoParseTest {
             .addFile(grpcbridge.test.proto.Test.getDescriptor())
             .addService(testService.bindService())
             .build();
-    
+
     private ServerInterceptor authCheck = new ServerInterceptor() {
         @Override
         public <ReqT, RespT> Listener<ReqT> interceptCall(
-                ServerCall<ReqT, RespT> call, 
+                ServerCall<ReqT, RespT> call,
                 Metadata headers,
                 ServerCallHandler<ReqT, RespT> next) {
             if (headers.containsKey(Key.of("auth", ASCII_STRING_MARSHALLER))) {
@@ -184,6 +184,24 @@ public class BridgeTest implements ProtoParseTest {
     }
 
     @Test
+    public void get_withParams_encoded() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get?string_field=h%3Del%2Fl%26o&int_field=987")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("h=el/l&o")
+                .setIntField(987)
+                .build()));
+    }
+
+    @Test
     public void get_withParams_noParams() {
         GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
@@ -211,6 +229,23 @@ public class BridgeTest implements ProtoParseTest {
         assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
                 .toBuilder()
                 .setStringField("hello")
+                .build()));
+    }
+
+    @Test
+    public void get_withSuffix_encoded() {
+        GetRequest rpcRequest = newGetRequest();
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/h%3Del%2Fl%26o/suffix")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
+                .toBuilder()
+                .setStringField("h=el/l&o")
                 .build()));
     }
 
@@ -480,7 +515,7 @@ public class BridgeTest implements ProtoParseTest {
             assertThat(ex.getTrailers()).isNull();
         }
     }
-    
+
     @Test
     public void getWithInterceptor() {
         Bridge bridge = Bridge
@@ -521,7 +556,7 @@ public class BridgeTest implements ProtoParseTest {
                 .setStringField("hello")
                 .build()));
     }
-    
+
     @Test
     public void getStream() {
         GetRequest rpcRequest = newGetRequest();
@@ -531,7 +566,7 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         HttpResponse response = bridge.handle(request);
-        
+
         List<GetResponse> responses = parseStream(response.getBody(), GetResponse.newBuilder());
         assertThat(responses.size()).isEqualTo(2);
         assertThat(responses.get(0).getStringField()).isEqualTo("hello");

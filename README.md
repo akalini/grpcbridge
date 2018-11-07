@@ -16,7 +16,7 @@ Maven:
 
 Gradle:
 ```groovy
-compile 'grpcbridge:grpcbridge:1.0.16'
+compile 'grpcbridge:grpcbridge:1.0.19'
 ```
 
 The library requires Java 8.
