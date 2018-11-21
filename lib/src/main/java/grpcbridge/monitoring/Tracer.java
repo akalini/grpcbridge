@@ -11,6 +11,7 @@ import io.opencensus.common.Scope;
 import io.opencensus.trace.AttributeValue;
 import io.opencensus.trace.Span;
 import io.opencensus.trace.SpanContext;
+import io.opencensus.trace.Status;
 import io.opencensus.trace.Tracing;
 import io.opencensus.trace.propagation.SpanContextParseException;
 import io.opencensus.trace.propagation.TextFormat;
@@ -57,10 +58,11 @@ public final class Tracer {
                 }
             }
 
-            try (Scope ignored = Tracing.getTracer()
+            Scope scope = Tracing.getTracer()
                     .spanBuilderWithRemoteParent("grpcbridge/http", context)
-                    .startScopedSpan()) {
-                Span span = Tracing.getTracer().getCurrentSpan();
+                    .startScopedSpan();
+            Span span = Tracing.getTracer().getCurrentSpan();
+            try {
                 span.putAttribute(
                         "service",
                         AttributeValue.stringAttributeValue(route.getService()));
@@ -68,6 +70,13 @@ public final class Tracer {
                         "method",
                         AttributeValue.stringAttributeValue(route.getMethod()));
                 return action.call();
+            } catch (StatusRuntimeException e) {
+                span.setStatus(Status.CanonicalCode.valueOf(e.getStatus().getCode().name())
+                        .toStatus()
+                        .withDescription(e.getStatus().getDescription()));
+                throw e;
+            } finally {
+                scope.close();
             }
         } catch (StatusRuntimeException e) {
             throw e;
