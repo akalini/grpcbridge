@@ -141,15 +141,14 @@ public final class Bridge {
         for (Route route : routes) {
             Optional<RpcCall> optionalCall = route.match(deserializer, httpRequest);
             if (optionalCall.isPresent()) {
-                return trace(route, httpRequest, () -> {
-                    RpcCall call = optionalCall.get();
-                    ListenableFuture<RpcMessage> response = call.execute();
-                    Serializer serializer = getSerializer(route, httpRequest);
-                    return transform(
-                            response,
-                            serializer.serializeAsync(route.getPrinter())::apply,
-                            MoreExecutors.directExecutor());
-                });
+                RpcCall call = optionalCall.get();
+                ListenableFuture<RpcMessage> response = call.execute();
+                trace(route, httpRequest, response);
+                Serializer serializer = getSerializer(route, httpRequest);
+                return transform(
+                        response,
+                        serializer.serializeAsync(route.getPrinter())::apply,
+                        MoreExecutors.directExecutor());
             }
         }
 
