@@ -2,7 +2,6 @@ package grpcbridge;
 
 import static com.google.common.util.concurrent.Futures.transform;
 import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static grpcbridge.monitoring.Tracer.trace;
 import static java.lang.String.format;
 
 import com.google.common.base.Splitter;
@@ -12,6 +11,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
+import grpcbridge.monitoring.Tracer;
+import grpcbridge.monitoring.TracingSpan;
 import grpcbridge.parser.Deserializer;
 import grpcbridge.parser.ProtoJsonConverter;
 import grpcbridge.parser.Serializer;
@@ -142,8 +143,8 @@ public final class Bridge {
             Optional<RpcCall> optionalCall = route.match(deserializer, httpRequest);
             if (optionalCall.isPresent()) {
                 RpcCall call = optionalCall.get();
-                ListenableFuture<RpcMessage> response = call.execute();
-                trace(route, httpRequest, response);
+                TracingSpan tracingSpan = Tracer.newSpan(route, httpRequest);
+                ListenableFuture<RpcMessage> response = call.execute(tracingSpan);
                 Serializer serializer = getSerializer(route, httpRequest);
                 return transform(
                         response,

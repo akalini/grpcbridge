@@ -3,9 +3,11 @@ package grpcbridge.rpc;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.protobuf.Message;
-import com.google.protobuf.util.JsonFormat;
 import io.grpc.ServerCall;
 import io.grpc.ServerMethodDefinition;
+
+import grpcbridge.monitoring.TracingSpan;
+import javax.annotation.Nullable;
 
 /**
  * Abstracts away a gRPC method invocation. The invocation holds a pointer to
@@ -33,7 +35,20 @@ public final class RpcCall {
      * @return gRPC response future
      */
     public ListenableFuture<RpcMessage> execute() {
+        return execute(null);
+    }
+
+    /**
+     * Executes the gRPC request and returns response future.
+     *
+     * @param tracingSpan tracing span to attach to call
+     * @return gRPC response future
+     */
+    public ListenableFuture<RpcMessage> execute(@Nullable TracingSpan tracingSpan) {
         SettableFuture<RpcMessage> result = SettableFuture.create();
+        if (tracingSpan != null) {
+            tracingSpan.attachTo(result);
+        }
         ServerCall.Listener<Message> listener = method
                 .getServerCallHandler()
                 .startCall(
