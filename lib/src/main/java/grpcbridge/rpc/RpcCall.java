@@ -46,14 +46,23 @@ public final class RpcCall {
      */
     public ListenableFuture<RpcMessage> execute(@Nullable TracingSpan tracingSpan) {
         SettableFuture<RpcMessage> result = SettableFuture.create();
+        ServerCall.Listener<Message> listener;
+
         if (tracingSpan != null) {
             tracingSpan.attachTo(result);
+            listener = tracingSpan.callInContext(() -> method
+                    .getServerCallHandler()
+                    .startCall(
+                            new AsyncCall(method.getMethodDescriptor(), result),
+                            request.getMetadata()));
+        } else {
+            listener = method
+                    .getServerCallHandler()
+                    .startCall(
+                            new AsyncCall(method.getMethodDescriptor(), result),
+                            request.getMetadata());
         }
-        ServerCall.Listener<Message> listener = method
-                .getServerCallHandler()
-                .startCall(
-                        new AsyncCall(method.getMethodDescriptor(), result),
-                        request.getMetadata());
+
         for (Message message : request.getBody()) {
             listener.onMessage(message);
         }
