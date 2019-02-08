@@ -69,17 +69,16 @@ public final class Tracer {
             }
         }
 
-        Scope scope = Tracing.getTracer()
+        Span span = Tracing.getTracer()
                 .spanBuilderWithRemoteParent("grpcbridge/http", context)
-                .startScopedSpan();
-        Span span = Tracing.getTracer().getCurrentSpan();
+                .startSpan();
         span.putAttribute(
                 "service",
                 AttributeValue.stringAttributeValue(route.getService()));
         span.putAttribute(
                 "method",
                 AttributeValue.stringAttributeValue(route.getMethod()));
-        return new TracingSpan(scope, span);
+        return new TracingSpan(span);
     }
 
     private static Key<String> key(String header) {

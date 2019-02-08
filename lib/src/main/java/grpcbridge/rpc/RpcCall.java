@@ -7,7 +7,6 @@ import io.grpc.ServerCall;
 import io.grpc.ServerMethodDefinition;
 
 import grpcbridge.monitoring.TracingSpan;
-import javax.annotation.Nullable;
 
 /**
  * Abstracts away a gRPC method invocation. The invocation holds a pointer to
@@ -32,28 +31,18 @@ public final class RpcCall {
     /**
      * Executes the gRPC request and returns response future.
      *
-     * @return gRPC response future
-     */
-    public ListenableFuture<RpcMessage> execute() {
-        return execute(null);
-    }
-
-    /**
-     * Executes the gRPC request and returns response future.
-     *
      * @param tracingSpan tracing span to attach to call
      * @return gRPC response future
      */
-    public ListenableFuture<RpcMessage> execute(@Nullable TracingSpan tracingSpan) {
+    public ListenableFuture<RpcMessage> execute(TracingSpan tracingSpan) {
         SettableFuture<RpcMessage> result = SettableFuture.create();
-        if (tracingSpan != null) {
-            tracingSpan.attachTo(result);
-        }
-        ServerCall.Listener<Message> listener = method
+        tracingSpan.attachTo(result);
+        ServerCall.Listener<Message> listener = tracingSpan.callInContext(() -> method
                 .getServerCallHandler()
                 .startCall(
                         new AsyncCall(method.getMethodDescriptor(), result),
-                        request.getMetadata());
+                        request.getMetadata()));
+
         for (Message message : request.getBody()) {
             listener.onMessage(message);
         }
