@@ -8,15 +8,17 @@ import grpcbridge.http.HttpRequest;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcMessage;
 import io.grpc.Metadata.Key;
-import io.opencensus.common.Scope;
 import io.opencensus.trace.AttributeValue;
 import io.opencensus.trace.Span;
 import io.opencensus.trace.SpanContext;
+import io.opencensus.trace.SpanId;
+import io.opencensus.trace.TraceOptions;
 import io.opencensus.trace.Tracing;
 import io.opencensus.trace.propagation.SpanContextParseException;
 import io.opencensus.trace.propagation.TextFormat;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -25,6 +27,8 @@ import java.util.function.Function;
  * Executes an action within the new span.
  */
 public final class Tracer {
+    private static final Random RANDOM = new Random();
+
     public static void trace(Route route, HttpRequest request, Consumer<TracingSpan> action) {
         trace(route, request, span -> {
             action.accept(span);
@@ -65,6 +69,20 @@ public final class Tracer {
                                 .orElse(null);
                     }
                 });
+
+                if (context.isValid()) {
+                    // Don't let the client force sampling; always reset trace options.
+                    context = SpanContext.create(
+                            context.getTraceId(),
+                            context.getSpanId(),
+                            TraceOptions.DEFAULT);
+                } else if (context.getTraceId().isValid() && !context.getSpanId().isValid()) {
+                    // Generate a new Span ID if the client provides an empty ID.
+                    context = SpanContext.create(
+                            context.getTraceId(),
+                            SpanId.generateRandomId(RANDOM),
+                            TraceOptions.DEFAULT);
+                }
             } catch (SpanContextParseException ignored) {
             }
         }
