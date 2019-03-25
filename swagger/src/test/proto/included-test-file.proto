@@ -1,0 +1,10 @@
+syntax = "proto3";
+package grpcbridge.test.included.proto;
+
+message ExternalMessage {
+  string external_string_field = 1;
+
+  message ExternalNested {
+    string external_nested_string_field = 1;
+  }
+}

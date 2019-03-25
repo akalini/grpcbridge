@@ -16,6 +16,7 @@ import grpcbridge.monitoring.TracingSpan;
 import grpcbridge.parser.Deserializer;
 import grpcbridge.parser.ProtoJsonConverter;
 import grpcbridge.parser.Serializer;
+import grpcbridge.route.ManifestGenerator;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
@@ -156,6 +157,10 @@ public final class Bridge {
         throw new Exceptions.RouteNotFoundException(
                 format("Mapper not found: %s %s", httpRequest.getMethod(), httpRequest.getPath())
         );
+    }
+
+    public String generateManifest(ManifestGenerator manifestGenerator) {
+        return manifestGenerator.generate(routes);
     }
 
     private Deserializer getDeserializer(HttpRequest httpRequest) {

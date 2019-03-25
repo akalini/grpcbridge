@@ -79,34 +79,28 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get/hello")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
     }
 
     @Test
     public void get_withParams() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get?string_field=hello&int_field=987")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .setIntField(987)
                 .build()));
@@ -114,17 +108,14 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withParams_reordered() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get?int_field=987&string_field=hello")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .setIntField(987)
                 .build()));
@@ -132,17 +123,14 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withParams_camelCase() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get?stringField=hello&intField=987")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .setIntField(987)
                 .build()));
@@ -150,17 +138,14 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withParams_trainCase() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get?string-field=hello&int-field=987")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .setIntField(987)
                 .build()));
@@ -168,34 +153,30 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withParams_partial() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
-                .builder(GET, "/get?string_field=hello")
-                .body(serialize(rpcRequest))
+                .builder(GET, "/get?string_field=hello&nested.nested_field=abc")
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
+                .setNested(Nested.newBuilder()
+                    .setNestedField("abc"))
                 .build()));
     }
 
     @Test
     public void get_withParams_encoded() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get?string_field=h%3Del%2Fl%26o&int_field=987")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("h=el/l&o")
                 .setIntField(987)
                 .build()));
@@ -203,109 +184,83 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withParams_noParams() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest));
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.getDefaultInstance()));
     }
 
     @Test
     public void get_withSuffix() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get/hello/suffix")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
     }
 
     @Test
     public void get_withSuffix_encoded() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get/h%3Del%2Fl%26o/suffix")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("h=el/l&o")
                 .build()));
     }
 
     @Test
     public void get_static() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get-static")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
-                .setStringField("string")
-                .build()));
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.getDefaultInstance()));
     }
 
     @Test
     public void get_static_withParam() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get-static?string_field=value1")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("value1")
                 .build()));
     }
 
     @Test(expected = RouteNotFoundException.class)
     public void get_static_withParam_noMatch() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get-static?param1=no_match")
-                .body(serialize(rpcRequest))
                 .build();
 
-        HttpResponse response = bridge.handle(request);
-        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
-
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
-                .setStringField("string")
-                .build()));
+        bridge.handle(request);
     }
 
     @Test
     public void get_multipleParams() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
-                .builder(GET, "/get-multi/hello/123/321/1.0/3.0/false/bytes/INVALID")
-                .body(serialize(rpcRequest))
+                .builder(GET, "/get-multi/hello/123/321/1.0/3.0/false/bytes/INVALID/nested")
                 .build();
 
         HttpResponse response = bridge.handle(request);
@@ -326,17 +281,14 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_nestedMessage() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get-nested/hello")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setNested(Nested.newBuilder()
                         .setNestedField("hello")
                         .build())
@@ -345,18 +297,14 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_repeatedParam() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
-
                 .builder(GET, "/get-repeated?repeated_field=one&repeated_field=two")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .addRepeatedField("one")
                 .addRepeatedField("two")
                 .build()));
@@ -397,6 +345,21 @@ public class BridgeTest implements ProtoParseTest {
                 .toBuilder()
                 .setStringField("hello")
                 .build()));
+    }
+
+    @Test
+    public void post_noBody() {
+        HttpRequest request = HttpRequest
+            .builder(POST, "/post/hello?int_field=123")
+            .build();
+
+        HttpResponse response = bridge.handle(request);
+        PostResponse rpcResponse = parse(response.getBody(), PostResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(PostRequest.newBuilder()
+            .setStringField("hello")
+            .setIntField(123)
+            .build()));
     }
 
     @Test
@@ -478,7 +441,7 @@ public class BridgeTest implements ProtoParseTest {
     @Test(expected = ParsingException.class)
     public void invalidBody() {
         HttpRequest request = HttpRequest
-                .builder(GET, "/get/hello")
+                .builder(POST, "/post/hello")
                 .body("__INVALID__")
                 .build();
         bridge.handle(request);
@@ -526,10 +489,8 @@ public class BridgeTest implements ProtoParseTest {
                 .build();
 
         /* Try without Auth header */
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get/hello")
-                .body(serialize(rpcRequest))
                 .build();
 
         try {
@@ -542,27 +503,22 @@ public class BridgeTest implements ProtoParseTest {
         /* Next put auth header */
         Metadata headers = new Metadata();
         headers.put(Key.of("auth", ASCII_STRING_MARSHALLER), "token");
-        rpcRequest = newGetRequest();
         request = HttpRequest
                 .builder(GET, "/get/hello")
                 .headers(headers)
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
     }
 
     @Test
     public void getStream() {
-        GetRequest rpcRequest = newGetRequest();
         HttpRequest request = HttpRequest
                 .builder(GET, "/get-stream/hello?int_field=2")
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
@@ -577,7 +533,6 @@ public class BridgeTest implements ProtoParseTest {
 
     @Test
     public void get_withTracing() {
-        GetRequest rpcRequest = newGetRequest();
         Metadata headers = new Metadata();
         headers.put(
                 Key.of("X-Cloud-Trace-Context", ASCII_STRING_MARSHALLER),
@@ -585,14 +540,12 @@ public class BridgeTest implements ProtoParseTest {
         HttpRequest request = HttpRequest
                 .builder(GET, "/get/hello")
                 .headers(headers)
-                .body(serialize(rpcRequest))
                 .build();
 
         HttpResponse response = bridge.handle(request);
         GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
 
-        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest
-                .toBuilder()
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
     }
