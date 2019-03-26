@@ -1,4 +1,4 @@
-package grpcbridge.swagger.proto;
+package grpcbridge.util;
 
 import static java.lang.String.format;
 

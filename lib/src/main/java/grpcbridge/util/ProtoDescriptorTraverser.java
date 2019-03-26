@@ -1,11 +1,11 @@
-package grpcbridge.swagger.proto;
+package grpcbridge.util;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.JavaType;
 import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 
-import grpcbridge.swagger.proto.ProtoVisitor.SimpleFieldType;
+import grpcbridge.util.ProtoVisitor.SimpleFieldType;
 import java.util.List;
 
 /**

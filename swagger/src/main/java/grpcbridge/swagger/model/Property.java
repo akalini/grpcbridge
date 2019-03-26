@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.GenericDescriptor;
 
-import grpcbridge.swagger.proto.ProtoVisitor.SimpleFieldType;
+import grpcbridge.util.ProtoVisitor.SimpleFieldType;
 
 /**
  * Base class for all Property definitions which make up a {@link SwaggerModel}. A property can be

@@ -10,7 +10,7 @@ import grpcbridge.test.proto.TestServiceGrpc.TestServiceImplBase;
 import java.io.IOException;
 import org.junit.Test;
 
-public class SwaggerManifestGeneratorTest {
+public class BridgeSwaggerManifestGeneratorTest {
     private Bridge bridge = Bridge
         .builder()
         .addFile(grpcbridge.test.proto.Test.getDescriptor())
@@ -19,7 +19,7 @@ public class SwaggerManifestGeneratorTest {
 
     @Test
     public void generateManifest() {
-        String manifest = bridge.generateManifest(new SwaggerManifestGenerator());
+        String manifest = bridge.generateManifest(new BridgeSwaggerManifestGenerator());
         String expected = load("test-proto-swagger.json")
             .replaceAll("\n", "")
             .replaceAll(" ", "");

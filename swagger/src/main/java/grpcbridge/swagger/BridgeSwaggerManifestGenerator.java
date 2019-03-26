@@ -7,7 +7,7 @@ import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 
 import grpcbridge.http.BridgeHttpRule;
-import grpcbridge.route.ManifestGenerator;
+import grpcbridge.route.SwaggerManifestGenerator;
 import grpcbridge.route.Route;
 import grpcbridge.swagger.model.SwaggerRoute;
 import grpcbridge.swagger.model.SwaggerSchema;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Generates a Swagger 2.0 compatible API specification for the given routes.
  */
-public final class SwaggerManifestGenerator implements ManifestGenerator {
+public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGenerator {
     public String generate(List<Route> routes) {
         String serviceName = routes.stream()
             .map(Route::getService)

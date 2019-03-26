@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
 import grpcbridge.swagger.model.Property.Type;
-import grpcbridge.swagger.proto.ProtoVisitor.SimpleFieldType;
+import grpcbridge.util.ProtoVisitor.SimpleFieldType;
 
 /**
  * Base class for all Parameter definitions that make up a {@link SwaggerRoute}. A parameter can

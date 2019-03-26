@@ -16,7 +16,7 @@ import grpcbridge.monitoring.TracingSpan;
 import grpcbridge.parser.Deserializer;
 import grpcbridge.parser.ProtoJsonConverter;
 import grpcbridge.parser.Serializer;
-import grpcbridge.route.ManifestGenerator;
+import grpcbridge.route.SwaggerManifestGenerator;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcCall;
 import grpcbridge.rpc.RpcMessage;
@@ -159,7 +159,7 @@ public final class Bridge {
         );
     }
 
-    public String generateManifest(ManifestGenerator manifestGenerator) {
+    public String generateManifest(SwaggerManifestGenerator manifestGenerator) {
         return manifestGenerator.generate(routes);
     }
 
