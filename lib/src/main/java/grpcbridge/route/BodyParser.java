@@ -1,6 +1,7 @@
 package grpcbridge.route;
 
 import com.google.api.HttpRule;
+import com.google.api.HttpRule.PatternCase;
 import com.google.common.base.Strings;
 import com.google.protobuf.Message;
 import grpcbridge.http.HttpRequest;
@@ -23,7 +24,8 @@ import javax.annotation.Nullable;
  *         corresponding protobuf request message.
  *     </li>
  *     <li>
- *         <c>body</c> is missing. This is equivalent to the case above.
+ *         <c>body</c> is missing. The body is not parsed - all request fields
+ *         are expected to be found in the path and query.
  *     </li>
  *     <li>
  *         <c>body</c> is in the '{var}' form - an empty protobuf message
@@ -37,7 +39,7 @@ final class BodyParser {
 
     private final @Nullable VariableExtractor bodyExtractor;
     private final Message blank;
-    private final Deserializer deserializer;
+    private final @Nullable Deserializer deserializer;
 
     /**
      * Creates new parser.
@@ -48,14 +50,19 @@ final class BodyParser {
      *              request instances
      */
     public BodyParser(@Nonnull Deserializer deserializer, HttpRule httpRule, Message blank) {
-        this.deserializer = deserializer;
         String bodyPattern = Strings.emptyToNull(httpRule.getBody());
         if (bodyPattern == null) {
+            this.deserializer = null;
             this.bodyExtractor = null;
         } else {
+            if (httpRule.getPatternCase() == PatternCase.GET) {
+                throw new IllegalArgumentException("GET cannot accept a body: " + httpRule);
+            }
             if (bodyPattern.equals(BODY_WILDCARD)) {
+                this.deserializer = deserializer;
                 this.bodyExtractor = null;
             } else {
+                this.deserializer = null;
                 this.bodyExtractor = new VariableExtractor(bodyPattern);
             }
         }
@@ -71,12 +78,14 @@ final class BodyParser {
     public RpcMessage extract(HttpRequest request) {
         return request.getBody()
                 .map(requestBody -> {
-                    if (bodyExtractor == null) {
+                    if (deserializer != null) {
                         return deserializer.deserialize(request, blank.toBuilder());
-                    } else {
+                    } else if (bodyExtractor != null) {
                         RpcMessage result = new RpcMessage(blank, request.getHeaders());
                         bodyExtractor.extract(requestBody).forEach(result::setVar);
                         return result;
+                    } else {
+                        return new RpcMessage(blank, request.getHeaders());
                     }
                 })
                 .orElse(new RpcMessage(blank, request.getHeaders()));

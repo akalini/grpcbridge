@@ -1,6 +1,8 @@
 package grpcbridge.route;
 
 import com.google.api.HttpRule;
+
+import grpcbridge.http.BridgeHttpRule;
 import grpcbridge.http.HttpMethod;
 import grpcbridge.http.HttpRequest;
 
@@ -13,26 +15,9 @@ final class PathMatcher {
     private final VariableExtractor path;
 
     public PathMatcher(HttpRule httpRule) {
-        String path;
-        if (!httpRule.getGet().isEmpty()) {
-            this.method = HttpMethod.GET;
-            path = httpRule.getGet();
-        } else if (!httpRule.getPost().isEmpty()) {
-            this.method = HttpMethod.POST;
-            path = httpRule.getPost();
-        } else if (!httpRule.getPut().isEmpty()) {
-            this.method = HttpMethod.PUT;
-            path = httpRule.getPut();
-        } else if (!httpRule.getDelete().isEmpty()) {
-            this.method = HttpMethod.DELETE;
-            path = httpRule.getDelete();
-        } else if (!httpRule.getPatch().isEmpty()) {
-            this.method = HttpMethod.PATCH;
-            path = httpRule.getPatch();
-        } else {
-            throw new UnsupportedOperationException("Unsupported method: " + httpRule);
-        }
-        this.path = new VariableExtractor(path);
+        BridgeHttpRule rule = BridgeHttpRule.create(httpRule);
+        this.method = rule.getMethod();
+        this.path = new VariableExtractor(rule.getPath());
     }
 
     public boolean matches(HttpRequest httpRequest) {

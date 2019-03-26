@@ -105,6 +105,13 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
+    public void postNoBody(
+            PostRequest request,
+            StreamObserver<PostResponse> responseObserver) {
+        post(request, responseObserver);
+    }
+
+    @Override
     public void postCustomBody(
             PostRequest request,
             StreamObserver<PostResponse> responseObserver) {

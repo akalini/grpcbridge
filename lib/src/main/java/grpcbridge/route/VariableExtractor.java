@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * {path.to.protobuf.field}. The var can only point to a primitive field
  * types.
  */
-final class VariableExtractor {
+public final class VariableExtractor {
     private static final String VAR_SEGMENT = "([^/]+)";
     private static final Pattern VAR_PATTERN = Pattern.compile("\\{([\\w.]+)\\}");
 
@@ -82,6 +82,10 @@ final class VariableExtractor {
         result.addAll(pathAndQuery.variables());
 
         return result;
+    }
+
+    public List<String> getPathVars() {
+        return pathVars;
     }
 
     @Override public String toString() {

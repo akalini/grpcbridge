@@ -1,5 +1,6 @@
 include 'lib'
 include 'sample'
 include 'xml'
+include 'swagger'
 
 rootProject.name = 'grpcbridge'

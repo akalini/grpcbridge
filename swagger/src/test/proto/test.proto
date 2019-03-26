@@ -1,6 +1,7 @@
 syntax = "proto3";
 package grpcbridge.test.proto;
 
+import "included-test-file.proto";
 import "google/api/annotations.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
@@ -20,6 +21,13 @@ message GetRequest {
   Enum enum_field = 8;
   Nested nested = 9;
   repeated string repeated_field = 10;
+  repeated string repeated_enum = 15;
+  grpcbridge.test.included.proto.ExternalMessage external_field = 11;
+
+  oneof one_of_field {
+    string string_one_of = 13;
+    Nested message_one_of = 14;
+  }
 }
 
 message GetResponse {
@@ -33,6 +41,13 @@ message GetResponse {
   Enum enum_field = 8;
   Nested nested = 9;
   repeated string repeated_field = 10;
+  repeated string repeated_enum = 15;
+  grpcbridge.test.included.proto.ExternalMessage external_field = 11;
+
+  oneof one_of_field {
+    string string_one_of = 13;
+    Nested message_one_of = 14;
+  }
 }
 
 message PostRequest {
@@ -69,30 +84,10 @@ message PatchResponse {
   string string_field = 1;
 }
 
-message GrpcErrorRequest {
-  bool add_metadata = 1;
-}
-
-message GrpcErrorResponse {
-}
-
-
 service TestService {
   rpc Get (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get/{string_field}"
-    };
-  }
-
-  rpc GetWithParams (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get"
-    };
-  }
-
-  rpc GetWithSuffix (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get/{string_field}/suffix"
     };
   }
 
@@ -104,31 +99,13 @@ service TestService {
 
   rpc GetMultipleParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}/{nested.nested_field}"
+        get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}"
     };
   }
 
   rpc GetNestedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-nested/{nested.nested_field}"
-    };
-  }
-
-  rpc GetRepeatedParams (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get-repeated"
-    };
-  }
-
-  rpc GetUnknownPath (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get-unknown-path/{unknown.name}"
-    };
-  }
-
-  rpc GetUnknownParam (GetRequest) returns (GetResponse) {
-    option (google.api.http) = {
-        get: "/get-unknown-param/{nested.unknown}"
     };
   }
 
@@ -168,18 +145,6 @@ service TestService {
   rpc Patch (PatchRequest) returns (PatchResponse) {
     option (google.api.http) = {
         patch: "/patch/{string_field}"
-    };
-  }
-
-  rpc GrpcError (GrpcErrorRequest) returns (GrpcErrorResponse) {
-    option (google.api.http) = {
-        get: "/grpc-error"
-    };
-  }
-  
-  rpc GetStream (GetRequest) returns (stream GetResponse) {
-    option (google.api.http) = {
-        get: "/get-stream/{string_field}"
     };
   }
 }
