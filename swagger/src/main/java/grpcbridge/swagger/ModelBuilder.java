@@ -20,17 +20,17 @@ class ModelBuilder extends ProtoVisitor {
     private final Stack<SwaggerModel> models = new Stack<>();
     private final Map<String, SwaggerModel> completeDefinitions = new HashMap<>();
     private final Descriptor rootDescriptor;
-    private final FieldNameFormatter formatter;
+    private final SwaggerConfig config;
 
-    static Map<String, SwaggerModel> define(Descriptor messageDescriptor) {
-        ModelBuilder builder = new ModelBuilder(messageDescriptor, FieldNameFormatter.snakeCase());
+    static Map<String, SwaggerModel> define(Descriptor messageDescriptor, SwaggerConfig config) {
+        ModelBuilder builder = new ModelBuilder(messageDescriptor, config);
         builder.traverse();
         return builder.completeDefinitions;
     }
 
-    private ModelBuilder(Descriptor rootDescriptor, FieldNameFormatter formatter) {
+    private ModelBuilder(Descriptor rootDescriptor, SwaggerConfig config) {
         this.rootDescriptor = rootDescriptor;
-        this.formatter = formatter;
+        this.config = config;
     }
 
     private void traverse() {
@@ -42,8 +42,9 @@ class ModelBuilder extends ProtoVisitor {
     @Override
     public void onMessageStart(FieldDescriptor field) {
         models.peek().putProperty(
-            formatter.nameFor(field),
-            Property.forReferenceTo(field.getMessageType())
+            config.formatFieldName(field),
+            Property.forReferenceTo(field.getMessageType()),
+            false
         );
 
         // Open scope with new message definition
@@ -53,7 +54,7 @@ class ModelBuilder extends ProtoVisitor {
     @Override
     public void onMessageEnd(FieldDescriptor field) {
         // Close current message definition scope and save
-        completeDefinitions.put(field.getFullName(), models.pop());
+        completeDefinitions.put(field.getMessageType().getFullName(), models.pop());
     }
 
     @Override
@@ -64,10 +65,11 @@ class ModelBuilder extends ProtoVisitor {
 
     @Override
     public void onRepeatedFieldEnd(FieldDescriptor field) {
-        Property repeatedType = models.pop().getProperty(formatter.nameFor(field));
+        Property repeatedType = models.pop().getProperty(config.formatFieldName(field));
         models.peek().putProperty(
-            formatter.nameFor(field),
-            Property.forRepeated(repeatedType)
+            config.formatFieldName(field),
+            Property.forRepeated(repeatedType),
+            config.isRequired(field)
         );
     }
 
@@ -79,13 +81,15 @@ class ModelBuilder extends ProtoVisitor {
                 EnumSwaggerModel.create(field.getEnumType())
             );
             models.peek().putProperty(
-                formatter.nameFor(field),
-                Property.forReferenceTo(field.getEnumType())
+                config.formatFieldName(field),
+                Property.forReferenceTo(field.getEnumType()),
+                config.isRequired(field)
             );
         } else {
             models.peek().putProperty(
-                formatter.nameFor(field),
-                Property.forSimpleField(field, type)
+                config.formatFieldName(field),
+                Property.forSimpleField(field, type),
+                config.isRequired(field)
             );
         }
     }

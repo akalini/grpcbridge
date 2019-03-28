@@ -27,7 +27,7 @@ public class EnumSwaggerModel extends SwaggerModel {
     }
 
     @Override
-    public void putProperty(String name, Property property) {
+    public void putProperty(String name, Property property, boolean isRequired) {
         throw new UnsupportedOperationException("Cannot put property on enum model definition");
     }
 }

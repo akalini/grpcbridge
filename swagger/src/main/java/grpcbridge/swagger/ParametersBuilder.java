@@ -33,16 +33,16 @@ class ParametersBuilder extends ProtoVisitor {
     private final List<Parameter> parameters = new LinkedList<>();
     private final Map<String, SwaggerModel> modelDefinitions = new HashMap<>();
     private final MethodDescriptor method;
-    private final FieldNameFormatter formatter;
+    private final SwaggerConfig config;
     private final FieldLocator locator;
     private boolean visitingRepeated = false;
 
-    static ParametersBuilder create(MethodDescriptor method, BridgeHttpRule rule) {
-        ParametersBuilder builder = new ParametersBuilder(
-            method,
-            rule,
-            FieldNameFormatter.snakeCase()
-        );
+    static ParametersBuilder create(
+        MethodDescriptor method,
+        BridgeHttpRule rule,
+        SwaggerConfig config
+    ) {
+        ParametersBuilder builder = new ParametersBuilder(method, rule, config);
         builder.traverse();
         return builder;
     }
@@ -50,10 +50,10 @@ class ParametersBuilder extends ProtoVisitor {
     private ParametersBuilder(
         MethodDescriptor method,
         BridgeHttpRule rule,
-        FieldNameFormatter formatter
+        SwaggerConfig config
     ) {
         this.method = method;
-        this.formatter = formatter;
+        this.config = config;
         this.locator = new FieldLocator(rule);
     }
 
@@ -61,11 +61,15 @@ class ParametersBuilder extends ProtoVisitor {
         new ProtoDescriptorTraverser(this).traverse(method.getInputType());
         if (locator.bodyIsWildCard) {
             // TODO: support custom body
-            // TODO: filter out types defined in parameters
+            modelDefinitions.putAll(ModelBuilder.define(method.getInputType(), config));
+
+            // Removes any top-level fields from request body that are included in path or query.
+            // Nested fields defined in the path or query will not be removed
+            SwaggerModel requestType = modelDefinitions.get(method.getInputType().getFullName());
+            parameters.forEach(parameter -> requestType.remove(parameter.getName()));
             parameters.add(Parameter.forBody(Property.forReferenceTo(method.getInputType())));
-            modelDefinitions.putAll(ModelBuilder.define(method.getInputType()));
         }
-        modelDefinitions.putAll(ModelBuilder.define(method.getOutputType()));
+        modelDefinitions.putAll(ModelBuilder.define(method.getOutputType(), config));
     }
 
     List<Parameter> getParameters() {
@@ -124,13 +128,13 @@ class ParametersBuilder extends ProtoVisitor {
         if (location == Location.BODY) {
             return;
         }
-        parameters.add(Parameter.forSimpleField(name, location, field));
+        parameters.add(Parameter.forSimpleField(name, location, field, config.isRequired(field)));
     }
 
     private String fullPathName(FieldDescriptor field) {
         List<String> path = new ArrayList<>(jsonPath);
         Collections.reverse(path);
-        path.add(formatter.nameFor(field));
+        path.add(config.formatFieldName(field));
         return String.join(".", path);
     }
 
@@ -166,7 +170,7 @@ class ParametersBuilder extends ProtoVisitor {
                 return Location.PATH;
             } else if (bodyIsWildCard) {
                 return Location.BODY;
-            } else if (bodyParameter != null && fullPathName.startsWith(bodyParameter)) {
+            } else if (inBodyParameter(fullPathName)) {
                 // Covers selected body field and any sub fields
                 return Location.BODY;
             } else {
@@ -174,8 +178,12 @@ class ParametersBuilder extends ProtoVisitor {
             }
         }
 
-        private boolean selectedBodyField(String fullPathName) {
-            return getLocation(fullPathName) == Location.BODY && fullPathName.equals(bodyParameter);
+        private boolean inBodyParameter(String fullPathName) {
+            if (bodyParameter == null) {
+                return false;
+            }
+            return fullPathName.equals(bodyParameter)
+                || fullPathName.startsWith(bodyParameter + ".");
         }
     }
 }

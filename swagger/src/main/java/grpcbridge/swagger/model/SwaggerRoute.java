@@ -1,5 +1,6 @@
 package grpcbridge.swagger.model;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
 import com.google.common.collect.ImmutableMap;
@@ -32,8 +33,8 @@ public class SwaggerRoute {
 
     public static SwaggerRoute create(MethodDescriptor method, List<Parameter> parameters) {
         return new SwaggerRoute(
-            method.getName(),
-            ImmutableMap.of("200", Response.create(method)),
+            format("%s.%s", method.getService().getName(), method.getName()),
+            ImmutableMap.of("200", Response.create("Successful response", method)),
             parameters,
             emptyList()
         );
@@ -52,9 +53,9 @@ public class SwaggerRoute {
             this.schema = schema;
         }
 
-        private static Response create(MethodDescriptor methodDescriptor) {
+        private static Response create(String description, MethodDescriptor methodDescriptor) {
             return new Response(
-                null,
+                description,
                 ReferenceProperty.create(methodDescriptor.getOutputType())
             );
         }

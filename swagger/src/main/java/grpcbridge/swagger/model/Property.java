@@ -22,7 +22,8 @@ public abstract class Property {
             case INT:
                 return SimpleProperty.create(Type.INTEGER, "int32");
             case LONG:
-                return SimpleProperty.create(Type.INTEGER, "int64");
+                // GRPC converts long to string to prevent precision loss
+                return SimpleProperty.create(Type.STRING, "string");
             case BOOL:
                 return SimpleProperty.create(Type.BOOLEAN, "boolean");
             case DOUBLE:

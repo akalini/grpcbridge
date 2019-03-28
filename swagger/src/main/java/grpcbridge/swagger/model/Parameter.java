@@ -25,12 +25,14 @@ public abstract class Parameter {
     public static Parameter forSimpleField(
         String name,
         Location location,
-        FieldDescriptor simpleField
+        FieldDescriptor simpleField,
+        boolean required
     ) {
         return SimpleParameter.create(
             name,
             location,
-            SimpleProperty.forSimpleField(simpleField, SimpleFieldType.fromDescriptor(simpleField))
+            SimpleProperty.forSimpleField(simpleField, SimpleFieldType.fromDescriptor(simpleField)),
+            required
         );
     }
 
@@ -39,6 +41,10 @@ public abstract class Parameter {
             name,
             SimpleProperty.forSimpleField(simpleField, SimpleFieldType.fromDescriptor(simpleField))
         );
+    }
+
+    public String getName() {
+        return name;
     }
 
     protected Parameter(

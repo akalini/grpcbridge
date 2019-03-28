@@ -31,7 +31,15 @@ public class SwaggerModel {
         return properties.get(name);
     }
 
-    public void putProperty(String name, Property property) {
+    public void putProperty(String name, Property property, boolean isRequired) {
         properties.put(name, property);
+        if (isRequired) {
+            required.add(name);
+        }
+    }
+
+    public void remove(String name) {
+        properties.remove(name);
+        required.remove(name);
     }
 }
