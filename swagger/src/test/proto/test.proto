@@ -3,15 +3,24 @@ package grpcbridge.test.proto;
 
 import "included-test-file.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/descriptor.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
+
+extend google.protobuf.FieldOptions {
+  bool test_required = 50000;
+}
 
 message Nested {
   string nested_field = 1;
 }
 
+message RepeatedNested {
+  string repeated_nested_field = 1;
+}
+
 message GetRequest {
-  string string_field = 1;
+  string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
   int64 long_field = 3;
   float float_field = 4;
@@ -51,7 +60,7 @@ message GetResponse {
 }
 
 message PostRequest {
-  string string_field = 1;
+  string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
 }
 
@@ -60,12 +69,24 @@ message PostResponse {
   int32 int_field = 2;
 }
 
+message PostBodyRequest {
+  string string_field = 1 [(test_required) = true];
+  int32 int_field = 2;
+}
+
+message PostBodyResponse {
+  string string_field = 1;
+  int32 int_field = 2;
+}
+
 message PutRequest {
   string string_field = 1;
+  repeated RepeatedNested repeated_message = 2;
 }
 
 message PutResponse {
   string string_field = 1;
+  repeated RepeatedNested repeated_message = 2;
 }
 
 message DeleteRequest {
@@ -116,9 +137,16 @@ service TestService {
     };
   }
 
+  rpc PostBody (PostBodyRequest) returns (PostBodyResponse) {
+    option (google.api.http) = {
+        post: "/post-body"
+        body: "*"
+    };
+  }
+
   rpc PostNoBody (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post-no-body/{string_field}"
+        post: "/post-no-body/{int_field}"
     };
   }
 

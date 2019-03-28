@@ -12,9 +12,10 @@
   "paths": {
     "/delete/{string_field}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "TestService.Delete",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.DeleteResponse"
             }
@@ -31,39 +32,12 @@
         "tags": []
       }
     },
-    "/post-no-body/{string_field}": {
-      "post": {
-        "operationId": "PostNoBody",
-        "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "string_field",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "format": "int32",
-            "name": "int_field",
-            "in": "query",
-            "required": false,
-            "type": "integer"
-          }
-        ],
-        "tags": []
-      }
-    },
     "/get-nested/{nested.nested_field}": {
       "get": {
-        "operationId": "GetNestedParams",
+        "operationId": "TestService.GetNestedParams",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
             }
@@ -73,7 +47,7 @@
           {
             "name": "string_field",
             "in": "query",
-            "required": false,
+            "required": true,
             "type": "string"
           },
           {
@@ -84,11 +58,11 @@
             "type": "integer"
           },
           {
-            "format": "int64",
+            "format": "string",
             "name": "long_field",
             "in": "query",
             "required": false,
-            "type": "integer"
+            "type": "string"
           },
           {
             "format": "float",
@@ -179,9 +153,10 @@
     },
     "/patch/{string_field}": {
       "patch": {
-        "operationId": "Patch",
+        "operationId": "TestService.Patch",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.PatchResponse"
             }
@@ -200,9 +175,10 @@
     },
     "/get-static": {
       "get": {
-        "operationId": "GetStatic",
+        "operationId": "TestService.GetStatic",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
             }
@@ -212,7 +188,7 @@
           {
             "name": "string_field",
             "in": "query",
-            "required": false,
+            "required": true,
             "type": "string"
           },
           {
@@ -223,11 +199,11 @@
             "type": "integer"
           },
           {
-            "format": "int64",
+            "format": "string",
             "name": "long_field",
             "in": "query",
             "required": false,
-            "type": "integer"
+            "type": "string"
           },
           {
             "format": "float",
@@ -318,9 +294,10 @@
     },
     "/put/{string_field}": {
       "put": {
-        "operationId": "Put",
+        "operationId": "TestService.Put",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.PutResponse"
             }
@@ -345,11 +322,36 @@
         "tags": []
       }
     },
-    "/get/{string_field}": {
-      "get": {
-        "operationId": "Get",
+    "/post-body": {
+      "post": {
+        "operationId": "TestService.PostBody",
         "responses": {
           "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostBodyRequest"
+            },
+            "name": "body",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get/{string_field}": {
+      "get": {
+        "operationId": "TestService.Get",
+        "responses": {
+          "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
             }
@@ -370,11 +372,11 @@
             "type": "integer"
           },
           {
-            "format": "int64",
+            "format": "string",
             "name": "long_field",
             "in": "query",
             "required": false,
-            "type": "integer"
+            "type": "string"
           },
           {
             "format": "float",
@@ -463,11 +465,41 @@
         "tags": []
       }
     },
-    "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}": {
-      "get": {
-        "operationId": "GetMultipleParams",
+    "/post-no-body/{int_field}": {
+      "post": {
+        "operationId": "TestService.PostNoBody",
         "responses": {
           "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "string_field",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "int_field",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}": {
+      "get": {
+        "operationId": "TestService.GetMultipleParams",
+        "responses": {
+          "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
             }
@@ -488,11 +520,11 @@
             "type": "integer"
           },
           {
-            "format": "int64",
+            "format": "string",
             "name": "long_field",
             "in": "path",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "format": "float",
@@ -583,9 +615,10 @@
     },
     "/post-custom/{string_field}": {
       "post": {
-        "operationId": "PostCustomBody",
+        "operationId": "TestService.PostCustomBody",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
             }
@@ -604,9 +637,10 @@
     },
     "/post/{string_field}": {
       "post": {
-        "operationId": "Post",
+        "operationId": "TestService.Post",
         "responses": {
           "200": {
+            "description": "Successful response",
             "schema": {
               "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
             }
@@ -633,15 +667,6 @@
     }
   },
   "definitions": {
-    "grpcbridge.test.proto.PatchResponse": {
-      "type": "object",
-      "properties": {
-        "string_field": {
-          "type": "string"
-        }
-      },
-      "required": []
-    },
     "grpcbridge.test.proto.Enum": {
       "enum": [
         "INVALID",
@@ -651,10 +676,10 @@
       "type": "string",
       "required": []
     },
-    "grpcbridge.test.proto.GetResponse.external_field": {
+    "grpcbridge.test.proto.RepeatedNested": {
       "type": "object",
       "properties": {
-        "external_string_field": {
+        "repeated_nested_field": {
           "type": "string"
         }
       },
@@ -664,24 +689,6 @@
       "type": "object",
       "properties": {
         "string_field": {
-          "type": "string"
-        }
-      },
-      "required": []
-    },
-    "grpcbridge.test.proto.GetResponse.message_one_of": {
-      "type": "object",
-      "properties": {
-        "nested_field": {
-          "type": "string"
-        }
-      },
-      "required": []
-    },
-    "grpcbridge.test.proto.GetResponse.nested": {
-      "type": "object",
-      "properties": {
-        "nested_field": {
           "type": "string"
         }
       },
@@ -698,8 +705,8 @@
           "$ref": "#/definitions/grpcbridge.test.proto.Enum"
         },
         "long_field": {
-          "format": "int64",
-          "type": "integer"
+          "format": "string",
+          "type": "string"
         },
         "nested": {
           "$ref": "#/definitions/grpcbridge.test.proto.Nested"
@@ -747,7 +754,26 @@
       },
       "required": []
     },
+    "grpcbridge.test.proto.Nested": {
+      "type": "object",
+      "properties": {
+        "nested_field": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
     "grpcbridge.test.proto.PostRequest": {
+      "type": "object",
+      "properties": {
+        "int_field": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.PostBodyRequest": {
       "type": "object",
       "properties": {
         "int_field": {
@@ -758,20 +784,19 @@
           "type": "string"
         }
       },
-      "required": []
-    },
-    "grpcbridge.test.proto.PutRequest": {
-      "type": "object",
-      "properties": {
-        "string_field": {
-          "type": "string"
-        }
-      },
-      "required": []
+      "required": [
+        "string_field"
+      ]
     },
     "grpcbridge.test.proto.PutResponse": {
       "type": "object",
       "properties": {
+        "repeated_message": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.RepeatedNested"
+          },
+          "type": "array"
+        },
         "string_field": {
           "type": "string"
         }
@@ -787,6 +812,49 @@
         },
         "string_field": {
           "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.PatchResponse": {
+      "type": "object",
+      "properties": {
+        "string_field": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.PostBodyResponse": {
+      "type": "object",
+      "properties": {
+        "int_field": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "string_field": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.included.proto.ExternalMessage": {
+      "type": "object",
+      "properties": {
+        "external_string_field": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.PutRequest": {
+      "type": "object",
+      "properties": {
+        "repeated_message": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.RepeatedNested"
+          },
+          "type": "array"
         }
       },
       "required": []

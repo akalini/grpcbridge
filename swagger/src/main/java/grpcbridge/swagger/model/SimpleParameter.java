@@ -26,14 +26,15 @@ class SimpleParameter extends Parameter {
     static SimpleParameter create(
         String name,
         Location location,
-        SimpleProperty property
+        SimpleProperty property,
+        boolean required
     ) {
         return new SimpleParameter(
             property.type,
             property.defaultValue,
             name,
             location,
-            location == Location.PATH,
+            required || location == Location.PATH,
             property.format,
             property.enumValues
         );

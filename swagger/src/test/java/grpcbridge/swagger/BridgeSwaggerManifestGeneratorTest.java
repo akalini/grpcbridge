@@ -1,9 +1,14 @@
 package grpcbridge.swagger;
 
+import static grpcbridge.test.proto.Test.testRequired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import grpcbridge.Bridge;
 import grpcbridge.test.proto.TestServiceGrpc.TestServiceImplBase;
@@ -19,11 +24,13 @@ public class BridgeSwaggerManifestGeneratorTest {
 
     @Test
     public void generateManifest() {
-        String manifest = bridge.generateManifest(new BridgeSwaggerManifestGenerator());
-        String expected = load("test-proto-swagger.json")
-            .replaceAll("\n", "")
-            .replaceAll(" ", "");
-        assertThat(manifest).isEqualTo(expected);
+        String manifest = bridge.generateManifest(
+            BridgeSwaggerManifestGenerator.newBuilder()
+                .setRequiredExtension(testRequired)
+                .build()
+        );
+        String expected = load("test-proto-swagger.json");
+        assertThat(formatJson(manifest)).isEqualTo(expected);
     }
 
     private String load(String fileName) {
@@ -32,5 +39,12 @@ public class BridgeSwaggerManifestGeneratorTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String formatJson(String jsonString) {
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(jsonString).getAsJsonObject();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(json);
     }
 }
