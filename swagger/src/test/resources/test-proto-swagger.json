@@ -752,7 +752,9 @@
           "$ref": "#/definitions/grpcbridge.test.proto.Nested"
         }
       },
-      "required": []
+      "required": [
+        "nested"
+      ]
     },
     "grpcbridge.test.proto.Nested": {
       "type": "object",
