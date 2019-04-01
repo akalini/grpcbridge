@@ -42,4 +42,8 @@ public class SwaggerModel {
         properties.remove(name);
         required.remove(name);
     }
+
+    public boolean hasProperties() {
+        return properties.size() > 0;
+    }
 }

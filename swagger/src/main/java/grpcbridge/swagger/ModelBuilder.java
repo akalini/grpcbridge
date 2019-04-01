@@ -44,7 +44,7 @@ class ModelBuilder extends ProtoVisitor {
         models.peek().putProperty(
             config.formatFieldName(field),
             Property.forReferenceTo(field.getMessageType()),
-            false
+            config.isRequired(field)
         );
 
         // Open scope with new message definition

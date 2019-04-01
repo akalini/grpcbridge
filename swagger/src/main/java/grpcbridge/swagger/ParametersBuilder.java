@@ -67,7 +67,11 @@ class ParametersBuilder extends ProtoVisitor {
             // Nested fields defined in the path or query will not be removed
             SwaggerModel requestType = modelDefinitions.get(method.getInputType().getFullName());
             parameters.forEach(parameter -> requestType.remove(parameter.getName()));
-            parameters.add(Parameter.forBody(Property.forReferenceTo(method.getInputType())));
+            if (requestType.hasProperties()) {
+                parameters.add(Parameter.forBody(Property.forReferenceTo(method.getInputType())));
+            } else {
+                modelDefinitions.remove(method.getInputType().getFullName());
+            }
         }
         modelDefinitions.putAll(ModelBuilder.define(method.getOutputType(), config));
     }

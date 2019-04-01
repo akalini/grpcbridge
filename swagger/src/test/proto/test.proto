@@ -48,7 +48,7 @@ message GetResponse {
   bool bool_field = 6;
   bytes bytes_field = 7;
   Enum enum_field = 8;
-  Nested nested = 9;
+  Nested nested = 9 [(test_required) = true];
   repeated string repeated_field = 10;
   repeated string repeated_enum = 15;
   grpcbridge.test.included.proto.ExternalMessage external_field = 11;
