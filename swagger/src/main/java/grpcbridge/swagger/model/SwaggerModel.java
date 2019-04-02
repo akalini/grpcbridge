@@ -1,10 +1,10 @@
 package grpcbridge.swagger.model;
 
 import grpcbridge.swagger.model.Property.Type;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Defines a Swagger model.
@@ -20,11 +20,11 @@ public class SwaggerModel {
     }
 
     public static SwaggerModel forMessage() {
-        return new SwaggerModel(Type.OBJECT, new HashMap<>());
+        return new SwaggerModel(Type.OBJECT, new TreeMap<>());
     }
 
     public static SwaggerModel empty() {
-        return new SwaggerModel(Type.ARRAY, new HashMap<>());
+        return new SwaggerModel(Type.ARRAY, new TreeMap<>());
     }
 
     public Property getProperty(String name) {
