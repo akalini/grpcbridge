@@ -12,3 +12,7 @@ extend google.protobuf.ServiceOptions {
 extend google.protobuf.MethodOptions {
   bool serialize_enum_as_number = 70000;
 }
+
+extend google.protobuf.FieldOptions {
+  bool serialize_default_value = 51000;
+}

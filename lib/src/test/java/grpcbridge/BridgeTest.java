@@ -26,6 +26,7 @@ import grpcbridge.common.TestService;
 import grpcbridge.http.HttpRequest;
 import grpcbridge.http.HttpResponse;
 import grpcbridge.parser.ProtoJsonConverter;
+import grpcbridge.test.proto.Test.DefaultMessage;
 import grpcbridge.test.proto.Test.DeleteRequest;
 import grpcbridge.test.proto.Test.DeleteResponse;
 import grpcbridge.test.proto.Test.GetRequest;
@@ -276,6 +277,7 @@ public class BridgeTest implements ProtoParseTest {
                 .setBytesField(ByteString.copyFrom("bytes".getBytes()))
                 .setEnumField(INVALID)
                 .setNested(Nested.newBuilder().setNestedField("nested"))
+                .setDefault(DefaultMessage.getDefaultInstance())
                 .build());
     }
 
@@ -548,6 +550,26 @@ public class BridgeTest implements ProtoParseTest {
         assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
+    }
+
+    @Test
+    public void get_defaultValues() {
+        HttpRequest request = HttpRequest
+            .builder(GET, "/get")
+            .build();
+
+        HttpResponse response = bridge.handle(request);
+        String rpcResponse = response.getBody().replace(" ", "").replace("\n", "");
+
+        assertThat(rpcResponse).isEqualTo("{"
+            + "\"nested\":{},"
+            + "\"default\":{"
+                + "\"defaultString\":\"\","
+                + "\"defaultInt\":0,"
+                + "\"defaultBool\":false,"
+                + "\"defaultEnum\":\"INVALID\","
+                + "\"defaultRepeated\":[]"
+            + "}}");
     }
 
     private <T extends Message> List<T> parseStream(@Nullable String body, T.Builder builder) {

@@ -87,9 +87,9 @@ public class ProtoDescriptorTraverser {
     private void onMessageField(FieldDescriptor field) {
         visitor.onMessageStart(field);
         field.getMessageType().getFields().forEach(fieldDescriptor -> {
-            visitor.onBeforeField(field);
+            visitor.onBeforeField(fieldDescriptor);
             onField(fieldDescriptor);
-            visitor.onAfterField(field);
+            visitor.onAfterField(fieldDescriptor);
         });
         visitor.onMessageEnd(field);
     }

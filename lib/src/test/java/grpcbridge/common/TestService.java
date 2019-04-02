@@ -46,6 +46,7 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 .setBytesField(request.getBytesField())
                 .setNested(request.getNested())
                 .addAllRepeatedField(request.getRepeatedFieldList())
+                .setDefault(request.getDefault())
                 .build());
         responseObserver.onCompleted();
     }

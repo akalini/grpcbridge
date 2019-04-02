@@ -2,11 +2,21 @@ syntax = "proto3";
 package grpcbridge.test.proto;
 
 import "google/api/annotations.proto";
+import "grpcbridge/grpcbridge-options.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
 
 message Nested {
   string nested_field = 1;
+}
+
+message DefaultMessage {
+  string default_string = 1 [(grpcbridge.serialize_default_value) = true];
+  int32 default_int = 2 [(grpcbridge.serialize_default_value) = true];
+  bool default_bool = 3 [(grpcbridge.serialize_default_value) = true];
+  Enum default_enum= 4 [(grpcbridge.serialize_default_value) = true];
+  Nested default_nested = 5 [(grpcbridge.serialize_default_value) = true];
+  repeated string default_repeated = 6 [(grpcbridge.serialize_default_value) = true];
 }
 
 message GetRequest {
@@ -20,6 +30,7 @@ message GetRequest {
   Enum enum_field = 8;
   Nested nested = 9;
   repeated string repeated_field = 10;
+  DefaultMessage default = 11;
 }
 
 message GetResponse {
@@ -33,6 +44,8 @@ message GetResponse {
   Enum enum_field = 8;
   Nested nested = 9;
   repeated string repeated_field = 10;
+  DefaultMessage default = 11;
+  DefaultMessage unset_default = 12;
 }
 
 message PostRequest {
