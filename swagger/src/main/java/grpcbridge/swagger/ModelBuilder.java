@@ -8,9 +8,9 @@ import grpcbridge.swagger.model.EnumSwaggerModel;
 import grpcbridge.swagger.model.SwaggerModel;
 import grpcbridge.util.ProtoDescriptorTraverser;
 import grpcbridge.util.ProtoVisitor;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 
 /**
  * Proto Visitor which builds a {@link SwaggerModel} for the given input type and all included
@@ -18,7 +18,7 @@ import java.util.Stack;
  */
 class ModelBuilder extends ProtoVisitor {
     private final Stack<SwaggerModel> models = new Stack<>();
-    private final Map<String, SwaggerModel> completeDefinitions = new HashMap<>();
+    private final Map<String, SwaggerModel> completeDefinitions = new TreeMap<>();
     private final Descriptor rootDescriptor;
     private final SwaggerConfig config;
 

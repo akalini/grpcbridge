@@ -1,5 +1,6 @@
 package grpcbridge.swagger;
 
+import static grpcbridge.GrpcbridgeOptions.serializeDefaultValue;
 import static java.util.stream.Collectors.joining;
 
 import com.google.api.AnnotationsProto;
@@ -13,7 +14,9 @@ import grpcbridge.route.SwaggerManifestGenerator;
 import grpcbridge.route.Route;
 import grpcbridge.swagger.model.SwaggerRoute;
 import grpcbridge.swagger.model.SwaggerSchema;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
@@ -58,7 +61,7 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
     }
 
     public static class Builder {
-        private @Nullable GeneratedExtension<FieldOptions, Boolean> requiredExtension;
+        private Set<GeneratedExtension<FieldOptions, Boolean>> requiredExtensions = new HashSet<>();
         private @Nullable FieldNameFormatter formatter;
 
         /**
@@ -67,8 +70,8 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
          * @param extension extension
          * @return this
          */
-        public Builder setRequiredExtension(GeneratedExtension<FieldOptions, Boolean> extension) {
-            this.requiredExtension = extension;
+        public Builder addRequiredExtension(GeneratedExtension<FieldOptions, Boolean> extension) {
+            this.requiredExtensions.add(extension);
             return this;
         }
 
@@ -89,8 +92,11 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
          * @return a {@link BridgeSwaggerManifestGenerator} instance
          */
         public BridgeSwaggerManifestGenerator build() {
+            // Fields that print default values will always be present
+            requiredExtensions.add(serializeDefaultValue);
+
             SwaggerConfig config = new SwaggerConfig(
-                requiredExtension,
+                requiredExtensions,
                 formatter != null ? formatter : FieldNameFormatter.snakeCase()
             );
             return new BridgeSwaggerManifestGenerator(config);

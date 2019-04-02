@@ -34,6 +34,7 @@ public final class TestFactory {
                 .setBytesField(request.getBytesField())
                 .setNested(request.getNested())
                 .addAllRepeatedField(request.getRepeatedFieldList())
+                .setDefault(request.getDefault())
                 .build();
     }
 

@@ -11,9 +11,9 @@ import grpcbridge.swagger.gson.LowercaseEnumTypeAdapterFactory;
 import grpcbridge.swagger.model.Parameter.Location;
 import grpcbridge.swagger.model.Property.Type;
 import grpcbridge.swagger.model.RepeatedQueryParameter.CollectionFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Full Swagger schema definition. Supports serialization.
@@ -32,8 +32,8 @@ public class SwaggerSchema {
     private final List<String> schemes = singletonList("https");
     private final List<String> consumes = singletonList("application/json");
     private final List<String> produces = singletonList("application/json");
-    private final Map<String, Map<HttpMethod, SwaggerRoute>> paths = new HashMap<>();
-    private final Map<String, SwaggerModel> definitions = new HashMap<>();
+    private final Map<String, Map<HttpMethod, SwaggerRoute>> paths = new TreeMap<>();
+    private final Map<String, SwaggerModel> definitions = new TreeMap<>();
     private final InfoJson info;
 
     private SwaggerSchema(InfoJson info) {
@@ -45,7 +45,7 @@ public class SwaggerSchema {
     }
 
     public void addRoute(String path, HttpMethod method, SwaggerRoute route) {
-        paths.putIfAbsent(path, new HashMap<>());
+        paths.putIfAbsent(path, new TreeMap<>());
         if (paths.get(path).containsKey(method)) {
             throw new IllegalStateException(
                 String.format("Duplicate definition for %s %s found", method, route.getName())

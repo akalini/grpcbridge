@@ -1,8 +1,11 @@
 package grpcbridge.route;
 
+import static grpcbridge.route.ExtensionVisitor.serializeDefaultValueFields;
+
 import com.google.api.AnnotationsProto;
 import com.google.api.HttpRule;
 import com.google.protobuf.DescriptorProtos;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
@@ -15,6 +18,7 @@ import io.grpc.ServerMethodDefinition;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A route used by the {@link grpcbridge.Bridge} to match HTTP requests to the
@@ -75,6 +79,11 @@ public final class Route {
                 .getExtension(GrpcbridgeOptions.includeDefaultValues);
         if (includeDefaultValues) {
             printer = printer.includingDefaultValueFields();
+        } else {
+            Set<FieldDescriptor> fields = serializeDefaultValueFields(descriptor.getOutputType());
+            if (!fields.isEmpty()) {
+                printer = printer.includingDefaultValueFields(fields);
+            }
         }
         boolean serializeEnumAsNumber = descriptor
                 .getOptions()

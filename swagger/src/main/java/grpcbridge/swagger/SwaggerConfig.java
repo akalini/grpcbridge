@@ -4,25 +4,28 @@ import com.google.protobuf.DescriptorProtos.FieldOptions;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 
+import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
  * Configures schema generation. Handles field name formatting and optional extensions.
  */
 class SwaggerConfig {
-    private final @Nullable GeneratedExtension<FieldOptions, Boolean> requiredExtension;
+    private final Set<GeneratedExtension<FieldOptions, Boolean>> requiredExtensions;
     private final FieldNameFormatter formatter;
 
     SwaggerConfig(
-        @Nullable GeneratedExtension<FieldOptions, Boolean> requiredExtension,
+        Set<GeneratedExtension<FieldOptions, Boolean>> requiredExtensions,
         FieldNameFormatter formatter
     ) {
-        this.requiredExtension = requiredExtension;
+        this.requiredExtensions = requiredExtensions;
         this.formatter = formatter;
     }
 
     boolean isRequired(FieldDescriptor field) {
-        return requiredExtension != null && field.getOptions().getExtension(requiredExtension);
+        return requiredExtensions
+            .stream()
+            .anyMatch(extension -> field.getOptions().getExtension(extension));
     }
 
     String formatFieldName(FieldDescriptor field) {

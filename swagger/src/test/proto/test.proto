@@ -4,6 +4,7 @@ package grpcbridge.test.proto;
 import "included-test-file.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/descriptor.proto";
+import "grpcbridge/grpcbridge-options.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
 
@@ -41,7 +42,7 @@ message GetRequest {
 
 message GetResponse {
   string string_field = 1;
-  int32 int_field = 2;
+  int32 int_field = 2 [(grpcbridge.serialize_default_value) = true];
   int64 long_field = 3;
   float float_field = 4;
   double double_field = 5;

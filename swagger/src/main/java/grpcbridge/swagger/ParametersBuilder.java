@@ -16,13 +16,13 @@ import grpcbridge.util.ProtoDescriptorTraverser;
 import grpcbridge.util.ProtoVisitor;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Proto Visitor which extracts {@link Parameter} and {@link SwaggerModel} definitions for a given
@@ -31,7 +31,7 @@ import java.util.Stack;
 class ParametersBuilder extends ProtoVisitor {
     private final Stack<String> jsonPath = new Stack<>();
     private final List<Parameter> parameters = new LinkedList<>();
-    private final Map<String, SwaggerModel> modelDefinitions = new HashMap<>();
+    private final Map<String, SwaggerModel> modelDefinitions = new TreeMap<>();
     private final MethodDescriptor method;
     private final SwaggerConfig config;
     private final FieldLocator locator;
@@ -149,7 +149,7 @@ class ParametersBuilder extends ProtoVisitor {
         private final boolean bodyIsWildCard;
 
         private FieldLocator(BridgeHttpRule rule) {
-            pathParameters = new HashSet<>(new VariableExtractor(rule.getPath()).getPathVars());
+            pathParameters = new TreeSet<>(new VariableExtractor(rule.getPath()).getPathVars());
             bodyIsWildCard = rule.getBody().equals(WILD_CARD);
             if (rule.getBody().isEmpty() || bodyIsWildCard) {
                 bodyParameter = null;
