@@ -753,6 +753,7 @@
         }
       },
       "required": [
+        "int_field",
         "nested"
       ]
     },
