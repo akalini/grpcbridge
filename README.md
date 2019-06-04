@@ -9,14 +9,18 @@ Maven:
 <dependency>
   <groupId>grpcbridge</groupId>
   <artifactId>grpcbridge</artifactId>
-  <version>1.0.3</version>
+  <version>1.2.20</version>
   <type>pom</type>
 </dependency>
 ```
 
 Gradle:
 ```groovy
-compile 'grpcbridge:grpcbridge:1.0.19'
+compile 'grpcbridge:grpcbridge:1.2.20'
 ```
 
 The library requires Java 8.
+
+## Older versions
+
+Older versions of the library are available on the v1.X.X branch.
