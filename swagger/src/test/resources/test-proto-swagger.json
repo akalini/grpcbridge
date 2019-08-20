@@ -723,6 +723,9 @@
           "format": "int32",
           "type": "integer"
         },
+        "int_map_field": {
+          "$ref": "#/definitions/grpcbridge.test.proto.GetResponse.IntMapFieldEntry"
+        },
         "long_field": {
           "format": "string",
           "type": "string"
@@ -732,6 +735,9 @@
         },
         "nested": {
           "$ref": "#/definitions/grpcbridge.test.proto.Nested"
+        },
+        "nested_map_field": {
+          "$ref": "#/definitions/grpcbridge.test.proto.GetResponse.NestedMapFieldEntry"
         },
         "repeated_enum": {
           "items": {
@@ -756,6 +762,43 @@
         "int_field",
         "nested"
       ]
+    },
+    "grpcbridge.test.proto.GetResponse.IntMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": {
+        "format": "int32",
+        "type": "integer"
+      }
+    },
+    "grpcbridge.test.proto.GetResponse.NestedMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
+      }
+    },
+    "grpcbridge.test.proto.MapNested": {
+      "type": "object",
+      "properties": {
+        "map_field": {
+          "$ref": "#/definitions/grpcbridge.test.proto.MapNested.MapFieldEntry"
+        },
+        "string_field": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.MapNested.MapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.Nested"
+      }
     },
     "grpcbridge.test.proto.Nested": {
       "type": "object",
@@ -797,11 +840,34 @@
           "format": "int32",
           "type": "integer"
         },
+        "int_map_field": {
+          "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse.IntMapFieldEntry"
+        },
+        "nested_map_field": {
+          "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse.NestedMapFieldEntry"
+        },
         "string_field": {
           "type": "string"
         }
       },
       "required": []
+    },
+    "grpcbridge.test.proto.PostBodyResponse.IntMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": {
+        "format": "int32",
+        "type": "integer"
+      }
+    },
+    "grpcbridge.test.proto.PostBodyResponse.NestedMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
+      }
     },
     "grpcbridge.test.proto.PostRequest": {
       "type": "object",

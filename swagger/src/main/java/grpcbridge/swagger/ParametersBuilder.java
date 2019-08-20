@@ -97,7 +97,7 @@ class ParametersBuilder extends ProtoVisitor {
             );
         } else if (location == Location.QUERY && field.getJavaType() == JavaType.MESSAGE) {
             throw new IllegalArgumentException(
-                "Cannot put message in path: " + field.getFullName()
+                "Cannot put message in query: " + field.getFullName()
             );
         } else if (location == Location.BODY) {
             return;

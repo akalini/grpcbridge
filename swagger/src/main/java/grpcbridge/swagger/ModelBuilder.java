@@ -53,8 +53,10 @@ class ModelBuilder extends ProtoVisitor {
 
     @Override
     public void onMessageEnd(FieldDescriptor field) {
-        // Close current message definition scope and save
-        completeDefinitions.put(field.getMessageType().getFullName(), models.pop());
+        // Close current message definition scope and save. If this model is a definition of a
+        // map entry, convert the model to a map definition.
+        SwaggerModel model = field.isMapField() ? models.pop().asMapDefinition() : models.pop();
+        completeDefinitions.put(field.getMessageType().getFullName(), model);
     }
 
     @Override
@@ -65,10 +67,17 @@ class ModelBuilder extends ProtoVisitor {
 
     @Override
     public void onRepeatedFieldEnd(FieldDescriptor field) {
-        Property repeatedType = models.pop().getProperty(config.formatFieldName(field));
+        SwaggerModel repeatedType = models.pop();
+
+        // If this repeated field is a entry set of a map, convert to reference of the map
+        // definition.
+        Property containerType = field.isMapField()
+            ? Property.forReferenceTo(field.getMessageType())
+            : Property.forRepeated(repeatedType.getProperty(config.formatFieldName(field)));
+
         models.peek().putProperty(
             config.formatFieldName(field),
-            Property.forRepeated(repeatedType),
+            containerType,
             config.isRequired(field)
         );
     }

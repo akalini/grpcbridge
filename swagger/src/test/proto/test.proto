@@ -20,6 +20,11 @@ message RepeatedNested {
   string repeated_nested_field = 1;
 }
 
+message MapNested {
+  string string_field = 1;
+  map<string, Nested> map_field = 2;
+}
+
 message GetRequest {
   string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
@@ -53,6 +58,8 @@ message GetResponse {
   repeated string repeated_field = 10;
   repeated string repeated_enum = 15;
   grpcbridge.test.included.proto.ExternalMessage external_field = 11;
+  map<string, int32> int_map_field = 16;
+  map<string, MapNested> nested_map_field = 17;
 
   oneof one_of_field {
     string string_one_of = 13;
@@ -78,6 +85,8 @@ message PostBodyRequest {
 message PostBodyResponse {
   string string_field = 1;
   int32 int_field = 2;
+  map<string, int32> int_map_field = 16;
+  map<string, MapNested> nested_map_field = 17;
 }
 
 message PutRequest {

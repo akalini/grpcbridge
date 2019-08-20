@@ -11,7 +11,7 @@ public class EnumSwaggerModel extends SwaggerModel {
     private final @SerializedName("default") String defaultValue;
 
     private EnumSwaggerModel(List<String> enumValues, String defaultValue) {
-        super(Type.STRING, null);
+        super(Type.STRING, null, null);
         this.enumValues = enumValues;
         this.defaultValue = defaultValue;
     }
