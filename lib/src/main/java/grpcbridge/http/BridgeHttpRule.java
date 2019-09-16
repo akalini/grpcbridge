@@ -36,6 +36,8 @@ public class BridgeHttpRule {
             return new BridgeHttpRule(httpRule.getDelete(), HttpMethod.DELETE, httpRule.getBody());
         } else if (!httpRule.getPatch().isEmpty()) {
             return new BridgeHttpRule(httpRule.getPatch(), HttpMethod.PATCH, httpRule.getBody());
+        } else if (httpRule.getPatternCase() == HttpRule.PatternCase.PATTERN_NOT_SET) {
+            throw new UnsupportedOperationException("Pattern is not set. Make sure you have the HTTP binding defined.");
         } else {
             throw new UnsupportedOperationException("Unsupported method: " + httpRule);
         }
