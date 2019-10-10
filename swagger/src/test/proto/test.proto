@@ -42,7 +42,10 @@ message GetRequest {
   oneof one_of_field {
     string string_one_of = 13;
     Nested message_one_of = 14;
+    Excluded excluded_one_of = 16 [deprecated = true];
   }
+
+  string excluded = 17 [deprecated = true];
 }
 
 message GetResponse {
@@ -64,12 +67,22 @@ message GetResponse {
   oneof one_of_field {
     string string_one_of = 13;
     Nested message_one_of = 14;
+    Excluded excluded_one_of = 18 [deprecated = true];
   }
+
+  string excluded = 19 [deprecated = true];
+}
+
+message Excluded {
+  option deprecated = true;
+  string string_field = 1;
 }
 
 message PostRequest {
   string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
+
+  string excluded = 3 [deprecated = true];
 }
 
 message PostResponse {
@@ -80,6 +93,8 @@ message PostResponse {
 message PostBodyRequest {
   string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
+
+  string excluded = 3 [deprecated = true];
 }
 
 message PostBodyResponse {
@@ -185,4 +200,6 @@ service TestService {
         patch: "/patch/{string_field}"
     };
   }
+
+  rpc NoHttpOption (GetRequest) returns (GetResponse);
 }

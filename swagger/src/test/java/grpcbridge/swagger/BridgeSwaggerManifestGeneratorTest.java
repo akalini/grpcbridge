@@ -27,6 +27,7 @@ public class BridgeSwaggerManifestGeneratorTest {
         String manifest = bridge.generateManifest(
             BridgeSwaggerManifestGenerator.newBuilder()
                 .addRequiredExtension(testRequired)
+                .excludeDeprecated()
                 .build()
         );
         String expected = load("test-proto-swagger.json");
