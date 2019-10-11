@@ -40,6 +40,11 @@ class ModelBuilder extends ProtoVisitor {
     }
 
     @Override
+    public boolean accept(FieldDescriptor field) {
+        return !config.isExcluded(field);
+    }
+
+    @Override
     public void onMessageStart(FieldDescriptor field) {
         models.peek().putProperty(
             config.formatFieldName(field),

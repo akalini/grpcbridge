@@ -63,6 +63,16 @@ public abstract class ProtoVisitor {
     }
 
     /**
+     * Checks if the field is accepted by the visitor.
+     *
+     * @param field a field descriptor
+     * @return true if the field is accepted; false otherwise
+     */
+    public boolean accept(FieldDescriptor field) {
+        return true;
+    }
+
+    /**
      * Invoked at the start of a repeated field.
      *
      * @param field repeated field descriptor

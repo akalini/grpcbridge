@@ -85,6 +85,11 @@ class ParametersBuilder extends ProtoVisitor {
     }
 
     @Override
+    public boolean accept(FieldDescriptor field) {
+        return !config.isExcluded(field);
+    }
+
+    @Override
     public void onRepeatedFieldStart(FieldDescriptor field) {
         visitingRepeated = true;
         String name = fullPathName(field);

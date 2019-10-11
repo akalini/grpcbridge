@@ -4,16 +4,15 @@ import static grpcbridge.GrpcbridgeOptions.serializeDefaultValue;
 import static java.util.stream.Collectors.joining;
 
 import com.google.api.AnnotationsProto;
-import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.DescriptorProtos.FieldOptions;
 import com.google.protobuf.Descriptors.MethodDescriptor;
 import com.google.protobuf.GeneratedMessage.GeneratedExtension;
-
 import grpcbridge.http.BridgeHttpRule;
-import grpcbridge.route.SwaggerManifestGenerator;
 import grpcbridge.route.Route;
+import grpcbridge.route.SwaggerManifestGenerator;
 import grpcbridge.swagger.model.SwaggerRoute;
 import grpcbridge.swagger.model.SwaggerSchema;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,23 +36,27 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
 
         SwaggerSchema schema = SwaggerSchema.create(serviceName, "1.0");
 
-        routes.forEach(route -> {
-            MethodDescriptor descriptor = route.descriptor;
-            DescriptorProtos.MethodOptions options = descriptor.getOptions();
-            BridgeHttpRule rule = BridgeHttpRule.create(
-                options.getExtension(AnnotationsProto.http)
-            );
+        routes
+                .stream()
+                .map(route -> route.descriptor)
+                .filter(descriptor -> descriptor.getOptions().hasExtension(AnnotationsProto.http))
+                .forEach(descriptor -> applyMethodDescriptor(schema, descriptor));
 
-            ParametersBuilder parameters = ParametersBuilder.create(descriptor, rule, config);
-            schema.putAllModels(parameters.getModelDefinitions());
-            schema.addRoute(
+        return schema.serialize();
+    }
+
+    private void applyMethodDescriptor(SwaggerSchema schema, MethodDescriptor descriptor) {
+        BridgeHttpRule rule = BridgeHttpRule.create(
+                descriptor.getOptions().getExtension(AnnotationsProto.http)
+        );
+
+        ParametersBuilder parameters = ParametersBuilder.create(descriptor, rule, config);
+        schema.putAllModels(parameters.getModelDefinitions());
+        schema.addRoute(
                 rule.getPath(),
                 rule.getMethod(),
                 SwaggerRoute.create(descriptor, parameters.getParameters())
-            );
-        });
-
-        return schema.serialize();
+        );
     }
 
     public static Builder newBuilder() {
@@ -63,6 +66,7 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
     public static class Builder {
         private Set<GeneratedExtension<FieldOptions, Boolean>> requiredExtensions = new HashSet<>();
         private @Nullable FieldNameFormatter formatter;
+        private boolean excludeDeprecated;
 
         /**
          * Set extension to use to mark fields as required. Optional.
@@ -72,6 +76,25 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
          */
         public Builder addRequiredExtension(GeneratedExtension<FieldOptions, Boolean> extension) {
             this.requiredExtensions.add(extension);
+            return this;
+        }
+
+        /**
+         * Sets a flag to exclude deprecated fields. Optional.
+         *
+         * @return this
+         */
+        public Builder excludeDeprecated() {
+            return setExcludeDeprecated(true);
+        }
+
+        /**
+         * Sets a flag to exclude deprecated fields. Optional.
+         *
+         * @return this
+         */
+        public Builder setExcludeDeprecated(boolean excludeDeprecated) {
+            this.excludeDeprecated = excludeDeprecated;
             return this;
         }
 
@@ -97,7 +120,8 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
 
             SwaggerConfig config = new SwaggerConfig(
                 requiredExtensions,
-                formatter != null ? formatter : FieldNameFormatter.snakeCase()
+                formatter != null ? formatter : FieldNameFormatter.snakeCase(),
+                excludeDeprecated
             );
             return new BridgeSwaggerManifestGenerator(config);
         }
