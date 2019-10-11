@@ -29,11 +29,14 @@ public class ProtoDescriptorTraverser {
     }
 
     private void traverse(List<FieldDescriptor> fields) {
-        fields.forEach(field -> {
-            visitor.onBeforeField(field);
-            onField(field);
-            visitor.onAfterField(field);
-        });
+        fields
+                .stream()
+                .filter(visitor::accept)
+                .forEach(field -> {
+                    visitor.onBeforeField(field);
+                    onField(field);
+                    visitor.onAfterField(field);
+                });
     }
 
     /**
