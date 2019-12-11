@@ -31,13 +31,14 @@ public class PetstoreOpenapiV2Test {
         OpenapiV2.Swagger swaggerRoot = descriptor.getServices().stream()
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("No service defied"))
-                .getOptions().getExtension(OpenapiV2.root);
+                .getOptions()
+                .getExtension(OpenapiV2.root);
 
         String manifest = bridge.generateManifest(BridgeSwaggerManifestGenerator
                 .newBuilder()
                 .setSwaggerRoot(swaggerRoot)
-                .build()
-        );
+                .build());
+
         String result = formatJson(manifest);
         String expected = load("petstore-openapi_v2-swagger.json");
         assertThat(result).isEqualTo(expected);

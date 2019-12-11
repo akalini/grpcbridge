@@ -13,14 +13,12 @@ extend google.protobuf.MethodOptions {
   bool exclude = 72001; // indicates that the method should be excluded from swagger generation.
 }
 
-
 // https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object
 message Swagger {
   Info info = 1;
   string host = 2;
   string basePath = 3;
 }
-
 
 // https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#infoObject
 message Info {

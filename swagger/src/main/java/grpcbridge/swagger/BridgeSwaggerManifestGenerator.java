@@ -41,8 +41,8 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
                 getSwaggerInfo(OpenapiV2.Info::getTitle, serviceName),
                 getSwaggerInfo(OpenapiV2.Info::getVersion, "1.0"),
                 getSwaggerInfo(OpenapiV2.Info::getDescription, null),
-                getSwaggerFiled(OpenapiV2.Swagger::getHost),
-                getSwaggerFiled(OpenapiV2.Swagger::getBasePath));
+                getSwaggerField(OpenapiV2.Swagger::getHost),
+                getSwaggerField(OpenapiV2.Swagger::getBasePath));
 
         routes
                 .stream()
@@ -55,7 +55,7 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
         return schema.serialize();
     }
 
-    private <T> T getSwaggerFiled(Function<OpenapiV2.Swagger,T> extractor) {
+    private <T> T getSwaggerField(Function<OpenapiV2.Swagger,T> extractor) {
         return config.getSwaggerRoot()
                 .flatMap(root -> Optional.ofNullable(extractor.apply(root)))
                 .orElse(null);
