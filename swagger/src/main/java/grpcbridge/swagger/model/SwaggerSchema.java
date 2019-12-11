@@ -35,13 +35,26 @@ public class SwaggerSchema {
     private final Map<String, Map<HttpMethod, SwaggerRoute>> paths = new TreeMap<>();
     private final Map<String, SwaggerModel> definitions = new TreeMap<>();
     private final InfoJson info;
+    private final String host;
+    private final String basePath;
 
-    private SwaggerSchema(InfoJson info) {
+    private SwaggerSchema(InfoJson info, String host, String basePath) {
         this.info = info;
+        this.host = host;
+        this.basePath = basePath;
     }
 
     public static SwaggerSchema create(String title, String version) {
-        return new SwaggerSchema(new InfoJson(title, version));
+        return create(title, version, null, null, null);
+    }
+
+    public static SwaggerSchema create(
+            String title,
+            String version,
+            String description,
+            String host,
+            String basePath) {
+        return new SwaggerSchema(new InfoJson(title, version, description), host, basePath);
     }
 
     public void addRoute(String path, HttpMethod method, SwaggerRoute route) {
@@ -65,10 +78,15 @@ public class SwaggerSchema {
     private static class InfoJson {
         private final String title;
         private final String version;
+        private final String description;
 
-        private InfoJson(String title, String version) {
+        private InfoJson(
+                String title,
+                String version,
+                String description) {
             this.title = title;
             this.version = version;
+            this.description = description;
         }
     }
 }

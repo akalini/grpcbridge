@@ -10,12 +10,15 @@ import com.google.protobuf.GeneratedMessage.GeneratedExtension;
 import grpcbridge.http.BridgeHttpRule;
 import grpcbridge.route.Route;
 import grpcbridge.route.SwaggerManifestGenerator;
+import grpcbridge.swagger.OpenapiV2.Swagger;
 import grpcbridge.swagger.model.SwaggerRoute;
 import grpcbridge.swagger.model.SwaggerSchema;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -34,15 +37,37 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
             .distinct()
             .collect(joining(", "));
 
-        SwaggerSchema schema = SwaggerSchema.create(serviceName, "1.0");
+        SwaggerSchema schema = SwaggerSchema.create(
+                getSwaggerInfo(OpenapiV2.Info::getTitle, serviceName),
+                getSwaggerInfo(OpenapiV2.Info::getVersion, "1.0"),
+                getSwaggerInfo(OpenapiV2.Info::getDescription, null),
+                getSwaggerFiled(OpenapiV2.Swagger::getHost),
+                getSwaggerFiled(OpenapiV2.Swagger::getBasePath));
 
         routes
                 .stream()
                 .map(route -> route.descriptor)
                 .filter(descriptor -> descriptor.getOptions().hasExtension(AnnotationsProto.http))
+                .filter(descriptor -> !descriptor.getOptions().hasExtension(OpenapiV2.exclude)
+                        || !descriptor.getOptions().getExtension(OpenapiV2.exclude))
                 .forEach(descriptor -> applyMethodDescriptor(schema, descriptor));
 
         return schema.serialize();
+    }
+
+    private <T> T getSwaggerFiled(Function<OpenapiV2.Swagger,T> extractor) {
+        return config.getSwaggerRoot()
+                .flatMap(root -> Optional.ofNullable(extractor.apply(root)))
+                .orElse(null);
+    }
+
+    private <T> T getSwaggerInfo(
+            Function<OpenapiV2.Info,T> extractor,
+            T defaultValue) {
+        return config.getSwaggerRoot()
+                .flatMap(root -> Optional.ofNullable(root.getInfo()))
+                .flatMap(info -> Optional.ofNullable(extractor.apply(info)))
+                .orElse(defaultValue);
     }
 
     private void applyMethodDescriptor(SwaggerSchema schema, MethodDescriptor descriptor) {
@@ -66,6 +91,7 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
     public static class Builder {
         private Set<GeneratedExtension<FieldOptions, Boolean>> requiredExtensions = new HashSet<>();
         private @Nullable FieldNameFormatter formatter;
+        private @Nullable Swagger swaggerRoot;
         private boolean excludeDeprecated;
 
         /**
@@ -99,6 +125,16 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
         }
 
         /**
+         * Sets root details to be used for swagger generation. Optional.
+         *
+         * @return this
+         */
+        public Builder setSwaggerRoot(Swagger swaggerRoot) {
+            this.swaggerRoot = swaggerRoot;
+            return this;
+        }
+
+        /**
          * Set field formatter.
          *
          * @param formatter field formatter
@@ -121,6 +157,7 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
             SwaggerConfig config = new SwaggerConfig(
                 requiredExtensions,
                 formatter != null ? formatter : FieldNameFormatter.snakeCase(),
+                Optional.ofNullable(swaggerRoot),
                 excludeDeprecated
             );
             return new BridgeSwaggerManifestGenerator(config);
