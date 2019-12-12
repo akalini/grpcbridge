@@ -5,6 +5,7 @@ import "included-test-file.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/descriptor.proto";
 import "grpcbridge/grpcbridge-options.proto";
+import "openapi_v2.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
 
@@ -198,6 +199,13 @@ service TestService {
   rpc Patch (PatchRequest) returns (PatchResponse) {
     option (google.api.http) = {
         patch: "/patch/{string_field}"
+    };
+  }
+
+  rpc Excluded (GetRequest) returns (GetRequest) {
+    option (grpcbridge.swagger.exclude) = true;
+    option (google.api.http) = {
+        get: "/excluded/{string_field}"
     };
   }
 

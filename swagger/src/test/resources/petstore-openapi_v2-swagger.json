@@ -1,0 +1,263 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/pets": {
+      "post": {
+        "operationId": "PetStoreService.CreatePet",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.CreatePetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "pet"
+        ],
+        "summary": "Updates a pet in the store with form data",
+        "description": "",
+        "deprecated": false
+      }
+    },
+    "/pets/{pet_id}": {
+      "get": {
+        "operationId": "PetStoreService.GetPet",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetPetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pet_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "pet"
+        ],
+        "summary": "Find pet by ID",
+        "description": "Returns a single pet",
+        "deprecated": false
+      },
+      "post": {
+        "operationId": "PetStoreService.CreatePetDeprecated",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.CreatePetDeprecatedResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pet_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "pet"
+        ],
+        "summary": "Updates a pet in the store with form data",
+        "description": "",
+        "deprecated": true
+      },
+      "delete": {
+        "operationId": "PetStoreService.DeletePet",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.DeletePetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pet_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "pet"
+        ],
+        "summary": "Deletes a pet",
+        "description": "",
+        "deprecated": false
+      }
+    },
+    "/store/orders": {
+      "post": {
+        "operationId": "PetStoreService.CreateOrder",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.CreateOrderResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pet_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "store"
+        ],
+        "summary": "Place an order for a pet",
+        "description": "",
+        "deprecated": false
+      }
+    },
+    "/store/orders/{order_id}": {
+      "get": {
+        "operationId": "PetStoreService.GetOrder",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetOrderResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "store"
+        ],
+        "summary": "Find purchase order by ID",
+        "description": "",
+        "deprecated": false
+      },
+      "delete": {
+        "operationId": "PetStoreService.DeleteOrder",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.DeleteOrderResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "store"
+        ],
+        "summary": "Delete purchase order by ID",
+        "description": "Negative or non-integer values will generate API errors",
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "grpcbridge.test.proto.CreateOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.CreatePetDeprecatedResponse": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "grpcbridge.test.proto.CreatePetResponse": {
+      "type": "object",
+      "properties": {
+        "pet_id": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.DeleteOrderResponse": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "grpcbridge.test.proto.DeletePetResponse": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "grpcbridge.test.proto.GetOrderResponse": {
+      "type": "object",
+      "properties": {
+        "pet_id": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "grpcbridge.test.proto.GetPetResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": []
+    }
+  },
+  "info": {
+    "title": "Swagger Petstore",
+    "version": "1.0.3",
+    "description": "This is a sample Petstore server."
+  },
+  "host": "example.com",
+  "basePath": "/v1"
+}

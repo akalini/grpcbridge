@@ -1,0 +1,146 @@
+syntax = "proto3";
+package grpcbridge.test.proto;
+
+import "google/api/annotations.proto";
+import "openapi_v2.proto";
+
+
+message CreatePetRequest {
+  string name = 1;
+};
+
+message CreatePetResponse {
+  string pet_id = 1;
+};
+
+message CreatePetDeprecatedRequest {
+  string pet_id = 1;
+  string name = 2;
+};
+
+message CreatePetDeprecatedResponse {
+};
+
+message GetPetRequest {
+  string pet_id = 1;
+};
+
+message GetPetResponse {
+  string name = 1;
+};
+
+message DeletePetRequest {
+  string pet_id = 1;
+};
+
+message DeletePetResponse {
+};
+
+message CreateOrderRequest {
+  string pet_id = 1;
+};
+
+message CreateOrderResponse {
+  string order_id = 1;
+};
+
+message GetOrderRequest {
+  string order_id = 1;
+};
+
+message GetOrderResponse {
+  string pet_id = 1;
+};
+
+message DeleteOrderRequest {
+  string order_id = 1;
+};
+
+message DeleteOrderResponse {
+};
+
+
+service PetStoreService {
+  option (grpcbridge.swagger.root) = {
+      info: {
+          title: "Swagger Petstore"
+          description: "This is a sample Petstore server."
+          version: "1.0.3"
+      };
+      host: "example.com"
+      basePath: "/v1"
+  };
+
+  rpc CreatePet (CreatePetRequest) returns (CreatePetResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "pet"
+        summary: "Updates a pet in the store with form data"
+    };
+    option (google.api.http) = {
+        post: "/pets"
+    };
+  }
+
+  rpc CreatePetDeprecated (CreatePetDeprecatedRequest) returns (CreatePetDeprecatedResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "pet"
+        summary: "Updates a pet in the store with form data"
+        deprecated: true
+    };
+    option (google.api.http) = {
+        post: "/pets/{pet_id}"
+    };
+  }
+
+  rpc GetPet (GetPetRequest) returns (GetPetResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "pet"
+        summary: "Find pet by ID"
+        description: "Returns a single pet"
+    };
+    option (google.api.http) = {
+        get: "/pets/{pet_id}"
+    };
+  }
+
+  rpc DeletePet (DeletePetRequest) returns (DeletePetResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "pet"
+        summary: "Deletes a pet"
+    };
+    option (google.api.http) = {
+        delete: "/pets/{pet_id}"
+    };
+  }
+
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "store"
+        summary: "Place an order for a pet"
+    };
+    option (google.api.http) = {
+        post: "/store/orders"
+    };
+  }
+
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "store"
+        summary: "Find purchase order by ID"
+    };
+    option (google.api.http) = {
+        get: "/store/orders/{order_id}"
+    };
+  }
+
+  rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse) {
+    option (grpcbridge.swagger.operation) = {
+        tags: "store"
+        summary: "Delete purchase order by ID"
+        description: "Negative or non-integer values will generate API errors"
+    };
+    option (google.api.http) = {
+        delete: "/store/orders/{order_id}"
+    };
+  }
+}

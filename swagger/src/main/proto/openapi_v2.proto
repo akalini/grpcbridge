@@ -1,0 +1,36 @@
+syntax = "proto3";
+package grpcbridge.swagger;
+
+import "google/protobuf/descriptor.proto";
+
+
+extend google.protobuf.ServiceOptions {
+  Swagger root = 62000;
+}
+
+extend google.protobuf.MethodOptions {
+  Operation operation = 72000;
+  bool exclude = 72001; // indicates that the method should be excluded from swagger generation.
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object
+message Swagger {
+  Info info = 1;
+  string host = 2;
+  string basePath = 3;
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#infoObject
+message Info {
+  string title = 1;
+  string description = 2;
+  string version = 3;
+}
+
+// https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#operationObject
+message Operation {
+  repeated string tags = 2;
+  string summary = 3;
+  string description = 4;
+  bool deprecated = 5;
+}
