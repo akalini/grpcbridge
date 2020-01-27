@@ -17,6 +17,8 @@ import grpcbridge.rpc.RpcMessage;
 import io.grpc.ServerMethodDefinition;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -107,16 +109,22 @@ public final class Route {
     public Optional<RpcCall> match(Deserializer deserializer, HttpRequest httpRequest) {
         DescriptorProtos.MethodOptions options = descriptor.getOptions();
         HttpRule httpRule = options.getExtension(AnnotationsProto.http);
-        PathMatcher pathMatcher = new PathMatcher(httpRule);
 
-        if (pathMatcher.matches(httpRequest)) {
-            BodyParser bodyParser = new BodyParser(deserializer, httpRule, newRpcRequest());
-            RpcMessage rpcRequest = bodyParser.extract(httpRequest);
-            pathMatcher.parse(httpRequest).forEach(rpcRequest::setVar);
-            return Optional.of(new RpcCall(impl, rpcRequest));
-        } else {
-            return Optional.empty();
+        List<HttpRule> rules = new ArrayList<>(httpRule.getAdditionalBindingsCount() + 1);
+        rules.add(httpRule);
+        rules.addAll(httpRule.getAdditionalBindingsList());
+
+        for (HttpRule rule : rules) {
+            PathMatcher pathMatcher = new PathMatcher(rule);
+            if (pathMatcher.matches(httpRequest)) {
+                BodyParser bodyParser = new BodyParser(deserializer, httpRule, newRpcRequest());
+                RpcMessage rpcRequest = bodyParser.extract(httpRequest);
+                pathMatcher.parse(httpRequest).forEach(rpcRequest::setVar);
+                return Optional.of(new RpcCall(impl, rpcRequest));
+            }
         }
+
+        return Optional.empty();
     }
 
     @Override

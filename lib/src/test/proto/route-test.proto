@@ -1,0 +1,23 @@
+syntax = "proto3";
+package grpcbridge.test.proto;
+
+import "google/api/annotations.proto";
+
+message Empty {}
+
+service RouteTestService {
+  rpc Get (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/get"
+        additional_bindings {
+          get: "/v1/get"
+        }
+    };
+  }
+
+  rpc GetNoAdditional (Empty) returns (Empty) {
+    option (google.api.http) = {
+        get: "/get2"
+    };
+  }
+}
