@@ -3,7 +3,7 @@ apply plugin: 'grpcbridge.gradle.publish'
 archivesBaseName = 'grpcbridge'
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile "org.slf4j:slf4j-api:${ver.slf4j}"
     compile "io.grpc:grpc-netty:${ver.grpc}"
     compile "io.grpc:grpc-stub:${ver.grpc}"
     compile "io.grpc:grpc-stub:${ver.grpc}"
@@ -11,5 +11,5 @@ dependencies {
     compile "io.opencensus:opencensus-contrib-http-util:${ver.opencensus}"
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.slf4j:slf4j-simple:1.7.21'
+    testCompile "org.slf4j:slf4j-simple:${ver.slf4j}"
 }
