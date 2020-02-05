@@ -207,13 +207,11 @@
         "order_id": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.CreatePetDeprecatedResponse": {
       "type": "object",
-      "properties": {},
-      "required": []
+      "properties": {}
     },
     "grpcbridge.test.proto.CreatePetResponse": {
       "type": "object",
@@ -221,18 +219,15 @@
         "pet_id": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.DeleteOrderResponse": {
       "type": "object",
-      "properties": {},
-      "required": []
+      "properties": {}
     },
     "grpcbridge.test.proto.DeletePetResponse": {
       "type": "object",
-      "properties": {},
-      "required": []
+      "properties": {}
     },
     "grpcbridge.test.proto.GetOrderResponse": {
       "type": "object",
@@ -240,8 +235,7 @@
         "pet_id": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.GetPetResponse": {
       "type": "object",
@@ -249,8 +243,7 @@
         "name": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     }
   },
   "info": {

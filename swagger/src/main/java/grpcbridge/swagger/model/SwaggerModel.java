@@ -14,7 +14,7 @@ import java.util.TreeMap;
 public class SwaggerModel {
     private final Type type;
     private final Map<String, Property> properties;
-    private final List<String> required = new LinkedList<>();
+    private List<String> required = null;
     private final Property additionalProperties;
 
     SwaggerModel(Type type, Map<String, Property> properties, Property additionalProperties) {
@@ -38,13 +38,21 @@ public class SwaggerModel {
     public void putProperty(String name, Property property, boolean isRequired) {
         properties.put(name, property);
         if (isRequired) {
+            if (required == null) {
+                required = new LinkedList<>();
+            }
             required.add(name);
         }
     }
 
     public void remove(String name) {
         properties.remove(name);
-        required.remove(name);
+        if (required != null) {
+            required.remove(name);
+            if (required.isEmpty()) {
+                required = null;
+            }
+        }
     }
 
     public boolean hasProperties() {
