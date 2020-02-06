@@ -673,8 +673,7 @@
         "external_string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.DeleteResponse": {
       "type": "object",
@@ -682,8 +681,7 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.Enum": {
       "enum": [
@@ -691,8 +689,7 @@
         "VALID"
       ],
       "default": "INVALID",
-      "type": "string",
-      "required": []
+      "type": "string"
     },
     "grpcbridge.test.proto.GetResponse": {
       "type": "object",
@@ -766,7 +763,6 @@
     "grpcbridge.test.proto.GetResponse.IntMapFieldEntry": {
       "type": "object",
       "properties": {},
-      "required": [],
       "additionalProperties": {
         "format": "int32",
         "type": "integer"
@@ -775,7 +771,6 @@
     "grpcbridge.test.proto.GetResponse.NestedMapFieldEntry": {
       "type": "object",
       "properties": {},
-      "required": [],
       "additionalProperties": {
         "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
       }
@@ -789,13 +784,11 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.MapNested.MapFieldEntry": {
       "type": "object",
       "properties": {},
-      "required": [],
       "additionalProperties": {
         "$ref": "#/definitions/grpcbridge.test.proto.Nested"
       }
@@ -806,8 +799,7 @@
         "nested_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PatchResponse": {
       "type": "object",
@@ -815,8 +807,7 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PostBodyRequest": {
       "type": "object",
@@ -849,13 +840,11 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PostBodyResponse.IntMapFieldEntry": {
       "type": "object",
       "properties": {},
-      "required": [],
       "additionalProperties": {
         "format": "int32",
         "type": "integer"
@@ -864,7 +853,6 @@
     "grpcbridge.test.proto.PostBodyResponse.NestedMapFieldEntry": {
       "type": "object",
       "properties": {},
-      "required": [],
       "additionalProperties": {
         "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
       }
@@ -876,8 +864,7 @@
           "format": "int32",
           "type": "integer"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PostResponse": {
       "type": "object",
@@ -889,8 +876,7 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PutRequest": {
       "type": "object",
@@ -901,8 +887,7 @@
           },
           "type": "array"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.PutResponse": {
       "type": "object",
@@ -916,8 +901,7 @@
         "string_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     },
     "grpcbridge.test.proto.RepeatedNested": {
       "type": "object",
@@ -925,8 +909,7 @@
         "repeated_nested_field": {
           "type": "string"
         }
-      },
-      "required": []
+      }
     }
   },
   "info": {
