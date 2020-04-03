@@ -2,7 +2,7 @@ package grpcbridge.swagger;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
-interface FieldNameFormatter {
+public interface FieldNameFormatter {
     String nameFor(FieldDescriptor field);
 
     static FieldNameFormatter camelCase() {
