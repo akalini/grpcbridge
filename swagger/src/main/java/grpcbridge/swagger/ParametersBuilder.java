@@ -14,6 +14,7 @@ import grpcbridge.swagger.model.Property;
 import grpcbridge.swagger.model.SwaggerModel;
 import grpcbridge.util.ProtoDescriptorTraverser;
 import grpcbridge.util.ProtoVisitor;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -142,7 +143,11 @@ class ParametersBuilder extends ProtoVisitor {
         } else if (location == Location.PATH) {
             pathParameters.add(field);
         }
-        parameters.add(Parameter.forSimpleField(fullPathName(field), location, field, config.isRequired(field)));
+        parameters.add(Parameter.forSimpleField(
+                fullPathName(field),
+                location,
+                field,
+                config.isRequired(field)));
     }
 
     private String fullPathName(FieldDescriptor field, boolean isForLocation) {
