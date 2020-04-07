@@ -98,7 +98,7 @@ class ParametersBuilder extends ProtoVisitor {
     @Override
     public void onRepeatedFieldStart(FieldDescriptor field) {
         visitingRepeated = true;
-        Location location = locator.getLocation(fullPathName(field, true));
+        Location location = locator.getLocation(protoPathTo(field));
 
         // Repeated fields must not be in the path and for queries must be simple type or enum.
         if (location == Location.PATH) {
@@ -113,7 +113,7 @@ class ParametersBuilder extends ProtoVisitor {
             return;
         }
 
-        parameters.add(Parameter.forRepeatedQuery(fullPathName(field), field));
+        parameters.add(Parameter.forRepeatedQuery(formatterPathTo(field), field));
     }
 
     @Override
@@ -137,29 +137,44 @@ class ParametersBuilder extends ProtoVisitor {
             // Ignore definition of repeated field.
             return;
         }
-        Location location = locator.getLocation(fullPathName(field, true));
+        Location location = locator.getLocation(protoPathTo(field));
         if (location == Location.BODY) {
             return;
         } else if (location == Location.PATH) {
             pathParameters.add(field);
         }
         parameters.add(Parameter.forSimpleField(
-                fullPathName(field),
+                formatterPathTo(field),
                 location,
                 field,
                 config.isRequired(field)));
     }
 
-    private String fullPathName(FieldDescriptor field, boolean isForLocation) {
-        List<String> path = new ArrayList<>(jsonPath);
-        Collections.reverse(path);
-        path.add(isForLocation ? field.getName() :
-                config.formatFieldName(field));
-        return String.join(".", path);
+    /**
+     * Returns full path name using config formatter
+     * @param field FieldDescriptor
+     * @return full path
+     */
+    private String formatterPathTo(FieldDescriptor field) {
+        return fullPathName(field, false);
     }
 
-    private String fullPathName(FieldDescriptor field) {
-        return fullPathName(field, false);
+    /**
+     * Returns full path name according to proto definition
+     * @param field FieldDescriptor
+     * @return full path
+     */
+    private String protoPathTo(FieldDescriptor field) {
+        return fullPathName(field, true);
+    }
+
+    private String fullPathName(FieldDescriptor field, boolean isForProtoPath) {
+        List<String> path = new ArrayList<>(jsonPath);
+        Collections.reverse(path);
+        path.add(isForProtoPath
+                ? field.getName()
+                : config.formatFieldName(field));
+        return String.join(".", path);
     }
 
     private static class FieldLocator {
@@ -207,7 +222,7 @@ class ParametersBuilder extends ProtoVisitor {
                 return false;
             }
             return fullPathName.equals(bodyParameter)
-                || fullPathName.startsWith(bodyParameter + ".");
+                    || fullPathName.startsWith(bodyParameter + ".");
         }
     }
 }
