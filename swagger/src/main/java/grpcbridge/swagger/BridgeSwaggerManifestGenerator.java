@@ -76,10 +76,12 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
         );
 
         ParametersBuilder parameters = ParametersBuilder.create(descriptor, rule, config);
-        PathBuilder pathBuilder = PathBuilder.create(rule.getPath(), parameters.getPathParameters(), config);
         schema.putAllModels(parameters.getModelDefinitions());
         schema.addRoute(
-                pathBuilder.getPath(),
+                PathFormatter.getPath(
+                        rule.getPath(),
+                        parameters.getPathParameters(),
+                        config),
                 rule.getMethod(),
                 SwaggerRoute.create(descriptor, parameters.getParameters())
         );
