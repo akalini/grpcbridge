@@ -33,9 +33,9 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
 
     public String generate(List<Route> routes) {
         String serviceName = routes.stream()
-            .map(Route::getService)
-            .distinct()
-            .collect(joining(", "));
+                .map(Route::getService)
+                .distinct()
+                .collect(joining(", "));
 
         SwaggerSchema schema = SwaggerSchema.create(
                 getSwaggerInfo(OpenapiV2.Info::getTitle, serviceName),
@@ -55,14 +55,14 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
         return schema.serialize();
     }
 
-    private <T> T getSwaggerField(Function<OpenapiV2.Swagger,T> extractor) {
+    private <T> T getSwaggerField(Function<OpenapiV2.Swagger, T> extractor) {
         return config.getSwaggerRoot()
                 .flatMap(root -> Optional.ofNullable(extractor.apply(root)))
                 .orElse(null);
     }
 
     private <T> T getSwaggerInfo(
-            Function<OpenapiV2.Info,T> extractor,
+            Function<OpenapiV2.Info, T> extractor,
             T defaultValue) {
         return config.getSwaggerRoot()
                 .flatMap(root -> Optional.ofNullable(root.getInfo()))
@@ -78,12 +78,14 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
         ParametersBuilder parameters = ParametersBuilder.create(descriptor, rule, config);
         schema.putAllModels(parameters.getModelDefinitions());
         schema.addRoute(
-                rule.getPath(),
+                PathFormatter.getPath(
+                        rule.getPath(),
+                        parameters.getPathParameters(),
+                        config),
                 rule.getMethod(),
                 SwaggerRoute.create(descriptor, parameters.getParameters())
         );
     }
-
     public static Builder newBuilder() {
         return new Builder();
     }

@@ -14,6 +14,7 @@ import grpcbridge.swagger.model.Property;
 import grpcbridge.swagger.model.SwaggerModel;
 import grpcbridge.util.ProtoDescriptorTraverser;
 import grpcbridge.util.ProtoVisitor;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ class ParametersBuilder extends ProtoVisitor {
     private final Stack<String> jsonPath = new Stack<>();
     private final List<Parameter> parameters = new LinkedList<>();
     private final Map<String, SwaggerModel> modelDefinitions = new TreeMap<>();
+    private final List<FieldDescriptor> pathParameters = new LinkedList<>();
     private final MethodDescriptor method;
     private final SwaggerConfig config;
     private final FieldLocator locator;
@@ -80,6 +82,10 @@ class ParametersBuilder extends ProtoVisitor {
         return parameters;
     }
 
+    List<FieldDescriptor> getPathParameters() {
+        return pathParameters;
+    }
+
     Map<String, SwaggerModel> getModelDefinitions() {
         return modelDefinitions;
     }
@@ -92,8 +98,7 @@ class ParametersBuilder extends ProtoVisitor {
     @Override
     public void onRepeatedFieldStart(FieldDescriptor field) {
         visitingRepeated = true;
-        String name = fullPathName(field);
-        Location location = locator.getLocation(name);
+        Location location = locator.getLocation(protoPathTo(field));
 
         // Repeated fields must not be in the path and for queries must be simple type or enum.
         if (location == Location.PATH) {
@@ -108,7 +113,7 @@ class ParametersBuilder extends ProtoVisitor {
             return;
         }
 
-        parameters.add(Parameter.forRepeatedQuery(name, field));
+        parameters.add(Parameter.forRepeatedQuery(formatterPathTo(field), field));
     }
 
     @Override
@@ -132,18 +137,43 @@ class ParametersBuilder extends ProtoVisitor {
             // Ignore definition of repeated field.
             return;
         }
-        String name = fullPathName(field);
-        Location location = locator.getLocation(name);
+        Location location = locator.getLocation(protoPathTo(field));
         if (location == Location.BODY) {
             return;
+        } else if (location == Location.PATH) {
+            pathParameters.add(field);
         }
-        parameters.add(Parameter.forSimpleField(name, location, field, config.isRequired(field)));
+        parameters.add(Parameter.forSimpleField(
+                formatterPathTo(field),
+                location,
+                field,
+                config.isRequired(field)));
     }
 
-    private String fullPathName(FieldDescriptor field) {
+    /**
+     * Returns full path name using config formatter
+     * @param field FieldDescriptor
+     * @return full path
+     */
+    private String formatterPathTo(FieldDescriptor field) {
+        return fullPathName(field, false);
+    }
+
+    /**
+     * Returns full path name according to proto definition
+     * @param field FieldDescriptor
+     * @return full path
+     */
+    private String protoPathTo(FieldDescriptor field) {
+        return fullPathName(field, true);
+    }
+
+    private String fullPathName(FieldDescriptor field, boolean isForProtoPath) {
         List<String> path = new ArrayList<>(jsonPath);
         Collections.reverse(path);
-        path.add(config.formatFieldName(field));
+        path.add(isForProtoPath
+                ? field.getName()
+                : config.formatFieldName(field));
         return String.join(".", path);
     }
 
@@ -192,7 +222,7 @@ class ParametersBuilder extends ProtoVisitor {
                 return false;
             }
             return fullPathName.equals(bodyParameter)
-                || fullPathName.startsWith(bodyParameter + ".");
+                    || fullPathName.startsWith(bodyParameter + ".");
         }
     }
 }

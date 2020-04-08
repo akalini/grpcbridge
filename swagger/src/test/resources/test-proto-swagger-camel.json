@@ -1,0 +1,919 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/delete/{stringField}": {
+      "delete": {
+        "operationId": "TestService.Delete",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.DeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get-multi/{stringField}/{intField}/{longField}/{floatField}/{doubleField}/{boolField}/{bytesField}/{enumField}": {
+      "get": {
+        "operationId": "TestService.GetMultipleParams",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "intField",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "format": "string",
+            "name": "longField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "float",
+            "name": "floatField",
+            "in": "path",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "format": "double",
+            "name": "doubleField",
+            "in": "path",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "format": "boolean",
+            "name": "boolField",
+            "in": "path",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "format": "byte",
+            "name": "bytesField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "INVALID",
+              "VALID"
+            ],
+            "name": "enumField",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "INVALID"
+          },
+          {
+            "name": "nested.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedField",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedEnum",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "name": "external_field.externalStringField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stringOneOf",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message_one_of.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get-nested/{nested.nested_field}": {
+      "get": {
+        "operationId": "TestService.GetNestedParams",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "intField",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "string",
+            "name": "longField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "float",
+            "name": "floatField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "double",
+            "name": "doubleField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "boolean",
+            "name": "boolField",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "format": "byte",
+            "name": "bytesField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "INVALID",
+              "VALID"
+            ],
+            "name": "enumField",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "INVALID"
+          },
+          {
+            "name": "nested.nestedField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedField",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedEnum",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "name": "external_field.externalStringField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stringOneOf",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message_one_of.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get-static": {
+      "get": {
+        "operationId": "TestService.GetStatic",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "intField",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "string",
+            "name": "longField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "float",
+            "name": "floatField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "double",
+            "name": "doubleField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "boolean",
+            "name": "boolField",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "format": "byte",
+            "name": "bytesField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "INVALID",
+              "VALID"
+            ],
+            "name": "enumField",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "INVALID"
+          },
+          {
+            "name": "nested.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedField",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedEnum",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "name": "external_field.externalStringField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stringOneOf",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message_one_of.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/get/{stringField}": {
+      "get": {
+        "operationId": "TestService.Get",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "intField",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "string",
+            "name": "longField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "float",
+            "name": "floatField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "double",
+            "name": "doubleField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "boolean",
+            "name": "boolField",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "format": "byte",
+            "name": "bytesField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "INVALID",
+              "VALID"
+            ],
+            "name": "enumField",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "INVALID"
+          },
+          {
+            "name": "nested.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedField",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            },
+            "name": "repeatedEnum",
+            "in": "query",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "name": "external_field.externalStringField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stringOneOf",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "message_one_of.nestedField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/patch/{stringField}": {
+      "patch": {
+        "operationId": "TestService.Patch",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PatchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/post-body": {
+      "post": {
+        "operationId": "TestService.PostBody",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostBodyRequest"
+            },
+            "name": "body",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/post-custom/{stringField}": {
+      "post": {
+        "operationId": "TestService.PostCustomBody",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/post-no-body/{intField}": {
+      "post": {
+        "operationId": "TestService.PostNoBody",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "intField",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/post/{stringField}": {
+      "post": {
+        "operationId": "TestService.Post",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostRequest"
+            },
+            "name": "body",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "tags": []
+      }
+    },
+    "/put/{stringField}": {
+      "put": {
+        "operationId": "TestService.Put",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PutResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PutRequest"
+            },
+            "name": "body",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "tags": []
+      }
+    }
+  },
+  "definitions": {
+    "grpcbridge.test.included.proto.ExternalMessage": {
+      "type": "object",
+      "properties": {
+        "externalStringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.DeleteResponse": {
+      "type": "object",
+      "properties": {
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.Enum": {
+      "enum": [
+        "INVALID",
+        "VALID"
+      ],
+      "default": "INVALID",
+      "type": "string"
+    },
+    "grpcbridge.test.proto.GetResponse": {
+      "type": "object",
+      "properties": {
+        "boolField": {
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "bytesField": {
+          "format": "byte",
+          "type": "string"
+        },
+        "doubleField": {
+          "format": "double",
+          "type": "number"
+        },
+        "enumField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.Enum"
+        },
+        "externalField": {
+          "$ref": "#/definitions/grpcbridge.test.included.proto.ExternalMessage"
+        },
+        "floatField": {
+          "format": "float",
+          "type": "number"
+        },
+        "intField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "intMapField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.GetResponse.IntMapFieldEntry"
+        },
+        "longField": {
+          "format": "string",
+          "type": "string"
+        },
+        "messageOneOf": {
+          "$ref": "#/definitions/grpcbridge.test.proto.Nested"
+        },
+        "nested": {
+          "$ref": "#/definitions/grpcbridge.test.proto.Nested"
+        },
+        "nestedMapField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.GetResponse.NestedMapFieldEntry"
+        },
+        "repeatedEnum": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "repeatedField": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "stringField": {
+          "type": "string"
+        },
+        "stringOneOf": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "intField",
+        "nested"
+      ]
+    },
+    "grpcbridge.test.proto.GetResponse.IntMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "format": "int32",
+        "type": "integer"
+      }
+    },
+    "grpcbridge.test.proto.GetResponse.NestedMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
+      }
+    },
+    "grpcbridge.test.proto.MapNested": {
+      "type": "object",
+      "properties": {
+        "mapField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.MapNested.MapFieldEntry"
+        },
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.MapNested.MapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.Nested"
+      }
+    },
+    "grpcbridge.test.proto.Nested": {
+      "type": "object",
+      "properties": {
+        "nestedField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PatchResponse": {
+      "type": "object",
+      "properties": {
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PostBodyRequest": {
+      "type": "object",
+      "properties": {
+        "intField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "stringField": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "stringField"
+      ]
+    },
+    "grpcbridge.test.proto.PostBodyResponse": {
+      "type": "object",
+      "properties": {
+        "intField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "intMapField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse.IntMapFieldEntry"
+        },
+        "nestedMapField": {
+          "$ref": "#/definitions/grpcbridge.test.proto.PostBodyResponse.NestedMapFieldEntry"
+        },
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PostBodyResponse.IntMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "format": "int32",
+        "type": "integer"
+      }
+    },
+    "grpcbridge.test.proto.PostBodyResponse.NestedMapFieldEntry": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
+      }
+    },
+    "grpcbridge.test.proto.PostRequest": {
+      "type": "object",
+      "properties": {
+        "intField": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PostResponse": {
+      "type": "object",
+      "properties": {
+        "intField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PutRequest": {
+      "type": "object",
+      "properties": {
+        "repeatedMessage": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.RepeatedNested"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "grpcbridge.test.proto.PutResponse": {
+      "type": "object",
+      "properties": {
+        "repeatedMessage": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.RepeatedNested"
+          },
+          "type": "array"
+        },
+        "stringField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.RepeatedNested": {
+      "type": "object",
+      "properties": {
+        "repeatedNestedField": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "grpcbridge.test.proto.TestService",
+    "version": "1.0"
+  }
+}
