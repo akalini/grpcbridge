@@ -4,6 +4,6 @@ archivesBaseName = 'grpcbridge-swagger'
 
 dependencies {
     compile project(':lib')
-    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'com.google.code.gson:gson:2.8.6'
     testCompile 'javax.annotation:javax.annotation-api:1.3.2'
 }
