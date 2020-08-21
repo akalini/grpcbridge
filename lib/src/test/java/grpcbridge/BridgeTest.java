@@ -553,6 +553,25 @@ public class BridgeTest implements ProtoParseTest {
     }
 
     @Test
+    public void get_withTracing_noSpanId() {
+        Metadata headers = new Metadata();
+        headers.put(
+                Key.of("X-Cloud-Trace-Context", ASCII_STRING_MARSHALLER),
+                "105445aa7843bc8bf206b12000100000");
+        HttpRequest request = HttpRequest
+                .builder(GET, "/get/hello")
+                .headers(headers)
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        GetResponse rpcResponse = parse(response.getBody(), GetResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
+                .setStringField("hello")
+                .build()));
+    }
+
+    @Test
     public void get_defaultValues() {
         HttpRequest request = HttpRequest
             .builder(GET, "/get")

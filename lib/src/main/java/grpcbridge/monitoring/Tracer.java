@@ -8,12 +8,7 @@ import grpcbridge.http.HttpRequest;
 import grpcbridge.route.Route;
 import grpcbridge.rpc.RpcMessage;
 import io.grpc.Metadata.Key;
-import io.opencensus.trace.AttributeValue;
-import io.opencensus.trace.Span;
-import io.opencensus.trace.SpanContext;
-import io.opencensus.trace.SpanId;
-import io.opencensus.trace.TraceOptions;
-import io.opencensus.trace.Tracing;
+import io.opencensus.trace.*;
 import io.opencensus.trace.propagation.SpanContextParseException;
 import io.opencensus.trace.propagation.TextFormat;
 
@@ -21,12 +16,15 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * OpenCensus tracer. Extracts an existing context from the request if present.
  * Executes an action within the new span.
  */
 public final class Tracer {
+    private static final Logger logger = Logger.getLogger(Tracer.class.getName());
     private static final Random RANDOM = new Random();
 
     public static void trace(Route route, HttpRequest request, Consumer<TracingSpan> action) {
@@ -66,6 +64,14 @@ public final class Tracer {
                                 .map(header -> carrier.getHeaders().get(key(header)))
                                 .filter(Objects::nonNull)
                                 .findFirst()
+                                .map(v -> {
+                                    // The formatter requires span-id/trace-id format.
+                                    if (v.contains("/")) {
+                                        return v;
+                                    } else {
+                                        return v + "/0";
+                                    }
+                                })
                                 .orElse(null);
                     }
                 });
@@ -75,15 +81,18 @@ public final class Tracer {
                     context = SpanContext.create(
                             context.getTraceId(),
                             context.getSpanId(),
-                            TraceOptions.DEFAULT);
+                            TraceOptions.DEFAULT,
+                            Tracestate.builder().build());
                 } else if (context.getTraceId().isValid() && !context.getSpanId().isValid()) {
                     // Generate a new Span ID if the client provides an empty ID.
                     context = SpanContext.create(
                             context.getTraceId(),
                             SpanId.generateRandomId(RANDOM),
-                            TraceOptions.DEFAULT);
+                            TraceOptions.DEFAULT,
+                            Tracestate.builder().build());
                 }
-            } catch (SpanContextParseException ignored) {
+            } catch (SpanContextParseException e) {
+                logger.log(Level.WARNING, e, () -> "Failed to parse tracing context");
             }
         }
 
