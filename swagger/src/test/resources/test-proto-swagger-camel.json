@@ -389,6 +389,84 @@
         "tags": []
       }
     },
+    "/get-wrappers": {
+      "get": {
+        "operationId": "TestService.GetWrappers",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.GetWrappersResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "format": "double",
+            "name": "doubleValueField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "float",
+            "name": "floatValueField",
+            "in": "query",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "format": "string",
+            "name": "int64ValueField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "string",
+            "name": "uint64ValueField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "int32",
+            "name": "int32ValueField",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "int32",
+            "name": "uint32ValueField",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "boolean",
+            "name": "boolValueField",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "stringValueField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "format": "byte",
+            "name": "bytesValueField",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": []
+      }
+    },
     "/get/{stringField}": {
       "get": {
         "operationId": "TestService.Get",
@@ -773,6 +851,46 @@
       "properties": {},
       "additionalProperties": {
         "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
+      }
+    },
+    "grpcbridge.test.proto.GetWrappersResponse": {
+      "type": "object",
+      "properties": {
+        "boolValueField": {
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "bytesValueField": {
+          "format": "byte",
+          "type": "string"
+        },
+        "doubleValueField": {
+          "format": "double",
+          "type": "number"
+        },
+        "floatValueField": {
+          "format": "float",
+          "type": "number"
+        },
+        "int32ValueField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "int64ValueField": {
+          "format": "string",
+          "type": "string"
+        },
+        "stringValueField": {
+          "type": "string"
+        },
+        "uint32ValueField": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "uint64ValueField": {
+          "format": "string",
+          "type": "string"
+        }
       }
     },
     "grpcbridge.test.proto.MapNested": {

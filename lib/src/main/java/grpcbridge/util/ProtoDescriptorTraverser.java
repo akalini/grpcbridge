@@ -75,7 +75,7 @@ public class ProtoDescriptorTraverser {
             throw new IllegalArgumentException("Groups are not supported");
         }
 
-        if (field.getJavaType() == JavaType.MESSAGE) {
+        if (field.getJavaType() == JavaType.MESSAGE && !SimpleFieldType.isWrapper(field)) {
             onMessageField(field);
         } else {
             visitor.onSimpleField(field, SimpleFieldType.fromDescriptor(field));

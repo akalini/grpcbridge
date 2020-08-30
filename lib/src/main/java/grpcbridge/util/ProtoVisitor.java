@@ -1,12 +1,33 @@
 package grpcbridge.util;
 
-import static java.lang.String.format;
-
 import com.google.protobuf.Descriptors.FieldDescriptor;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.lang.String.format;
 
 public abstract class ProtoVisitor {
     public enum SimpleFieldType {
         INT, LONG, BOOL, DOUBLE, FLOAT, STRING, BYTES, ENUM;
+
+        static Map<String, SimpleFieldType> wrappers = new HashMap<String, SimpleFieldType>() {
+            {
+                put("google.protobuf.DoubleValue", DOUBLE);
+                put("google.protobuf.FloatValue", FLOAT);
+                put("google.protobuf.Int64Value", LONG);
+                put("google.protobuf.UInt64Value", LONG);
+                put("google.protobuf.Int32Value", INT);
+                put("google.protobuf.UInt32Value", INT);
+                put("google.protobuf.BoolValue", BOOL);
+                put("google.protobuf.StringValue", STRING);
+                put("google.protobuf.BytesValue", BYTES);
+            }
+        };
+
+        public static boolean isWrapper(FieldDescriptor field) {
+            return wrappers.containsKey(field.getMessageType().getFullName());
+        }
 
         /**
          * Maps simple protobuf types to a {@link SimpleFieldType}.
@@ -49,6 +70,9 @@ public abstract class ProtoVisitor {
                     return SimpleFieldType.ENUM;
 
                 case MESSAGE:
+                    if (isWrapper(field)) {
+                        return wrappers.get(field.getMessageType().getFullName());
+                    }
                 case GROUP:
                 default:
                     throw new IllegalArgumentException(

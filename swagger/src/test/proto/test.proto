@@ -4,6 +4,7 @@ package grpcbridge.test.proto;
 import "included-test-file.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/descriptor.proto";
+import "google/protobuf/wrappers.proto";
 import "grpcbridge/grpcbridge-options.proto";
 import "openapi_v2.proto";
 
@@ -72,6 +73,30 @@ message GetResponse {
   }
 
   string excluded = 19 [deprecated = true];
+}
+
+message GetWrappersRequest {
+  google.protobuf.DoubleValue double_value_field = 1;
+  google.protobuf.FloatValue float_value_field = 2;
+  google.protobuf.Int64Value int64_value_field = 3;
+  google.protobuf.UInt64Value uint64_value_field = 4;
+  google.protobuf.Int32Value int32_value_field = 5;
+  google.protobuf.UInt32Value uint32_value_field = 6;
+  google.protobuf.BoolValue bool_value_field = 7;
+  google.protobuf.StringValue string_value_field = 8;
+  google.protobuf.BytesValue bytes_value_field = 9;
+}
+
+message GetWrappersResponse {
+  google.protobuf.DoubleValue double_value_field = 1;
+  google.protobuf.FloatValue float_value_field = 2;
+  google.protobuf.Int64Value int64_value_field = 3;
+  google.protobuf.UInt64Value uint64_value_field = 4;
+  google.protobuf.Int32Value int32_value_field = 5;
+  google.protobuf.UInt32Value uint32_value_field = 6;
+  google.protobuf.BoolValue bool_value_field = 7;
+  google.protobuf.StringValue string_value_field = 8;
+  google.protobuf.BytesValue bytes_value_field = 9;
 }
 
 message Excluded {
@@ -153,6 +178,12 @@ service TestService {
   rpc GetNestedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get-nested/{nested.nested_field}"
+    };
+  }
+
+  rpc GetWrappers (GetWrappersRequest) returns (GetWrappersResponse) {
+    option (google.api.http) = {
+        get: "/get-wrappers"
     };
   }
 
