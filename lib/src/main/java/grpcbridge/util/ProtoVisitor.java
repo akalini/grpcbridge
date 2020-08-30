@@ -11,6 +11,12 @@ public abstract class ProtoVisitor {
     public enum SimpleFieldType {
         INT, LONG, BOOL, DOUBLE, FLOAT, STRING, BYTES, ENUM;
 
+        /**
+         * Maps supported wrapper types to a {@link SimpleFieldType}.
+         *
+         * There's no simple way to identify whether the message is a wrapper, we have to use
+         * explicit full names.
+         */
         static Map<String, SimpleFieldType> wrappers = new HashMap<String, SimpleFieldType>() {
             {
                 put("google.protobuf.DoubleValue", DOUBLE);
@@ -25,6 +31,12 @@ public abstract class ProtoVisitor {
             }
         };
 
+        /**
+         * Checks whether the supplied {@link FieldDescriptor} represents a supported wrapper type.
+         *
+         * @param field field descriptor
+         * @return whether the field is a supported wrapper type
+         */
         public static boolean isWrapper(FieldDescriptor field) {
             return wrappers.containsKey(field.getMessageType().getFullName());
         }
