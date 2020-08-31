@@ -18,8 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.base.Charsets;
+import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
+import com.google.protobuf.StringValue;
 import grpcbridge.Exceptions.ParsingException;
 import grpcbridge.Exceptions.RouteNotFoundException;
 import grpcbridge.common.TestService;
@@ -37,6 +39,8 @@ import grpcbridge.test.proto.Test.PatchRequest;
 import grpcbridge.test.proto.Test.PatchResponse;
 import grpcbridge.test.proto.Test.PostRequest;
 import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PostWrappersRequest;
+import grpcbridge.test.proto.Test.PostWrappersResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
 import io.grpc.Metadata;
@@ -90,6 +94,24 @@ public class BridgeTest implements ProtoParseTest {
         assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
                 .build()));
+    }
+
+    @Test
+    public void post_withWrappers() {
+        PostWrappersRequest rpcRequest = PostWrappersRequest.newBuilder()
+                .setBoolValueField(BoolValue.of(true))
+                .setStringValueField(StringValue.of("world"))
+                .build();
+
+        HttpRequest request = HttpRequest
+                .builder(POST, "/post-wrappers")
+                .body(serialize(rpcRequest))
+                .build();
+
+        HttpResponse response = bridge.handle(request);
+        PostWrappersResponse rpcResponse = parse(response.getBody(), PostWrappersResponse.newBuilder());
+
+        assertThat(rpcResponse).isEqualTo(responseFor(rpcRequest));
     }
 
     @Test

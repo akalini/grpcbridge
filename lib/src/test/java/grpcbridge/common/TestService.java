@@ -14,6 +14,8 @@ import grpcbridge.test.proto.Test.PatchRequest;
 import grpcbridge.test.proto.Test.PatchResponse;
 import grpcbridge.test.proto.Test.PostRequest;
 import grpcbridge.test.proto.Test.PostResponse;
+import grpcbridge.test.proto.Test.PostWrappersRequest;
+import grpcbridge.test.proto.Test.PostWrappersResponse;
 import grpcbridge.test.proto.Test.PutRequest;
 import grpcbridge.test.proto.Test.PutResponse;
 import grpcbridge.test.proto.TestServiceGrpc;
@@ -47,6 +49,16 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
                 .setNested(request.getNested())
                 .addAllRepeatedField(request.getRepeatedFieldList())
                 .setDefault(request.getDefault())
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void postWrappers(PostWrappersRequest request,
+                             StreamObserver<PostWrappersResponse> responseObserver) {
+        responseObserver.onNext(PostWrappersResponse.newBuilder()
+                .setStringValueField(request.getStringValueField())
+                .setBoolValueField(request.getBoolValueField())
                 .build());
         responseObserver.onCompleted();
     }

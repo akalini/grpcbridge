@@ -2,6 +2,7 @@ syntax = "proto3";
 package grpcbridge.test.proto;
 
 import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
 import "grpcbridge/grpcbridge-options.proto";
 
 enum Enum { INVALID = 0; VALID = 1; }
@@ -46,6 +47,30 @@ message GetResponse {
   repeated string repeated_field = 10;
   DefaultMessage default = 11;
   DefaultMessage unset_default = 12;
+}
+
+message PostWrappersRequest {
+  google.protobuf.DoubleValue double_value_field = 1;
+  google.protobuf.FloatValue float_value_field = 2;
+  google.protobuf.Int64Value int64_value_field = 3;
+  google.protobuf.UInt64Value uint64_value_field = 4;
+  google.protobuf.Int32Value int32_value_field = 5;
+  google.protobuf.UInt32Value uint32_value_field = 6;
+  google.protobuf.BoolValue bool_value_field = 7;
+  google.protobuf.StringValue string_value_field = 8;
+  google.protobuf.BytesValue bytes_value_field = 9;
+}
+
+message PostWrappersResponse {
+  google.protobuf.DoubleValue double_value_field = 1;
+  google.protobuf.FloatValue float_value_field = 2;
+  google.protobuf.Int64Value int64_value_field = 3;
+  google.protobuf.UInt64Value uint64_value_field = 4;
+  google.protobuf.Int32Value int32_value_field = 5;
+  google.protobuf.UInt32Value uint32_value_field = 6;
+  google.protobuf.BoolValue bool_value_field = 7;
+  google.protobuf.StringValue string_value_field = 8;
+  google.protobuf.BytesValue bytes_value_field = 9;
 }
 
 message PostRequest {
@@ -94,6 +119,13 @@ service TestService {
   rpc Get (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
         get: "/get/{string_field}"
+    };
+  }
+
+  rpc PostWrappers (PostWrappersRequest) returns (PostWrappersResponse) {
+    option (google.api.http) = {
+      post: "/post-wrappers"
+      body: "*"
     };
   }
 
