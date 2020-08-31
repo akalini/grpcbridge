@@ -1,6 +1,5 @@
 package grpcbridge.util;
 
-
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
