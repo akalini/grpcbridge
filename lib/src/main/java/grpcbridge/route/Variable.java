@@ -37,6 +37,9 @@ public final class Variable {
     private final String name;
     private final String value;
 
+    /**
+     * Maps supported wrapper types to a value parser.
+     */
     private final Map<Descriptor, Function<String, Object>> wrappers = new HashMap<Descriptor, Function<String, Object>>() {
         {
             put(DoubleValue.getDescriptor(), (s) -> DoubleValue.of(Double.parseDouble(s)));
