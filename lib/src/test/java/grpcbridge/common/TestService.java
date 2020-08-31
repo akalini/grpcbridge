@@ -54,8 +54,9 @@ public final class TestService extends TestServiceGrpc.TestServiceImplBase {
     }
 
     @Override
-    public void postWrappers(PostWrappersRequest request,
-                             StreamObserver<PostWrappersResponse> responseObserver) {
+    public void postWrappers(
+            PostWrappersRequest request,
+            StreamObserver<PostWrappersResponse> responseObserver) {
         responseObserver.onNext(PostWrappersResponse.newBuilder()
                 .setStringValueField(request.getStringValueField())
                 .setBoolValueField(request.getBoolValueField())

@@ -92,8 +92,8 @@ public abstract class ProtoVisitor {
                     return SimpleFieldType.ENUM;
 
                 case MESSAGE:
-                    if (isWrapper(field)) {
-                        return wrappers.get(field.getMessageType());
+                    if (SimpleFieldMapper.isSupported(field)) {
+                        return SimpleFieldMapper.forDescriptor(field).getType();
                     }
                 case GROUP:
                 default:
