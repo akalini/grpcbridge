@@ -32,6 +32,7 @@ message GetRequest {
   Nested nested = 9;
   repeated string repeated_field = 10;
   DefaultMessage default = 11;
+  google.protobuf.StringValue string_value_field = 12;
 }
 
 message GetResponse {
@@ -47,6 +48,7 @@ message GetResponse {
   repeated string repeated_field = 10;
   DefaultMessage default = 11;
   DefaultMessage unset_default = 12;
+  google.protobuf.StringValue string_value_field = 13;
 }
 
 message PostWrappersRequest {

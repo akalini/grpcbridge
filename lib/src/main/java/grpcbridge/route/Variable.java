@@ -1,17 +1,29 @@
 package grpcbridge.route;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.BytesValue;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.DoubleValue;
+import com.google.protobuf.FloatValue;
+import com.google.protobuf.Int32Value;
+import com.google.protobuf.Int64Value;
+import com.google.protobuf.StringValue;
+import com.google.protobuf.UInt32Value;
+import com.google.protobuf.UInt64Value;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 /**
  * Describes a variable that can be specified in {@link com.google.api.HttpRule}
@@ -23,6 +35,20 @@ import java.util.Objects;
 public final class Variable {
     private final String name;
     private final String value;
+
+    private final Map<String, Function<String, Object>> wrappers = new HashMap<String, Function<String, Object>>() {
+        {
+            put("google.protobuf.DoubleValue", (s) -> DoubleValue.of(Double.parseDouble(s)));
+            put("google.protobuf.FloatValue", (s) -> FloatValue.of(Float.parseFloat(s)));
+            put("google.protobuf.Int64Value", (s) -> Int64Value.of(Long.parseLong(s)));
+            put("google.protobuf.UInt64Value", (s) -> UInt64Value.of(Long.parseLong(s)));
+            put("google.protobuf.Int32Value", (s) -> Int32Value.of(Integer.parseInt(s)));
+            put("google.protobuf.UInt32Value", (s) -> UInt32Value.of(Integer.parseInt(s)));
+            put("google.protobuf.BoolValue", (s) -> BoolValue.of(Boolean.parseBoolean(s)));
+            put("google.protobuf.StringValue", StringValue::of);
+            put("google.protobuf.BytesValue", (s) -> BytesValue.of(ByteString.copyFrom(s.getBytes())));
+        }
+    };
 
     /**
      * @param name variable name, e.g path.to.protobuf.field
@@ -76,6 +102,11 @@ public final class Variable {
                 return ByteString.copyFrom(value.getBytes());
             case ENUM:
                 return field.getEnumType().findValueByName(value);
+            case MESSAGE:
+                String name = field.getMessageType().getFullName();
+                if (wrappers.containsKey(name)) {
+                    return wrappers.get(name).apply(value);
+                }
             default:
                 throw new IllegalStateException("Unsupported field type found: " + field);
         }

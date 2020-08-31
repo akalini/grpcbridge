@@ -117,7 +117,7 @@ public class BridgeTest implements ProtoParseTest {
     @Test
     public void get_withParams() {
         HttpRequest request = HttpRequest
-                .builder(GET, "/get?string_field=hello&int_field=987")
+                .builder(GET, "/get?string_field=hello&int_field=987&string_value_field=world")
                 .build();
 
         HttpResponse response = bridge.handle(request);
@@ -125,6 +125,7 @@ public class BridgeTest implements ProtoParseTest {
 
         assertThat(rpcResponse).isEqualTo(responseFor(GetRequest.newBuilder()
                 .setStringField("hello")
+                .setStringValueField(StringValue.of("world"))
                 .setIntField(987)
                 .build()));
     }
