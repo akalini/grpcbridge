@@ -1,55 +1,12 @@
 package grpcbridge.util;
 
-import com.google.protobuf.BoolValue;
-import com.google.protobuf.BytesValue;
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.DoubleValue;
-import com.google.protobuf.FloatValue;
-import com.google.protobuf.Int32Value;
-import com.google.protobuf.Int64Value;
-import com.google.protobuf.StringValue;
-import com.google.protobuf.UInt32Value;
-import com.google.protobuf.UInt64Value;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static java.lang.String.format;
+
+import com.google.protobuf.Descriptors.FieldDescriptor;
 
 public abstract class ProtoVisitor {
     public enum SimpleFieldType {
         INT, LONG, BOOL, DOUBLE, FLOAT, STRING, BYTES, ENUM;
-
-        /**
-         * Maps supported wrapper types to a {@link SimpleFieldType}.
-         *
-         * There's no simple way to identify whether the message is a wrapper, we have to use
-         * explicit descriptors matching.
-         */
-        static Map<Descriptor, SimpleFieldType> wrappers = new HashMap<Descriptor, SimpleFieldType>() {
-            {
-                put(DoubleValue.getDescriptor(), DOUBLE);
-                put(FloatValue.getDescriptor(), FLOAT);
-                put(Int64Value.getDescriptor(), LONG);
-                put(UInt64Value.getDescriptor(), LONG);
-                put(Int32Value.getDescriptor(), INT);
-                put(UInt32Value.getDescriptor(), INT);
-                put(BoolValue.getDescriptor(), BOOL);
-                put(StringValue.getDescriptor(), STRING);
-                put(BytesValue.getDescriptor(), BYTES);
-            }
-        };
-
-        /**
-         * Checks whether the supplied {@link FieldDescriptor} represents a supported wrapper type.
-         *
-         * @param field field descriptor
-         * @return whether the field is a supported wrapper type
-         */
-        public static boolean isWrapper(FieldDescriptor field) {
-            return wrappers.containsKey(field.getMessageType());
-        }
 
         /**
          * Maps simple protobuf types to a {@link SimpleFieldType}.

@@ -1,5 +1,8 @@
 package grpcbridge.route;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
@@ -10,9 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 /**
  * Describes a variable that can be specified in {@link com.google.api.HttpRule}
