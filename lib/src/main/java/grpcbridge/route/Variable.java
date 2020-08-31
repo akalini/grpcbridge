@@ -6,6 +6,7 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DoubleValue;
 import com.google.protobuf.FloatValue;
 import com.google.protobuf.Int32Value;
@@ -36,17 +37,17 @@ public final class Variable {
     private final String name;
     private final String value;
 
-    private final Map<String, Function<String, Object>> wrappers = new HashMap<String, Function<String, Object>>() {
+    private final Map<Descriptor, Function<String, Object>> wrappers = new HashMap<Descriptor, Function<String, Object>>() {
         {
-            put("google.protobuf.DoubleValue", (s) -> DoubleValue.of(Double.parseDouble(s)));
-            put("google.protobuf.FloatValue", (s) -> FloatValue.of(Float.parseFloat(s)));
-            put("google.protobuf.Int64Value", (s) -> Int64Value.of(Long.parseLong(s)));
-            put("google.protobuf.UInt64Value", (s) -> UInt64Value.of(Long.parseLong(s)));
-            put("google.protobuf.Int32Value", (s) -> Int32Value.of(Integer.parseInt(s)));
-            put("google.protobuf.UInt32Value", (s) -> UInt32Value.of(Integer.parseInt(s)));
-            put("google.protobuf.BoolValue", (s) -> BoolValue.of(Boolean.parseBoolean(s)));
-            put("google.protobuf.StringValue", StringValue::of);
-            put("google.protobuf.BytesValue", (s) -> BytesValue.of(ByteString.copyFrom(s.getBytes())));
+            put(DoubleValue.getDescriptor(), (s) -> DoubleValue.of(Double.parseDouble(s)));
+            put(FloatValue.getDescriptor(), (s) -> FloatValue.of(Float.parseFloat(s)));
+            put(Int64Value.getDescriptor(), (s) -> Int64Value.of(Long.parseLong(s)));
+            put(UInt64Value.getDescriptor(), (s) -> UInt64Value.of(Long.parseLong(s)));
+            put(Int32Value.getDescriptor(), (s) -> Int32Value.of(Integer.parseInt(s)));
+            put(UInt32Value.getDescriptor(), (s) -> UInt32Value.of(Integer.parseInt(s)));
+            put(BoolValue.getDescriptor(), (s) -> BoolValue.of(Boolean.parseBoolean(s)));
+            put(StringValue.getDescriptor(), StringValue::of);
+            put(BytesValue.getDescriptor(), (s) -> BytesValue.of(ByteString.copyFrom(s.getBytes())));
         }
     };
 
@@ -103,9 +104,8 @@ public final class Variable {
             case ENUM:
                 return field.getEnumType().findValueByName(value);
             case MESSAGE:
-                String name = field.getMessageType().getFullName();
-                if (wrappers.containsKey(name)) {
-                    return wrappers.get(name).apply(value);
+                if (wrappers.containsKey(field.getMessageType())) {
+                    return wrappers.get(field.getMessageType()).apply(value);
                 }
             default:
                 throw new IllegalStateException("Unsupported field type found: " + field);

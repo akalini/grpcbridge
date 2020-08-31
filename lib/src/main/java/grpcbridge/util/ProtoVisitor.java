@@ -1,6 +1,16 @@
 package grpcbridge.util;
 
+import com.google.protobuf.BoolValue;
+import com.google.protobuf.BytesValue;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.DoubleValue;
+import com.google.protobuf.FloatValue;
+import com.google.protobuf.Int32Value;
+import com.google.protobuf.Int64Value;
+import com.google.protobuf.StringValue;
+import com.google.protobuf.UInt32Value;
+import com.google.protobuf.UInt64Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,19 +25,19 @@ public abstract class ProtoVisitor {
          * Maps supported wrapper types to a {@link SimpleFieldType}.
          *
          * There's no simple way to identify whether the message is a wrapper, we have to use
-         * explicit full names.
+         * explicit descriptors matching.
          */
-        static Map<String, SimpleFieldType> wrappers = new HashMap<String, SimpleFieldType>() {
+        static Map<Descriptor, SimpleFieldType> wrappers = new HashMap<Descriptor, SimpleFieldType>() {
             {
-                put("google.protobuf.DoubleValue", DOUBLE);
-                put("google.protobuf.FloatValue", FLOAT);
-                put("google.protobuf.Int64Value", LONG);
-                put("google.protobuf.UInt64Value", LONG);
-                put("google.protobuf.Int32Value", INT);
-                put("google.protobuf.UInt32Value", INT);
-                put("google.protobuf.BoolValue", BOOL);
-                put("google.protobuf.StringValue", STRING);
-                put("google.protobuf.BytesValue", BYTES);
+                put(DoubleValue.getDescriptor(), DOUBLE);
+                put(FloatValue.getDescriptor(), FLOAT);
+                put(Int64Value.getDescriptor(), LONG);
+                put(UInt64Value.getDescriptor(), LONG);
+                put(Int32Value.getDescriptor(), INT);
+                put(UInt32Value.getDescriptor(), INT);
+                put(BoolValue.getDescriptor(), BOOL);
+                put(StringValue.getDescriptor(), STRING);
+                put(BytesValue.getDescriptor(), BYTES);
             }
         };
 
@@ -38,7 +48,7 @@ public abstract class ProtoVisitor {
          * @return whether the field is a supported wrapper type
          */
         public static boolean isWrapper(FieldDescriptor field) {
-            return wrappers.containsKey(field.getMessageType().getFullName());
+            return wrappers.containsKey(field.getMessageType());
         }
 
         /**
@@ -83,7 +93,7 @@ public abstract class ProtoVisitor {
 
                 case MESSAGE:
                     if (isWrapper(field)) {
-                        return wrappers.get(field.getMessageType().getFullName());
+                        return wrappers.get(field.getMessageType());
                     }
                 case GROUP:
                 default:
