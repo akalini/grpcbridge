@@ -49,6 +49,9 @@ public abstract class ProtoVisitor {
                     return SimpleFieldType.ENUM;
 
                 case MESSAGE:
+                    if (SimpleFieldMapper.isSupported(field)) {
+                        return SimpleFieldMapper.forDescriptor(field).getType();
+                    }
                 case GROUP:
                 default:
                     throw new IllegalArgumentException(

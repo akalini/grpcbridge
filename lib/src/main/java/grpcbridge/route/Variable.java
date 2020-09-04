@@ -7,6 +7,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
+import grpcbridge.util.SimpleFieldMapper;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,6 +77,10 @@ public final class Variable {
                 return ByteString.copyFrom(value.getBytes());
             case ENUM:
                 return field.getEnumType().findValueByName(value);
+            case MESSAGE:
+                if (SimpleFieldMapper.isSupported(field)) {
+                    return SimpleFieldMapper.forDescriptor(field).parse(value);
+                }
             default:
                 throw new IllegalStateException("Unsupported field type found: " + field);
         }

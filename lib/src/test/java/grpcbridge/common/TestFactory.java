@@ -38,6 +38,38 @@ public final class TestFactory {
                 .build();
     }
 
+    public static PostWrappersResponse responseFor(PostWrappersRequest request) {
+        PostWrappersResponse.Builder builder = PostWrappersResponse.newBuilder();
+        if (request.hasBoolValueField()) {
+            builder.setBoolValueField(request.getBoolValueField());
+        }
+        if (request.hasBytesValueField()) {
+            builder.setBytesValueField(request.getBytesValueField());
+        }
+        if (request.hasDoubleValueField()) {
+            builder.setDoubleValueField(request.getDoubleValueField());
+        }
+        if (request.hasFloatValueField()) {
+            builder.setFloatValueField(request.getFloatValueField());
+        }
+        if (request.hasStringValueField()) {
+            builder.setStringValueField(request.getStringValueField());
+        }
+        if (request.hasInt64ValueField()) {
+            builder.setInt64ValueField(request.getInt64ValueField());
+        }
+        if (request.hasUint64ValueField()) {
+            builder.setUint64ValueField(request.getUint64ValueField());
+        }
+        if (request.hasInt32ValueField()) {
+            builder.setInt32ValueField(request.getInt32ValueField());
+        }
+        if (request.hasUint32ValueField()) {
+            builder.setUint32ValueField(request.getUint32ValueField());
+        }
+        return builder.build();
+    }
+
     public static PostRequest newPostRequest() {
         return PostRequest.newBuilder()
                 .setIntField(123)
