@@ -146,18 +146,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "excluded_one_of.string_field",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "excluded",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": []
@@ -277,18 +265,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "excluded_one_of.string_field",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "excluded",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": []
@@ -405,18 +381,6 @@
           },
           {
             "name": "message_one_of.nested_field",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "excluded_one_of.string_field",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "excluded",
             "in": "query",
             "required": false,
             "type": "string"
@@ -617,18 +581,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "excluded_one_of.string_field",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "excluded",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": []
@@ -697,12 +649,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "excluded",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": []
@@ -732,12 +678,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "excluded",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": []
@@ -829,14 +769,6 @@
       "default": "INVALID",
       "type": "string"
     },
-    "grpcbridge.test.proto.Excluded": {
-      "type": "object",
-      "properties": {
-        "string_field": {
-          "type": "string"
-        }
-      }
-    },
     "grpcbridge.test.proto.GetResponse": {
       "type": "object",
       "properties": {
@@ -854,12 +786,6 @@
         },
         "enum_field": {
           "$ref": "#/definitions/grpcbridge.test.proto.Enum"
-        },
-        "excluded": {
-          "type": "string"
-        },
-        "excluded_one_of": {
-          "$ref": "#/definitions/grpcbridge.test.proto.Excluded"
         },
         "external_field": {
           "$ref": "#/definitions/grpcbridge.test.included.proto.ExternalMessage"
@@ -1004,9 +930,6 @@
     "grpcbridge.test.proto.PostBodyRequest": {
       "type": "object",
       "properties": {
-        "excluded": {
-          "type": "string"
-        },
         "int_field": {
           "format": "int32",
           "type": "integer"
@@ -1055,9 +978,6 @@
     "grpcbridge.test.proto.PostRequest": {
       "type": "object",
       "properties": {
-        "excluded": {
-          "type": "string"
-        },
         "int_field": {
           "format": "int32",
           "type": "integer"
