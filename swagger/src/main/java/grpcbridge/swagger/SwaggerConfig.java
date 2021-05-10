@@ -35,7 +35,7 @@ class SwaggerConfig {
     }
 
     boolean isExcluded(FieldDescriptor field) {
-        return field.getOptions().getDeprecated();
+        return excludeDeprecated && field.getOptions().getDeprecated();
     }
 
     public Optional<OpenapiV2.Swagger> getSwaggerRoot() {

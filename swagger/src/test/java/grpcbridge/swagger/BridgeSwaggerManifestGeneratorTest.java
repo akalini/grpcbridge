@@ -28,10 +28,21 @@ public class BridgeSwaggerManifestGeneratorTest {
         String manifest = bridge.generateManifest(
             BridgeSwaggerManifestGenerator.newBuilder()
                 .addRequiredExtension(testRequired)
-                .excludeDeprecated()
                 .build()
         );
         String expected = load("test-proto-swagger.json");
+        assertThat(formatJson(manifest)).isEqualTo(expected);
+    }
+
+    @Test
+    public void generateManifest_excludeDeprecated() {
+        String manifest = bridge.generateManifest(
+            BridgeSwaggerManifestGenerator.newBuilder()
+                .addRequiredExtension(testRequired)
+                .excludeDeprecated()
+                .build()
+        );
+        String expected = load("test-proto-swagger-exclude-deprecated.json");
         assertThat(formatJson(manifest)).isEqualTo(expected);
     }
 }
