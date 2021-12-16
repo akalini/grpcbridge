@@ -1,11 +1,13 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven { url 'https://plugins.gradle.org/m2/' }
     }
 
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.12'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.18'
     }
 }
 
@@ -18,27 +20,27 @@ allprojects {
     group = 'grpcbridge'
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     ext {
         ver = [
-                protobuf   : '3.12.4',
-                grpc       : '1.31.0',
+                protobuf   : '3.19.1',
+                grpc       : '1.36.2',
                 opencensus : '0.26.0',
                 slf4j      : '1.7.30',
         ]
     }
 
     dependencies {
-        compile "org.slf4j:slf4j-api:${ver.slf4j}"
+        implementation "org.slf4j:slf4j-api:${ver.slf4j}"
 
-        compile "com.google.protobuf:protobuf-java:${ver.protobuf}"
-        compile "com.google.protobuf:protobuf-java-util:${ver.protobuf}"
-        compile "io.grpc:grpc-protobuf:${ver.grpc}"
+        implementation "com.google.protobuf:protobuf-java:${ver.protobuf}"
+        implementation "com.google.protobuf:protobuf-java-util:${ver.protobuf}"
+        implementation "io.grpc:grpc-protobuf:${ver.grpc}"
 
-        testCompile 'junit:junit:4.12'
-        testCompile 'org.assertj:assertj-core:3.14.0'
+        testImplementation 'junit:junit:4.12'
+        testImplementation 'org.assertj:assertj-core:3.14.0'
     }
 
     protobuf {
@@ -47,8 +49,11 @@ allprojects {
         }
 
         plugins {
+            // TODO: remove this suffix for M1 compatibility after upgrading gRPC >= 1.42.x
+            def os = DefaultNativePlatform.getCurrentOperatingSystem()
+            def versionSuffix = os.isMacOsX() ? ":osx-x86_64" : ""
             grpc {
-                artifact = "io.grpc:protoc-gen-grpc-java:${ver.grpc}"
+                artifact = "io.grpc:protoc-gen-grpc-java:${ver.grpc}:$versionSuffix"
             }
         }
 

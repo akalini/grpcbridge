@@ -158,6 +158,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "format": "boolean",
+            "name": "optional_bool",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": []
@@ -289,6 +296,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "format": "boolean",
+            "name": "optional_bool",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": []
@@ -420,6 +434,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "format": "boolean",
+            "name": "optional_bool",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": []
@@ -629,6 +650,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "format": "boolean",
+            "name": "optional_bool",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": []

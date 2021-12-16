@@ -38,7 +38,8 @@ public class SnakeCaseBridgeTest implements ProtoParseTest {
 
         SnakeRequest rpcRequest = SnakeRequest.newBuilder()
                 .setFirstName("John")
-                .setLastName("Doe").build();
+                .setLastName("Doe")
+                .build();
 
         String rawBody = serialize(rpcRequest);
         Map<String, String> bodyJson = gson.fromJson(rawBody, type);
