@@ -3,6 +3,6 @@ apply plugin: 'grpcbridge.gradle.publish'
 archivesBaseName = 'grpcbridge-xml'
 
 dependencies {
-    compile project(":lib")
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.6'
+    implementation project(":lib")
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.6'
 }

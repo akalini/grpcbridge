@@ -10,8 +10,8 @@ class PublishPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.apply plugin: 'com.jfrog.bintray'
-        project.apply plugin: 'maven'
         project.apply plugin: 'maven-publish'
+        project.apply plugin: 'java-library'
 
         project.bintray {
             user = 'akalini'

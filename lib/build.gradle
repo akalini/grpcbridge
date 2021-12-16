@@ -3,13 +3,13 @@ apply plugin: 'grpcbridge.gradle.publish'
 archivesBaseName = 'grpcbridge'
 
 dependencies {
-    compile "org.slf4j:slf4j-api:${ver.slf4j}"
-    compile "io.grpc:grpc-netty:${ver.grpc}"
-    compile "io.grpc:grpc-stub:${ver.grpc}"
-    compile "io.grpc:grpc-stub:${ver.grpc}"
-    compile "io.opencensus:opencensus-api:${ver.opencensus}"
-    compile "io.opencensus:opencensus-contrib-http-util:${ver.opencensus}"
+    implementation "org.slf4j:slf4j-api:${ver.slf4j}"
+    implementation "io.grpc:grpc-netty:${ver.grpc}"
+    api "io.grpc:grpc-stub:${ver.grpc}"
+    implementation "io.opencensus:opencensus-api:${ver.opencensus}"
+    implementation "io.opencensus:opencensus-contrib-http-util:${ver.opencensus}"
+    api "javax.annotation:javax.annotation-api:1.3.2"
 
-    testCompile 'junit:junit:4.12'
-    testCompile "org.slf4j:slf4j-simple:${ver.slf4j}"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.slf4j:slf4j-simple:${ver.slf4j}"
 }

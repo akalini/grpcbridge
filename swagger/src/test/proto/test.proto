@@ -48,6 +48,7 @@ message GetRequest {
   }
 
   string excluded = 17 [deprecated = true];
+  optional bool optional_bool = 18;
 }
 
 message GetResponse {

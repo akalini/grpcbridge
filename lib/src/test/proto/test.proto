@@ -18,6 +18,7 @@ message DefaultMessage {
   Enum default_enum= 4 [(grpcbridge.serialize_default_value) = true];
   Nested default_nested = 5 [(grpcbridge.serialize_default_value) = true];
   repeated string default_repeated = 6 [(grpcbridge.serialize_default_value) = true];
+  optional bool optional_bool = 7;
 }
 
 message GetRequest {
