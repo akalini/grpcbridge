@@ -16,7 +16,7 @@ allprojects {
     apply plugin: 'com.google.protobuf'
     apply plugin: 'idea'
 
-    version = '1.3.6'
+    version = '1.3.7'
     group = 'grpcbridge'
 
     repositories {
