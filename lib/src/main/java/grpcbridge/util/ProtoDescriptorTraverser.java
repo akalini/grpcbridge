@@ -90,6 +90,9 @@ public class ProtoDescriptorTraverser {
     private void onMessageField(FieldDescriptor field) {
         visitor.onMessageStart(field);
         field.getMessageType().getFields().forEach(fieldDescriptor -> {
+            final boolean messageReferencesItself =
+                    field.getContainingType() == fieldDescriptor.getContainingType();
+            if (messageReferencesItself) return;
             visitor.onBeforeField(fieldDescriptor);
             onField(fieldDescriptor);
             visitor.onAfterField(fieldDescriptor);
