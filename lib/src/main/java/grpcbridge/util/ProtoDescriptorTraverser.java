@@ -90,6 +90,9 @@ public class ProtoDescriptorTraverser {
     private void onMessageField(FieldDescriptor field) {
         visitor.onMessageStart(field);
         field.getMessageType().getFields().forEach(fieldDescriptor -> {
+            // A naive detection of self-referencing messages.
+            // This only works for trivial cycles (foo->foo),
+            // but not for longer ones (e.g. foo->bar->foo).
             final boolean messageReferencesItself =
                     field.getContainingType() == fieldDescriptor.getContainingType();
             if (messageReferencesItself) return;
