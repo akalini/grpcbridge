@@ -8,7 +8,7 @@ import "google/protobuf/wrappers.proto";
 import "grpcbridge/grpcbridge-options.proto";
 import "openapi_v2.proto";
 
-enum Enum {INVALID = 0; VALID = 1;}
+enum Enum { INVALID = 0; VALID = 1; }
 
 extend google.protobuf.FieldOptions {
   bool test_required = 50000;
@@ -26,6 +26,12 @@ message MapNested {
   string string_field = 1;
   map<string, Nested> map_field = 2;
 }
+
+message SelfReferencing {
+  string foo = 1;
+  repeated SelfReferencing circular = 2;
+}
+
 message GetRequest {
   string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
@@ -113,7 +119,7 @@ message PostRequest {
 
 message PostCircularRequest {
   string string_field = 1 [(test_required) = true];
-  repeated PostCircularRequest circular = 2;
+  SelfReferencing circular = 2;
 }
 
 message PostResponse {

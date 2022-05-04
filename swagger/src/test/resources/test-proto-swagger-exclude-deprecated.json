@@ -1037,10 +1037,7 @@
       "type": "object",
       "properties": {
         "circular": {
-          "items": {
-            "$ref": "#/definitions/grpcbridge.test.proto.PostCircularRequest"
-          },
-          "type": "array"
+          "$ref": "#/definitions/grpcbridge.test.proto.SelfReferencing"
         }
       }
     },
@@ -1094,6 +1091,20 @@
       "type": "object",
       "properties": {
         "repeated_nested_field": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.SelfReferencing": {
+      "type": "object",
+      "properties": {
+        "circular": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.SelfReferencing"
+          },
+          "type": "array"
+        },
+        "foo": {
           "type": "string"
         }
       }
