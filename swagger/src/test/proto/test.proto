@@ -27,6 +27,11 @@ message MapNested {
   map<string, Nested> map_field = 2;
 }
 
+message SelfReferencing {
+  string foo = 1;
+  repeated SelfReferencing circular = 2;
+}
+
 message GetRequest {
   string string_field = 1 [(test_required) = true];
   int32 int_field = 2;
@@ -112,6 +117,11 @@ message PostRequest {
   string excluded = 3 [deprecated = true];
 }
 
+message PostCircularRequest {
+  string string_field = 1 [(test_required) = true];
+  SelfReferencing circular = 2;
+}
+
 message PostResponse {
   string string_field = 1;
   int32 int_field = 2;
@@ -160,84 +170,91 @@ message PatchResponse {
 service TestService {
   rpc Get (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get/{string_field}"
+      get: "/get/{string_field}"
     };
   }
 
   rpc GetStatic (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-static"
+      get: "/get-static"
     };
   }
 
   rpc GetMultipleParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}"
+      get: "/get-multi/{string_field}/{int_field}/{long_field}/{float_field}/{double_field}/{bool_field}/{bytes_field}/{enum_field}"
     };
   }
 
   rpc GetNestedParams (GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-        get: "/get-nested/{nested.nested_field}"
+      get: "/get-nested/{nested.nested_field}"
     };
   }
 
   rpc GetWrappers (GetWrappersRequest) returns (GetWrappersResponse) {
     option (google.api.http) = {
-        get: "/get-wrappers"
+      get: "/get-wrappers"
     };
   }
 
   rpc Post (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post/{string_field}"
-        body: "*"
+      post: "/post/{string_field}"
+      body: "*"
+    };
+  }
+
+  rpc PostCircular (PostCircularRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      post: "/post-circular/{string_field}"
+      body: "*"
     };
   }
 
   rpc PostBody (PostBodyRequest) returns (PostBodyResponse) {
     option (google.api.http) = {
-        post: "/post-body"
-        body: "*"
+      post: "/post-body"
+      body: "*"
     };
   }
 
   rpc PostNoBody (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post-no-body/{int_field}"
+      post: "/post-no-body/{int_field}"
     };
   }
 
   rpc PostCustomBody (PostRequest) returns (PostResponse) {
     option (google.api.http) = {
-        post: "/post-custom/{string_field}"
-        body: "{int_field}"
+      post: "/post-custom/{string_field}"
+      body: "{int_field}"
     };
   }
 
   rpc Put (PutRequest) returns (PutResponse) {
     option (google.api.http) = {
-        put: "/put/{string_field}"
-        body: "*"
+      put: "/put/{string_field}"
+      body: "*"
     };
   }
 
   rpc Delete (DeleteRequest) returns (DeleteResponse) {
     option (google.api.http) = {
-        delete: "/delete/{string_field}"
+      delete: "/delete/{string_field}"
     };
   }
 
   rpc Patch (PatchRequest) returns (PatchResponse) {
     option (google.api.http) = {
-        patch: "/patch/{string_field}"
+      patch: "/patch/{string_field}"
     };
   }
 
   rpc Excluded (GetRequest) returns (GetRequest) {
     option (grpcbridge.swagger.exclude) = true;
     option (google.api.http) = {
-        get: "/excluded/{string_field}"
+      get: "/excluded/{string_field}"
     };
   }
 

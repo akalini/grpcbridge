@@ -660,6 +660,36 @@
         "tags": []
       }
     },
+    "/post-circular/{stringField}": {
+      "post": {
+        "operationId": "TestService.PostCircular",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "stringField",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "schema": {
+              "$ref": "#/definitions/grpcbridge.test.proto.PostCircularRequest"
+            },
+            "name": "body",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "tags": []
+      }
+    },
     "/post-custom/{stringField}": {
       "post": {
         "operationId": "TestService.PostCustomBody",
@@ -1003,6 +1033,14 @@
         "$ref": "#/definitions/grpcbridge.test.proto.MapNested"
       }
     },
+    "grpcbridge.test.proto.PostCircularRequest": {
+      "type": "object",
+      "properties": {
+        "circular": {
+          "$ref": "#/definitions/grpcbridge.test.proto.SelfReferencing"
+        }
+      }
+    },
     "grpcbridge.test.proto.PostRequest": {
       "type": "object",
       "properties": {
@@ -1053,6 +1091,20 @@
       "type": "object",
       "properties": {
         "repeatedNestedField": {
+          "type": "string"
+        }
+      }
+    },
+    "grpcbridge.test.proto.SelfReferencing": {
+      "type": "object",
+      "properties": {
+        "circular": {
+          "items": {
+            "$ref": "#/definitions/grpcbridge.test.proto.SelfReferencing"
+          },
+          "type": "array"
+        },
+        "foo": {
           "type": "string"
         }
       }
