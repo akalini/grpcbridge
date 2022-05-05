@@ -9,47 +9,47 @@ class PublishPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.apply plugin: 'com.jfrog.bintray'
         project.apply plugin: 'maven-publish'
         project.apply plugin: 'java-library'
 
-        project.bintray {
-            user = 'akalini'
-            key = System.getenv('BINTRAY_KEY')
-            publications = ['mavenJava']
-            publish = true
-            pkg {
-                repo = 'maven'
-                name = project.group
-                userOrg = 'akalini'
-                licenses = ['Apache-2.0']
-                vcsUrl = 'https://github.com/akalini/grpcbridge'
-
-                version {
-                    name = project.version
-                    desc = 'Expose your gRPC based API as a set of HTTP RESTful endpoints. HTTP framework agnostic.'
-                    released = new Date()
-                }
-            }
-        }
 
         project.tasks.create("sourceJar", Jar.class) {
             from project.sourceSets.main.allJava
         }
 
         project.publishing {
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = "https://maven.pkg.github.com/akalini/grpcbridge"
+                    credentials {
+                        username = project.findProperty("gpr.user")
+                                ?: System.getenv("GITHUB_USERNAME")
+                        password = project.findProperty("gpr.key")
+                                ?: System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
             publications {
-                mavenJava(MavenPublication) {
+                gpr(MavenPublication) {
                     from project.components.java
-                    groupId project.group
-                    artifactId project.archivesBaseName
-                    version project.version
                     artifact project.sourceJar {
                         classifier "sources"
+                    }
+                }
+                mavenJava(MavenPublication) {
+                    pom {
+                        description = 'Expose your gRPC based API as a set of HTTP RESTful endpoints. HTTP framework agnostic.'
+                        url = 'https://github.com/akalini/grpcbridge'
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
 }
