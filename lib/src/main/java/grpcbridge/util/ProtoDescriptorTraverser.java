@@ -7,6 +7,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 
 import grpcbridge.util.ProtoVisitor.SimpleFieldType;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Traverses a protobuf message descriptor. Implements a visitor pattern, using
@@ -14,6 +15,7 @@ import java.util.List;
  */
 public class ProtoDescriptorTraverser {
     private final ProtoVisitor visitor;
+    private final Stack<FieldDescriptor> scope = new Stack<>();
 
     public ProtoDescriptorTraverser(ProtoVisitor visitor) {
         this.visitor = visitor;
@@ -89,17 +91,17 @@ public class ProtoDescriptorTraverser {
      */
     private void onMessageField(FieldDescriptor field) {
         visitor.onMessageStart(field);
+        scope.push(field);
         field.getMessageType().getFields().forEach(fieldDescriptor -> {
-            // A naive detection of self-referencing messages.
-            // This only works for trivial cycles (foo->foo),
-            // but not for longer ones (e.g. foo->bar->foo).
-            final boolean messageReferencesItself =
-                    field.getContainingType() == fieldDescriptor.getContainingType();
-            if (messageReferencesItself) return;
-            visitor.onBeforeField(fieldDescriptor);
-            onField(fieldDescriptor);
-            visitor.onAfterField(fieldDescriptor);
+            // Skip recursively traversing the same field if we've already seen
+            // it in the current path.
+            if (!scope.contains(fieldDescriptor)) {
+                visitor.onBeforeField(fieldDescriptor);
+                onField(fieldDescriptor);
+                visitor.onAfterField(fieldDescriptor);
+            }
         });
+        scope.pop();
         visitor.onMessageEnd(field);
     }
 }

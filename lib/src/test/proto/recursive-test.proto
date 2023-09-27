@@ -1,0 +1,36 @@
+syntax = "proto3";
+package grpcbridge.test.recursive.proto;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "grpcbridge/grpcbridge-options.proto";
+
+message NestedLevel1 {
+  NestedLevel2 next = 1;
+}
+
+message NestedLevel2 {
+  NestedLevel3 next = 1;
+}
+
+message NestedLevel3 {
+  NestedLevel1 back_to_1 = 1;
+}
+
+message RecursivePostRequest {
+  NestedLevel1 nested = 1;
+}
+
+
+message RecursivePostResponse {
+  NestedLevel1 nested = 1;
+}
+
+service RecursiveTestService {
+  rpc RecursivePost (RecursivePostRequest) returns (RecursivePostResponse) {
+    option (google.api.http) = {
+        post: "/post";
+        body: '*'
+    };
+  }
+}
