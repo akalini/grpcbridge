@@ -101,10 +101,9 @@ public final class BridgeBuilder {
                 service = ServerInterceptors.intercept(service, interceptors);
             }
             for (ServerMethodDefinition<?, ?> method : service.getMethods()) {
-                Route route = files.routeFor(
-                        service,
-                        (ServerMethodDefinition<Message, Message>) method);
-                routes.add(route);
+                files
+                        .routeFor(service, (ServerMethodDefinition<Message, Message>) method)
+                        .ifPresent(routes::add);
             }
         }
 
