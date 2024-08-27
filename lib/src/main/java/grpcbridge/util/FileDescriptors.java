@@ -1,5 +1,6 @@
 package grpcbridge.util;
 
+import com.google.api.AnnotationsProto;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import grpcbridge.Exceptions.ConfigurationException;
@@ -41,21 +42,25 @@ public final class FileDescriptors {
     }
 
     /**
-     * Returns {@link Route} instance for the specified service/method.
+     * Returns {@link Route} instance for the specified service/method, if
+     * annotated as an HTTP method.
      *
      * @param service service definition
      * @param method method definition
      * @return route for the given service/method combination
      */
-    public Route routeFor(
+    public Optional<Route> routeFor(
             ServerServiceDefinition service,
             ServerMethodDefinition<Message, Message> method) {
         for (Descriptors.FileDescriptor file: files) {
-            Optional<Route> route = serviceFor(file, service)
-                    .flatMap(s -> methodFor(s, method))
-                    .map(m -> new Route(m, method));
-            if (route.isPresent()) {
-                return route.get();
+            Optional<Descriptors.MethodDescriptor> protoMethod = serviceFor(file, service)
+                    .flatMap(s -> methodFor(s, method));
+            if (protoMethod.isPresent()) {
+                if (protoMethod.get().getOptions().hasExtension(AnnotationsProto.http)) {
+                    return Optional.of(new Route(protoMethod.get(), method));
+                } else {
+                    return Optional.empty();
+                }
             }
         }
 

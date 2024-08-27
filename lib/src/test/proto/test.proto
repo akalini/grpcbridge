@@ -230,4 +230,6 @@ service TestService {
         get: "/get-stream/{string_field}"
     };
   }
+
+  rpc NoHttpMethod (GetRequest) returns (GetResponse);
 }

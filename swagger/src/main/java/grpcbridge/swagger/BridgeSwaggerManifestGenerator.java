@@ -71,6 +71,9 @@ public final class BridgeSwaggerManifestGenerator implements SwaggerManifestGene
     }
 
     private void applyMethodDescriptor(SwaggerSchema schema, MethodDescriptor descriptor) {
+        if (!descriptor.getOptions().hasExtension(AnnotationsProto.http)) {
+            return;
+        }
         BridgeHttpRule rule = BridgeHttpRule.create(
                 descriptor.getOptions().getExtension(AnnotationsProto.http)
         );
